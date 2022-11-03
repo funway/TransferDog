@@ -8,15 +8,3 @@
 .idea/
 # 忽略任意 .svn 目录
 .svn/
-
-# 忽略任意以test打头的文件
-test*
-
-# 忽略指定文件
-/version_info.txt
-/log/*.log*
-
-# 忽略指定目录
-/build/
-/dist/
-
