@@ -39,14 +39,15 @@ def main(arg=None):
     # 生成QApplication主程序
     app = QApplication(sys.argv)
     
-    # 生成并显示主窗口
-    main_window = MainWindow()
-
     # 加载 stylesheet
+    #   由于 QtDesigner 工具不支持加载外部 qss 文件，所以如果想要在 QtDesigner 中预览样式，
+    #   就需要在根节点（比如 QMainWindow）上右键选择 "Change styleSheet"，然后将 qss 文件内容拷贝进去
     with open(os.path.dirname(__file__) + '/ui/resources/stylesheets/default.qss', 'r') as qss_file:
         qss = qss_file.read()
         app.setStyleSheet(qss)
 
+    # 生成并显示主窗口
+    main_window = MainWindow()
     main_window.show()
 
     # 进入主程序循环直到退出
