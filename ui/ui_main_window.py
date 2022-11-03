@@ -13,6 +13,20 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
+        MainWindow.setStyleSheet("QToolBar {\n"
+"    /* set style for QToolBar */\n"
+"}\n"
+"QToolBar QToolButton {\n"
+"    /* set style for QToolButtons in QToolBar */\n"
+"    font-size: 15px;\n"
+"}\n"
+"QToolBar QToolButton:hover {\n"
+"    border-radius: 5px;\n"
+"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #fdfbf7, stop: 1 #cfccc7);\n"
+"}\n"
+"QToolBar QToolButton:pressed {\n"
+"    /* background-color: blue; */\n"
+"}")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         MainWindow.setCentralWidget(self.centralwidget)
@@ -33,8 +47,11 @@ class Ui_MainWindow(object):
         icon1.addPixmap(QtGui.QPixmap("/Users/funway/project/python/TransferDog/ui/resources/list.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.actionEditTask.setIcon(icon1)
         self.actionEditTask.setObjectName("actionEditTask")
+        self.actionTest = QtGui.QAction(MainWindow)
+        self.actionTest.setObjectName("actionTest")
         self.toolBar.addAction(self.actionNewTask)
         self.toolBar.addAction(self.actionEditTask)
+        self.toolBar.addAction(self.actionTest)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -47,3 +64,4 @@ class Ui_MainWindow(object):
         self.actionNewTask.setToolTip(_translate("MainWindow", "Add new transfer task"))
         self.actionEditTask.setText(_translate("MainWindow", "EditTask"))
         self.actionEditTask.setToolTip(_translate("MainWindow", "Edit a task\'s property"))
+        self.actionTest.setText(_translate("MainWindow", "Test"))

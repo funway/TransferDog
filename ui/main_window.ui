@@ -13,6 +13,22 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QToolBar {
+	/* set style for QToolBar */
+}
+QToolBar QToolButton {
+	/* set style for QToolButtons in QToolBar */
+	font-size: 15px;
+}
+QToolBar QToolButton:hover {
+	border-radius: 5px;
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #fdfbf7, stop: 1 #cfccc7);
+}
+QToolBar QToolButton:pressed {
+	/* background-color: blue; */
+}</string>
+  </property>
   <widget class="QWidget" name="centralwidget"/>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
@@ -29,6 +45,7 @@
    </attribute>
    <addaction name="actionNewTask"/>
    <addaction name="actionEditTask"/>
+   <addaction name="actionTest"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionNewTask">
@@ -53,6 +70,11 @@
    </property>
    <property name="toolTip">
     <string>Edit a task's property</string>
+   </property>
+  </action>
+  <action name="actionTest">
+   <property name="text">
+    <string>Test</string>
    </property>
   </action>
  </widget>

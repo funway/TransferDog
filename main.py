@@ -5,8 +5,9 @@
 # Created: 2022/11/03 20:23:34
 
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow
+from PyQt6.QtWidgets import QApplication, QMainWindow, QDialog
 from ui.ui_main_window import Ui_MainWindow
+from task_edit_dialog import TaskEditDialog
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """docstring for MainWindow."""
@@ -14,6 +15,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__()
         
         self.setupUi(self)
+        
+        # 绑定信号-槽
+        self.actionNewTask.triggered.connect(self.slot_show_edit_task_dialog)
+
+        pass
+
+    def slot_show_edit_task_dialog(self):
+        
+        dialog = TaskEditDialog()
+
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            print("dialog save!")
+            print("task name: %s" % dialog.lineEditTaskName.text())
+        else:
+            print("dialog cancel")
+
         pass
     
 
