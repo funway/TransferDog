@@ -22,16 +22,12 @@ def main(arg=None):
     # 生成QApplication主程序
     app = QApplication(sys.argv)
     
-    # 设置即使所有窗口都关闭也不退出程序
-    app.setQuitOnLastWindowClosed(False)
-
     # 生成并显示主窗口
     main_window = MainWindow()
     main_window.show()
 
     # 进入主程序循环直到退出
     sys.exit(app.exec())
-
     pass
 
 
