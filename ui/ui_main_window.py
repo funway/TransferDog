@@ -13,20 +13,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
-        MainWindow.setStyleSheet("QToolBar {\n"
-"    /* set style for QToolBar */\n"
-"}\n"
-"QToolBar QToolButton {\n"
-"    /* set style for QToolButtons in QToolBar */\n"
-"    font-size: 15px;\n"
-"}\n"
-"QToolBar QToolButton:hover {\n"
-"    border-radius: 5px;\n"
-"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #fdfbf7, stop: 1 #cfccc7);\n"
-"}\n"
-"QToolBar QToolButton:pressed {\n"
-"    /* background-color: blue; */\n"
-"}")
+        MainWindow.setStyleSheet("")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         MainWindow.setCentralWidget(self.centralwidget)

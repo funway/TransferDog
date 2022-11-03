@@ -4,7 +4,7 @@
 # Author:  funway.wang
 # Created: 2022/11/03 20:23:34
 
-import sys
+import os, sys
 from PyQt6.QtWidgets import QApplication, QMainWindow, QDialog
 from ui.ui_main_window import Ui_MainWindow
 from task_edit_dialog import TaskEditDialog
@@ -41,6 +41,12 @@ def main(arg=None):
     
     # 生成并显示主窗口
     main_window = MainWindow()
+
+    # 加载 stylesheet
+    with open(os.path.dirname(__file__) + '/ui/resources/stylesheets/default.qss', 'r') as qss_file:
+        qss = qss_file.read()
+        app.setStyleSheet(qss)
+
     main_window.show()
 
     # 进入主程序循环直到退出

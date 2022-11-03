@@ -1,0 +1,20 @@
+/*
+Author:  funway.wang
+Created: 2022.11.04 00:00
+ */
+
+QToolBar {
+	/* set style for QToolBar */
+}
+
+QToolBar QToolButton {
+	/* set style for QToolButtons in QToolBar */
+	font-size: 15px;
+}
+QToolBar QToolButton:hover {
+	border-radius: 5px;
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #fdfbf7, stop: 1 #cfccc7);
+}
+QToolBar QToolButton:pressed {
+	background-color: blue;
+}
