@@ -8,3 +8,6 @@
 .idea/
 # 忽略任意 .svn 目录
 .svn/
+
+# 忽略单个文件
+/conf/config.db

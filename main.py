@@ -4,20 +4,56 @@
 # Author:  funway.wang
 # Created: 2022/11/03 20:23:34
 
-import os, sys
+import os, sys, sqlite3
 from PyQt6.QtWidgets import QApplication, QMainWindow, QDialog
 from ui.ui_main_window import Ui_MainWindow
 from task_edit_dialog import TaskEditDialog
 
+BASE_PATH = os.path.dirname(__file__)
+CONFIG_DB = BASE_PATH + '/conf/config.db'
+CONFIG_TABLE_TASKS = 'tasks'
+
 class MainWindow(QMainWindow, Ui_MainWindow):
     """docstring for MainWindow."""
+
     def __init__(self):
         super(MainWindow, self).__init__()
         
+        # 定义成员变量
+        self.config_db_conn = None
+        self.config_db_cursor = None
+        self.load_config()
+
+        # 装载 UI
         self.setupUi(self)
         
         # 绑定信号-槽
         self.actionNewTask.triggered.connect(self.slot_show_edit_task_dialog)
+
+        pass
+
+    def load_config(self, config_db = CONFIG_DB):
+        os.makedirs(os.path.dirname(config_db), exist_ok=True)
+        self.config_db_conn = sqlite3.connect(config_db)
+        self.config_db_cursor = self.config_db_conn.cursor()
+
+        try:
+            res = self.config_db_cursor.execute('SELECT * FROM {tb}'.format(tb=CONFIG_TABLE_TASKS))
+            pass
+        except Exception as e:
+            print("任务表不存在，准备新建任务表")
+            sql_create = """CREATE TABLE {tb}(
+                name TEXT NOT NULL, 
+                enabled INTEGER NOT NULL CHECK(enabled IN (0, 1))
+                );
+            """.format(tb=CONFIG_TABLE_TASKS)
+
+            self.config_db_cursor.execute(sql_create)
+            pass
+        else:
+            pass
+        finally:
+            pass
 
         pass
 
@@ -27,10 +63,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         if dialog.exec() == QDialog.DialogCode.Accepted:
             print("dialog save!")
-            print("task name: %s" % dialog.lineEditTaskName.text())
+            self.add_task(dialog)
         else:
-            print("dialog cancel")
+            print("dialog cancelled")
+        pass
 
+    def add_task(self, dialog:TaskEditDialog):
+        print("task name: %s" % dialog.lineEditTaskName.text())
+
+        sql_insert = """INSERT INTO {tb} VALUES (?, ?)
+        """.format(tb=CONFIG_TABLE_TASKS)
+        
+        self.config_db_cursor.execute(sql_insert, (dialog.lineEditTaskName.text(), False))
+        self.config_db_conn.commit()
+        pass
+
+    def __del__(self):
+        if self.config_db_cursor is not None:
+            self.config_db_cursor.close()
+        if self.config_db_conn is not None:
+            self.config_db_conn.close()
         pass
     
 
@@ -42,7 +94,7 @@ def main(arg=None):
     # 加载 stylesheet
     #   由于 QtDesigner 工具不支持加载外部 qss 文件，所以如果想要在 QtDesigner 中预览样式，
     #   就需要在根节点（比如 QMainWindow）上右键选择 "Change styleSheet"，然后将 qss 文件内容拷贝进去
-    with open(os.path.dirname(__file__) + '/ui/resources/stylesheets/default.qss', 'r') as qss_file:
+    with open(BASE_PATH + '/ui/resources/stylesheets/default.qss', 'r') as qss_file:
         qss = qss_file.read()
         app.setStyleSheet(qss)
 
