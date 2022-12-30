@@ -4,20 +4,22 @@
 # Author:  funway.wang
 # Created: 2022/11/03 20:23:34
 
-import os, sys, sqlite3
-from PyQt6.QtWidgets import QApplication, QMainWindow, QDialog
+import os, sys, sqlite3, logging, logging.config
+from PyQt6.QtWidgets import QApplication, QMainWindow, QDialog, QMessageBox
 from ui.ui_main_window import Ui_MainWindow
 from task_edit_dialog import TaskEditDialog
 
-BASE_PATH = os.path.dirname(__file__)
-CONFIG_DB = BASE_PATH + '/conf/config.db'
-CONFIG_TABLE_TASKS = 'tasks'
+from utilities.constants import *
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """docstring for MainWindow."""
 
     def __init__(self):
         super(MainWindow, self).__init__()
+
+        # 设置 logger
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.debug('Init a %s instance' % self.__class__.__name__)
         
         # 定义成员变量
         self.config_db_conn = None
@@ -41,7 +43,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             res = self.config_db_cursor.execute('SELECT * FROM {tb}'.format(tb=CONFIG_TABLE_TASKS))
             pass
         except Exception as e:
-            print("任务表不存在，准备新建任务表")
+            self.logger.debug("任务表不存在，准备新建任务表")
             sql_create = """CREATE TABLE {tb}(
                 name TEXT NOT NULL, 
                 enabled INTEGER NOT NULL CHECK(enabled IN (0, 1))
@@ -62,19 +64,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         dialog = TaskEditDialog()
 
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            print("dialog save!")
+            self.logger.debug("dialog save clicked!")
             self.add_task(dialog)
         else:
-            print("dialog cancelled")
+            self.logger.debug("dialog cancel clicked")
         pass
 
     def add_task(self, dialog:TaskEditDialog):
-        print("task name: %s" % dialog.lineEditTaskName.text())
+        self.logger.debug("task name: %s" % dialog.leditTaskName.text())
 
         sql_insert = """INSERT INTO {tb} VALUES (?, ?)
         """.format(tb=CONFIG_TABLE_TASKS)
         
-        self.config_db_cursor.execute(sql_insert, (dialog.lineEditTaskName.text(), False))
+        self.config_db_cursor.execute(sql_insert, (dialog.leditTaskName.text(), False))
         self.config_db_conn.commit()
         pass
 
@@ -87,9 +89,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
 
 def main(arg=None):
+    # 设置工作目录
+    os.chdir(BASE_PATH)
     
     # 生成QApplication主程序
     app = QApplication(sys.argv)
+
+    # 设置即使所有窗口都关闭也不退出程序
+    # app.setQuitOnLastWindowClosed(False)
+
+    # 设置日志 logging
+    try:
+        logging.config.fileConfig(LOGGING_CONFIG)
+    except Exception as e:
+        logging.exception('load logging config file failed! [%s]', LOGGING_CONFIG)
+        QMessageBox.critical(None, '配置文件错误', 'Fail to load %s' % LOGGING_CONFIG)
+        sys.exit(-1)
     
     # 加载 stylesheet
     #   由于 QtDesigner 工具不支持加载外部 qss 文件，所以如果想要在 QtDesigner 中预览样式，
