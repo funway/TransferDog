@@ -10,9 +10,9 @@
 .svn/
 
 # 忽略单个文件
-/conf/config.db
+/transfer_dog/conf/config.db
 
 # 忽略目录
 /ideas/
-/test/
-/log/
+/tests/
+/transfer_dog/log/
