@@ -7,7 +7,7 @@
 import os, sys, sqlite3, logging, logging.config
 from PyQt6.QtWidgets import QApplication, QMainWindow, QDialog, QMessageBox
 from ui.ui_main_window import Ui_MainWindow
-from task_edit_dialog import TaskEditDialog
+from dialog_task_edit import DialogTaskEdit
 
 from utilities.constants import *
 
@@ -30,7 +30,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         
         # 绑定信号-槽
-        self.actionNewTask.triggered.connect(self.slot_show_edit_task_dialog)
+        self.actionNewTask.triggered.connect(self.slot_show_dialog_task_edit)
 
         pass
 
@@ -59,9 +59,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         pass
 
-    def slot_show_edit_task_dialog(self):
+    def slot_show_dialog_task_edit(self):
         
-        dialog = TaskEditDialog()
+        dialog = DialogTaskEdit()
 
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.logger.debug("dialog save clicked!")
@@ -70,7 +70,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.logger.debug("dialog cancel clicked")
         pass
 
-    def add_task(self, dialog:TaskEditDialog):
+    def add_task(self, dialog:DialogTaskEdit):
         self.logger.debug("task name: %s" % dialog.leditTaskName.text())
 
         sql_insert = """INSERT INTO {tb} VALUES (?, ?)

@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file '/Users/funway/project/python/TransferDog/ui/main_window.ui'
+# Form implementation generated from reading ui file '/Users/funway/project/python/TransferDog/transfer_dog/ui/main_window.ui'
 #
 # Created by: PyQt6 UI code generator 6.3.1
 #
@@ -26,12 +26,12 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusBar)
         self.actionNewTask = QtGui.QAction(MainWindow)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("/Users/funway/project/python/TransferDog/ui/resources/icons/add.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon.addPixmap(QtGui.QPixmap("/Users/funway/project/python/TransferDog/transfer_dog/ui/resources/icons/add.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.actionNewTask.setIcon(icon)
         self.actionNewTask.setObjectName("actionNewTask")
         self.actionEditTask = QtGui.QAction(MainWindow)
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("/Users/funway/project/python/TransferDog/ui/resources/icons/list.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon1.addPixmap(QtGui.QPixmap("/Users/funway/project/python/TransferDog/transfer_dog/ui/resources/icons/list.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.actionEditTask.setIcon(icon1)
         self.actionEditTask.setObjectName("actionEditTask")
         self.actionTest = QtGui.QAction(MainWindow)
