@@ -4,12 +4,17 @@
 # Author:  funway.wang
 # Created: 2022/11/03 20:23:34
 
-import os, sys, sqlite3, logging, logging.config
+import os, sys, logging, logging.config
+
 from PyQt6.QtWidgets import QApplication, QMainWindow, QDialog, QMessageBox
+from peewee import SqliteDatabase
+from playhouse.shortcuts import model_to_dict
+
+from utilities.constants import *
+from models.task import Task
 from ui.ui_main_window import Ui_MainWindow
 from dialog_task_edit import DialogTaskEdit
 
-from utilities.constants import *
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """docstring for MainWindow."""
@@ -22,69 +27,49 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.logger.debug('Init a %s instance' % self.__class__.__name__)
         
         # 定义成员变量
-        self.config_db_conn = None
-        self.config_db_cursor = None
+        self.db = None
+
+        # 读取配置文件
         self.load_config()
 
         # 装载 UI
         self.setupUi(self)
         
         # 绑定信号-槽
-        self.actionNewTask.triggered.connect(self.slot_show_dialog_task_edit)
+        self.actionNewTask.triggered.connect(lambda: self.show_dialog_task_edit(None))
 
         pass
 
-    def load_config(self, config_db = CONFIG_DB):
-        os.makedirs(os.path.dirname(config_db), exist_ok=True)
-        self.config_db_conn = sqlite3.connect(config_db)
-        self.config_db_cursor = self.config_db_conn.cursor()
+    def load_config(self, db_file=CONFIG_DB):
+        # 从指定文件创建数据库链接（如果不存在该文件，会主动创建）
+        self.db = SqliteDatabase(db_file, autoconnect=False)
+        self.db.connect()
 
-        try:
-            res = self.config_db_cursor.execute('SELECT * FROM {tb}'.format(tb=CONFIG_TABLE_TASKS))
-            pass
-        except Exception as e:
-            self.logger.debug("任务表不存在，准备新建任务表")
-            sql_create = """CREATE TABLE {tb}(
-                name TEXT NOT NULL, 
-                enabled INTEGER NOT NULL CHECK(enabled IN (0, 1))
-                );
-            """.format(tb=CONFIG_TABLE_TASKS)
-
-            self.config_db_cursor.execute(sql_create)
-            pass
-        else:
-            pass
-        finally:
-            pass
+        # 将 models 绑定到数据库，并创建对应的数据库表（if not exist）
+        self.db.bind([Task,])
+        self.db.create_tables([Task,], safe=True)
 
         pass
 
-    def slot_show_dialog_task_edit(self):
+    def show_dialog_task_edit(self, task:Task=None):
+        self.logger.debug('show dialog_task_edit with task: %s', task)
         
-        dialog = DialogTaskEdit()
+        dialog = DialogTaskEdit(task=task)
 
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.logger.debug("dialog save clicked!")
-            self.add_task(dialog)
+            task = dialog.retrieve_task()
+            self.logger.debug('retrieve task: %s', model_to_dict(task))
+            try:
+                task.save()
+            except Exception as e:
+                self.logger.exception('保存任务失败！')
         else:
             self.logger.debug("dialog cancel clicked")
         pass
 
-    def add_task(self, dialog:DialogTaskEdit):
-        self.logger.debug("task name: %s" % dialog.leditTaskName.text())
-
-        sql_insert = """INSERT INTO {tb} VALUES (?, ?)
-        """.format(tb=CONFIG_TABLE_TASKS)
-        
-        self.config_db_cursor.execute(sql_insert, (dialog.leditTaskName.text(), False))
-        self.config_db_conn.commit()
-        pass
-
     def __del__(self):
-        if self.config_db_cursor is not None:
-            self.config_db_cursor.close()
-        if self.config_db_conn is not None:
-            self.config_db_conn.close()
+        self.db.close()
         pass
     
 
@@ -105,7 +90,7 @@ def main(arg=None):
         logging.exception('load logging config file failed! [%s]', LOGGING_CONFIG)
         QMessageBox.critical(None, '配置文件错误', 'Fail to load %s' % LOGGING_CONFIG)
         sys.exit(-1)
-    
+
     # 加载 stylesheet
     #   由于 QtDesigner 工具不支持加载外部 qss 文件，所以如果想要在 QtDesigner 中预览样式，
     #   就需要在根节点（比如 QMainWindow）上右键选择 "Change styleSheet"，然后将 qss 文件内容拷贝进去

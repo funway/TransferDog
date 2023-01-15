@@ -40,15 +40,19 @@ QGroupBox::title {
       <string>General</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
+      <item row="1" column="2">
+       <widget class="QCheckBox" name="checkBox_task_enabled">
         <property name="text">
-         <string>Task Name</string>
+         <string>Enable</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="lineEdit"/>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="lineEdit_task_schedule">
+        <property name="placeholderText">
+         <string>* * * * *</string>
+        </property>
+       </widget>
       </item>
       <item row="0" column="2">
        <widget class="QLabel" name="label_2">
@@ -57,10 +61,13 @@ QGroupBox::title {
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
-       <widget class="QComboBox" name="comboBox">
-        <property name="editable">
-         <bool>true</bool>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="lineEdit_task_name"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Task Name</string>
         </property>
        </widget>
       </item>
@@ -71,17 +78,10 @@ QGroupBox::title {
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="lineEdit_2">
-        <property name="placeholderText">
-         <string>* * * * *</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QCheckBox" name="checkBox">
-        <property name="text">
-         <string>Enable</string>
+      <item row="0" column="3">
+       <widget class="QComboBox" name="comboBox_task_group">
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -104,17 +104,39 @@ QGroupBox::title {
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="radioButton">
+         <widget class="QRadioButton" name="radioButton_src_local">
           <property name="text">
            <string>Local</string>
           </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">buttonGroup_src_protocol</string>
+          </attribute>
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="radioButton_2">
+         <widget class="QRadioButton" name="radioButton_src_ftp">
           <property name="text">
            <string>FTP</string>
           </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">buttonGroup_src_protocol</string>
+          </attribute>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButton_src_sftp">
+          <property name="text">
+           <string>SFTP</string>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">buttonGroup_src_protocol</string>
+          </attribute>
          </widget>
         </item>
         <item>
@@ -133,7 +155,10 @@ QGroupBox::title {
        </layout>
       </item>
       <item>
-       <widget class="QGroupBox" name="groupBox_5">
+       <widget class="QGroupBox" name="groupBox_src_server">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="title">
          <string>Server</string>
         </property>
@@ -146,7 +171,7 @@ QGroupBox::title {
           </widget>
          </item>
          <item row="3" column="2">
-          <widget class="QCheckBox" name="checkBox_2">
+          <widget class="QCheckBox" name="checkBox_src_server_passive">
            <property name="text">
             <string>Passive Mode</string>
            </property>
@@ -156,7 +181,7 @@ QGroupBox::title {
           </widget>
          </item>
          <item row="3" column="1">
-          <widget class="QComboBox" name="comboBox_3">
+          <widget class="QComboBox" name="comboBox_src_server_encoding">
            <item>
             <property name="text">
              <string>UTF8</string>
@@ -193,7 +218,7 @@ QGroupBox::title {
           </spacer>
          </item>
          <item row="0" column="1" colspan="3">
-          <widget class="QLineEdit" name="lineEdit_3">
+          <widget class="QLineEdit" name="lineEdit_src_server_address">
            <property name="placeholderText">
             <string>username:password@host:port</string>
            </property>
@@ -212,10 +237,10 @@ QGroupBox::title {
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_4"/>
+         <widget class="QLineEdit" name="lineEdit_src_dir"/>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="pushButton_src_dir">
           <property name="text">
            <string>Browse</string>
           </property>
@@ -259,7 +284,7 @@ QGroupBox::title {
        </widget>
       </item>
       <item row="1" column="2">
-       <widget class="QCheckBox" name="checkBox_3">
+       <widget class="QCheckBox" name="checkBox_scan_subdir">
         <property name="text">
          <string>Scan Subdirectories</string>
         </property>
@@ -279,7 +304,7 @@ QGroupBox::title {
        </spacer>
       </item>
       <item row="1" column="3">
-       <widget class="QCheckBox" name="checkBox_4">
+       <widget class="QCheckBox" name="checkBox_delete_source">
         <property name="text">
          <string>Delete Source</string>
         </property>
@@ -293,41 +318,14 @@ QGroupBox::title {
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QComboBox" name="comboBox_2">
-        <item>
-         <property name="text">
-          <string>All Time</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>10 Minutes</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>30 Minutes</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>1 Hour</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>3 Hours</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>12 Hours</string>
-         </property>
-        </item>
-       </widget>
+       <widget class="QComboBox" name="comboBox_filter_valid_time"/>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="lineEdit_5"/>
+       <widget class="QLineEdit" name="lineEdit_filter_filename">
+        <property name="text">
+         <string>.*</string>
+        </property>
+       </widget>
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label_8">
@@ -355,17 +353,36 @@ QGroupBox::title {
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="radioButton_5">
+         <widget class="QRadioButton" name="radioButton_dest_local">
           <property name="text">
            <string>Local</string>
           </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">buttonGroup_dest_protocol</string>
+          </attribute>
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="radioButton_6">
+         <widget class="QRadioButton" name="radioButton_dest_ftp">
           <property name="text">
            <string>FTP</string>
           </property>
+          <attribute name="buttonGroup">
+           <string notr="true">buttonGroup_dest_protocol</string>
+          </attribute>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButton_dest_sftp">
+          <property name="text">
+           <string>SFTP</string>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">buttonGroup_dest_protocol</string>
+          </attribute>
          </widget>
         </item>
         <item>
@@ -384,7 +401,10 @@ QGroupBox::title {
        </layout>
       </item>
       <item>
-       <widget class="QGroupBox" name="groupBox_6">
+       <widget class="QGroupBox" name="groupBox_dest_server">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="title">
          <string>Server</string>
         </property>
@@ -397,7 +417,7 @@ QGroupBox::title {
           </widget>
          </item>
          <item row="3" column="2">
-          <widget class="QCheckBox" name="checkBox_6">
+          <widget class="QCheckBox" name="checkBox_dest_server_passive">
            <property name="text">
             <string>Passive Mode</string>
            </property>
@@ -407,7 +427,7 @@ QGroupBox::title {
           </widget>
          </item>
          <item row="3" column="1">
-          <widget class="QComboBox" name="comboBox_5">
+          <widget class="QComboBox" name="comboBox_dest_server_encoding">
            <item>
             <property name="text">
              <string>UTF8</string>
@@ -444,7 +464,7 @@ QGroupBox::title {
           </spacer>
          </item>
          <item row="0" column="1" colspan="3">
-          <widget class="QLineEdit" name="lineEdit_8">
+          <widget class="QLineEdit" name="lineEdit_dest_server_address">
            <property name="placeholderText">
             <string>username:password@host:port</string>
            </property>
@@ -463,10 +483,10 @@ QGroupBox::title {
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_9"/>
+         <widget class="QLineEdit" name="lineEdit_dest_dir"/>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_4">
+         <widget class="QPushButton" name="pushButton_dest_dir">
           <property name="text">
            <string>Browse</string>
           </property>
@@ -502,6 +522,33 @@ QGroupBox::title {
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>lineEdit_task_name</tabstop>
+  <tabstop>comboBox_task_group</tabstop>
+  <tabstop>lineEdit_task_schedule</tabstop>
+  <tabstop>checkBox_task_enabled</tabstop>
+  <tabstop>radioButton_src_local</tabstop>
+  <tabstop>radioButton_src_ftp</tabstop>
+  <tabstop>radioButton_src_sftp</tabstop>
+  <tabstop>lineEdit_src_server_address</tabstop>
+  <tabstop>comboBox_src_server_encoding</tabstop>
+  <tabstop>checkBox_src_server_passive</tabstop>
+  <tabstop>lineEdit_src_dir</tabstop>
+  <tabstop>pushButton_src_dir</tabstop>
+  <tabstop>lineEdit_filter_filename</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>comboBox_filter_valid_time</tabstop>
+  <tabstop>checkBox_scan_subdir</tabstop>
+  <tabstop>checkBox_delete_source</tabstop>
+  <tabstop>radioButton_dest_local</tabstop>
+  <tabstop>radioButton_dest_ftp</tabstop>
+  <tabstop>radioButton_dest_sftp</tabstop>
+  <tabstop>lineEdit_dest_server_address</tabstop>
+  <tabstop>comboBox_dest_server_encoding</tabstop>
+  <tabstop>checkBox_dest_server_passive</tabstop>
+  <tabstop>lineEdit_dest_dir</tabstop>
+  <tabstop>pushButton_dest_dir</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -537,4 +584,8 @@ QGroupBox::title {
    </hints>
   </connection>
  </connections>
+ <buttongroups>
+  <buttongroup name="buttonGroup_dest_protocol"/>
+  <buttongroup name="buttonGroup_src_protocol"/>
+ </buttongroups>
 </ui>

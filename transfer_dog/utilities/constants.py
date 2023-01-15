@@ -12,9 +12,8 @@ APP_VERSION = '0.0.1'
 # 程序主目录
 BASE_PATH = path.dirname(path.dirname(__file__))
 
-# 程序配置文件
-CONFIG_DB = BASE_PATH + '/conf/config.db'
-
-CONFIG_TABLE_TASKS = 'tasks'
-
+# 日志配置文件
 LOGGING_CONFIG = BASE_PATH + '/conf/logging.conf'
+
+# 程序配置库
+CONFIG_DB = BASE_PATH + '/conf/app.db'
