@@ -6,10 +6,13 @@
 
 import logging
 from urllib.parse import urlparse
+from typing import Optional
 from datetime import datetime
 
-import croniter
-from PyQt6.QtWidgets import QDialog, QFileDialog
+from croniter import croniter
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QFontMetrics
+from PyQt6.QtWidgets import QDialog, QFileDialog, QButtonGroup, QLineEdit
 
 from models.task import Task
 from ui.ui_dialog_task_edit import Ui_Dialog
@@ -50,8 +53,8 @@ class DialogTaskEdit(QDialog, Ui_Dialog):
         # 绑定 信号-槽
         self.buttonGroup_src_protocol.buttonToggled.connect(self.update_groupBox_src_server)
         self.buttonGroup_dest_protocol.buttonToggled.connect(self.update_groupBox_dest_server)
-        self.pushButton_src_dir.clicked.connect(lambda: self.open_file_dialog_to(self.lineEdit_src_dir))
-        self.pushButton_dest_dir.clicked.connect(lambda: self.open_file_dialog_to(self.lineEdit_dest_dir))
+        self.pushButton_src_browse.clicked.connect(lambda: self.open_file_dialog_to(self.lineEdit_src_dir))
+        self.pushButton_dest_browse.clicked.connect(lambda: self.open_file_dialog_to(self.lineEdit_dest_dir))
 
         pass
 
@@ -129,46 +132,99 @@ class DialogTaskEdit(QDialog, Ui_Dialog):
         pass
 
     def update_groupBox_src_server(self, btn, checked):
-        self.logger.debug('btn %s, toggled to %s', btn.objectName(), checked)
+        # self.logger.debug('btn %s, toggled to %s', btn.objectName(), checked)
 
         if not checked:
             return
         elif btn is self.radioButton_src_local:
             self.logger.debug('radioButton_src_local checked!')
             self.groupBox_src_server.setEnabled(False)
+            self.pushButton_src_browse.setEnabled(True)
         else:
             self.logger.debug('radioButton_src_ftp/sftp checked!')
             self.groupBox_src_server.setEnabled(True)
+            self.pushButton_src_browse.setEnabled(False)
         pass
 
     def update_groupBox_dest_server(self, btn, checked):
-        self.logger.debug('btn %s, toggled to %s', btn.objectName(), checked)
+        # self.logger.debug('btn %s, toggled to %s', btn.objectName(), checked)
         
         if not checked:
             return
         elif btn is self.radioButton_dest_local:
             self.logger.debug('radioButton_dest_local checked!')
             self.groupBox_dest_server.setEnabled(False)
+            self.pushButton_dest_browse.setEnabled(True)
         else:
             self.logger.debug('radioButton_dest_ftp/sftp checked!')
             self.groupBox_dest_server.setEnabled(True)
+            self.pushButton_dest_browse.setEnabled(False)
 
         pass
+    
+    def get_server_url(self, btng:QButtonGroup, le:QLineEdit) -> str:
+        """获取服务器的 URL 地址。
 
-    def validate_user_input(self):
-        
+        Args:
+            btng (QButtonGroup): 选择协议的 button group
+            le (QLineEdit): 地址输入框
+
+        Returns:
+            str: 以 protocol://address 的格式返回 URL 字符串。
+        """
+        protocol = btng.checkedButton().text().lower()
+        return protocol + '://' + le.text()
+
+    def validate_user_input(self) -> str | None:
+        """validate user input from dialog.
+
+        Returns:
+            str | None: return error message, or None if there is no error.
+        """
+
+        self.logger.debug('验证用户输入')
+
+        # 验证 调度时间
         if not croniter.is_valid(self.lineEdit_task_schedule.text()):
-            return 'schedule syntax error!'
-
-        pass
+            self.lineEdit_task_schedule.setFocus()
+            self.logger.warning('调度时间输入有误！')
+            return 'Schedule syntax error!'
+        self.logger.debug('调度时间验证通过')
+        
+        try:
+            # 验证 源服务器地址
+            h = 'Source'
+            o = urlparse(self.get_server_url(self.buttonGroup_src_protocol, self.lineEdit_src_server_address))
+            if o.scheme != 'local':
+                assert o.hostname is not None, 'Host is None.'
+            o.port # urlparse 执行时不会对 port 错误抛出异常，只有在调用 port 的时候才会。
+            
+            # 验证 目标服务器地址
+            h = 'Destination'
+            o = urlparse(self.get_server_url(self.buttonGroup_dest_protocol, self.lineEdit_dest_server_address))
+            if o.scheme != 'local':
+                assert o.hostname is not None, 'Host is None.'
+            o.port # urlparse 执行时不会对 port 错误抛出异常，只有在调用 port 的时候才会。
+        except Exception as e:
+            self.lineEdit_src_server_address.setFocus()
+            self.logger.warning('%s 服务器地址输入有误！ %s', h, str(e))
+            return h + ' address error! ' + str(e)
+        
+        self.logger.debug('地址栏验证通过')
+        return None
     
     def accept(self):
         """overwrite QDialog.accept() method. validate user input before accept.
         """
         self.logger.debug('用户点击 accept 按钮，准备对用户输入进行格式验证。')
 
-        super().accept()
-
+        msg = self.validate_user_input()
+        if msg is None:
+            super().accept()
+        else:
+            # QLabel 不支持长字符串的自动 elide 成 'This is long tex...'，要用 QFontMetrics 实现
+            self.label_error_msg.setText(QFontMetrics(self.label_error_msg.font()).elidedText(msg, Qt.TextElideMode.ElideRight, 250))
+            self.label_error_msg.setToolTip(msg)
 
 def test(arg=None):
 

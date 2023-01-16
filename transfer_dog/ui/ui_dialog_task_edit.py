@@ -12,7 +12,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(650, 692)
+        Dialog.resize(650, 704)
         Dialog.setStyleSheet("QGroupBox {\n"
 "    font: bold;\n"
 "    border: 1px solid silver;\n"
@@ -24,6 +24,10 @@ class Ui_Dialog(object):
 "    subcontrol-origin: margin;\n"
 "    left: 7px;\n"
 "    padding: 0px 5px 0px 5px;\n"
+"}\n"
+"\n"
+"QLabel#label_error_msg {\n"
+"    color: red;\n"
 "}")
         self.verticalLayout = QtWidgets.QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -121,9 +125,9 @@ class Ui_Dialog(object):
         self.lineEdit_src_dir = QtWidgets.QLineEdit(self.groupBox_2)
         self.lineEdit_src_dir.setObjectName("lineEdit_src_dir")
         self.horizontalLayout_2.addWidget(self.lineEdit_src_dir)
-        self.pushButton_src_dir = QtWidgets.QPushButton(self.groupBox_2)
-        self.pushButton_src_dir.setObjectName("pushButton_src_dir")
-        self.horizontalLayout_2.addWidget(self.pushButton_src_dir)
+        self.pushButton_src_browse = QtWidgets.QPushButton(self.groupBox_2)
+        self.pushButton_src_browse.setObjectName("pushButton_src_browse")
+        self.horizontalLayout_2.addWidget(self.pushButton_src_browse)
         spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem2)
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
@@ -222,18 +226,47 @@ class Ui_Dialog(object):
         self.lineEdit_dest_dir = QtWidgets.QLineEdit(self.groupBox_4)
         self.lineEdit_dest_dir.setObjectName("lineEdit_dest_dir")
         self.horizontalLayout_6.addWidget(self.lineEdit_dest_dir)
-        self.pushButton_dest_dir = QtWidgets.QPushButton(self.groupBox_4)
-        self.pushButton_dest_dir.setObjectName("pushButton_dest_dir")
-        self.horizontalLayout_6.addWidget(self.pushButton_dest_dir)
+        self.pushButton_dest_browse = QtWidgets.QPushButton(self.groupBox_4)
+        self.pushButton_dest_browse.setObjectName("pushButton_dest_browse")
+        self.horizontalLayout_6.addWidget(self.pushButton_dest_browse)
         spacerItem6 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.horizontalLayout_6.addItem(spacerItem6)
         self.verticalLayout_4.addLayout(self.horizontalLayout_6)
         self.verticalLayout.addWidget(self.groupBox_4)
-        self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
+        self.frame = QtWidgets.QFrame(Dialog)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
+        self.frame.setSizePolicy(sizePolicy)
+        self.frame.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
+        self.frame.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
+        self.frame.setObjectName("frame")
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.frame)
+        self.horizontalLayout_3.setContentsMargins(6, 0, 0, 0)
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.label_error_msg = QtWidgets.QLabel(self.frame)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_error_msg.sizePolicy().hasHeightForWidth())
+        self.label_error_msg.setSizePolicy(sizePolicy)
+        self.label_error_msg.setText("")
+        self.label_error_msg.setWordWrap(False)
+        self.label_error_msg.setObjectName("label_error_msg")
+        self.horizontalLayout_3.addWidget(self.label_error_msg)
+        self.buttonBox = QtWidgets.QDialogButtonBox(self.frame)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.buttonBox.sizePolicy().hasHeightForWidth())
+        self.buttonBox.setSizePolicy(sizePolicy)
+        self.buttonBox.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.buttonBox.setOrientation(QtCore.Qt.Orientation.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Cancel|QtWidgets.QDialogButtonBox.StandardButton.Ok)
         self.buttonBox.setObjectName("buttonBox")
-        self.verticalLayout.addWidget(self.buttonBox)
+        self.horizontalLayout_3.addWidget(self.buttonBox)
+        self.verticalLayout.addWidget(self.frame)
 
         self.retranslateUi(Dialog)
         self.buttonBox.accepted.connect(Dialog.accept) # type: ignore
@@ -249,8 +282,8 @@ class Ui_Dialog(object):
         Dialog.setTabOrder(self.lineEdit_src_server_address, self.comboBox_src_server_encoding)
         Dialog.setTabOrder(self.comboBox_src_server_encoding, self.checkBox_src_server_passive)
         Dialog.setTabOrder(self.checkBox_src_server_passive, self.lineEdit_src_dir)
-        Dialog.setTabOrder(self.lineEdit_src_dir, self.pushButton_src_dir)
-        Dialog.setTabOrder(self.pushButton_src_dir, self.lineEdit_filter_filename)
+        Dialog.setTabOrder(self.lineEdit_src_dir, self.pushButton_src_browse)
+        Dialog.setTabOrder(self.pushButton_src_browse, self.lineEdit_filter_filename)
         Dialog.setTabOrder(self.lineEdit_filter_filename, self.pushButton_2)
         Dialog.setTabOrder(self.pushButton_2, self.comboBox_filter_valid_time)
         Dialog.setTabOrder(self.comboBox_filter_valid_time, self.checkBox_scan_subdir)
@@ -262,7 +295,7 @@ class Ui_Dialog(object):
         Dialog.setTabOrder(self.lineEdit_dest_server_address, self.comboBox_dest_server_encoding)
         Dialog.setTabOrder(self.comboBox_dest_server_encoding, self.checkBox_dest_server_passive)
         Dialog.setTabOrder(self.checkBox_dest_server_passive, self.lineEdit_dest_dir)
-        Dialog.setTabOrder(self.lineEdit_dest_dir, self.pushButton_dest_dir)
+        Dialog.setTabOrder(self.lineEdit_dest_dir, self.pushButton_dest_browse)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
@@ -286,7 +319,7 @@ class Ui_Dialog(object):
         self.label_5.setText(_translate("Dialog", "Address"))
         self.lineEdit_src_server_address.setPlaceholderText(_translate("Dialog", "username:password@host:port"))
         self.label_7.setText(_translate("Dialog", "Directory"))
-        self.pushButton_src_dir.setText(_translate("Dialog", "Browse"))
+        self.pushButton_src_browse.setText(_translate("Dialog", "Browse"))
         self.groupBox_3.setTitle(_translate("Dialog", "Filter / Middleware"))
         self.pushButton_2.setText(_translate("Dialog", "Test"))
         self.checkBox_scan_subdir.setText(_translate("Dialog", "Scan Subdirectories"))
@@ -307,4 +340,4 @@ class Ui_Dialog(object):
         self.label_15.setText(_translate("Dialog", "Address"))
         self.lineEdit_dest_server_address.setPlaceholderText(_translate("Dialog", "username:password@host:port"))
         self.label_17.setText(_translate("Dialog", "Directory"))
-        self.pushButton_dest_dir.setText(_translate("Dialog", "Browse"))
+        self.pushButton_dest_browse.setText(_translate("Dialog", "Browse"))
