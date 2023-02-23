@@ -4,15 +4,15 @@
 # 忽略任意 .DS_Store 文件
 .DS_Store
 
-# 忽略任意 .idea 目录
+# 忽略目录（任意位置）
 .idea/
-# 忽略任意 .svn 目录
 .svn/
+.vscode/
 
-# 忽略单个文件
-/transfer_dog/conf/app.db
-
-# 忽略目录
+# 忽略目录（根目录下）
 /ideas/
 /tests/
 /transfer_dog/log/
+
+# 忽略单个文件
+/transfer_dog/conf/app.db

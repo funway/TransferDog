@@ -6,7 +6,7 @@
 
 import os, sys, logging, logging.config
 
-from PyQt6.QtWidgets import QApplication, QMainWindow, QDialog, QMessageBox
+from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QMessageBox
 from peewee import SqliteDatabase
 from playhouse.shortcuts import model_to_dict
 
@@ -49,6 +49,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.db.bind([Task,])
         self.db.create_tables([Task,], safe=True)
 
+        pass
+
+    def update_UI(self):
+        """执行一些无法在 setupUi() 中完成的界面更新
+        """
+        self.treeView.setHeaderHidden(True)
         pass
 
     def show_dialog_task_edit(self, task:Task=None):
@@ -97,6 +103,8 @@ def main(arg=None):
     with open(BASE_PATH + '/ui/resources/stylesheets/default.qss', 'r') as qss_file:
         qss = qss_file.read()
         app.setStyleSheet(qss)
+        # 还可以选择 QT 内建的主题，使用 QStyleFactory.keys() 可以返回可用的 styleName。
+        # app.setStyle(QStyleFactory.create(styleName))
 
     # 生成并显示主窗口
     main_window = MainWindow()

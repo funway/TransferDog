@@ -8,9 +8,9 @@ import logging, re
 from urllib.parse import urlparse
 
 from croniter import croniter
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QFontMetrics
-from PyQt6.QtWidgets import QDialog, QFileDialog, QButtonGroup, QLineEdit
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QFontMetrics
+from PySide6.QtWidgets import QDialog, QFileDialog, QButtonGroup, QLineEdit
 
 from models.task import Task
 from ui.ui_dialog_task_edit import Ui_Dialog
