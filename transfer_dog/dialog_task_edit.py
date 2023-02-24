@@ -12,7 +12,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QFontMetrics
 from PySide6.QtWidgets import QDialog, QFileDialog, QButtonGroup, QLineEdit
 
-from models.task import Task
+from model.task import Task
 from ui.ui_dialog_task_edit import Ui_Dialog
 
 

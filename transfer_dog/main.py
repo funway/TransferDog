@@ -10,8 +10,8 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QMessageBox
 from peewee import SqliteDatabase
 from playhouse.shortcuts import model_to_dict
 
-from utilities.constants import *
-from models.task import Task
+from utility.constants import *
+from model.task import Task
 from ui.ui_main_window import Ui_MainWindow
 from dialog_task_edit import DialogTaskEdit
 
@@ -100,7 +100,7 @@ def main(arg=None):
     # 加载 stylesheet
     #   由于 QtDesigner 工具不支持加载外部 qss 文件，所以如果想要在 QtDesigner 中预览样式，
     #   就需要在根节点（比如 QMainWindow）上右键选择 "Change styleSheet"，然后将 qss 文件内容拷贝进去
-    with open(BASE_PATH + '/ui/resources/stylesheets/default.qss', 'r') as qss_file:
+    with open(BASE_PATH + '/ui/resource/qss/default.qss', 'r') as qss_file:
         qss = qss_file.read()
         app.setStyleSheet(qss)
         # 还可以选择 QT 内建的主题，使用 QStyleFactory.keys() 可以返回可用的 styleName。

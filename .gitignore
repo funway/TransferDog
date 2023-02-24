@@ -10,8 +10,8 @@
 .vscode/
 
 # 忽略目录（根目录下）
-/ideas/
-/tests/
+/idea/
+/test/
 /transfer_dog/log/
 
 # 忽略单个文件

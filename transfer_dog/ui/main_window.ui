@@ -52,7 +52,7 @@
   <action name="actionNewTask">
    <property name="icon">
     <iconset>
-     <normaloff>resources/icons/add.png</normaloff>resources/icons/add.png</iconset>
+     <normaloff>resource/img/add.png</normaloff>resource/img/add.png</iconset>
    </property>
    <property name="text">
     <string>NewTask</string>
@@ -64,7 +64,7 @@
   <action name="actionEditTask">
    <property name="icon">
     <iconset>
-     <normaloff>resources/icons/list.png</normaloff>resources/icons/list.png</iconset>
+     <normaloff>resource/img/list.png</normaloff>resource/img/list.png</iconset>
    </property>
    <property name="text">
     <string>EditTask</string>
