@@ -13,7 +13,10 @@ from peewee import CharField, BooleanField, IntegerField
 
 class Task(Model):
     """docstring for Task."""
-        
+    
+    # todo
+    # 这里使用 lambda 函数会不会内存溢出啊？
+    # 可能不会哦，这个是赋值给类成员变量了，只此一个
     uuid = CharField(unique=True, default=lambda: uuid.uuid4().hex)
     task_name = CharField(default=lambda: datetime.now().strftime('task_%Y%m%d%H%M%S'))
     group_name = CharField(default='Default')
@@ -34,3 +37,22 @@ class Task(Model):
     dest_encoding = CharField(default='UTF8')
     dest_passive_mode = BooleanField(default=True)
     dest_path = CharField(default='')
+
+
+def test():
+    a = Task()
+    b = Task()
+    print(a)
+    a.task_name = '你好'
+    print(a.uuid, a.task_name)
+    print(a.uuid, a.task_name)
+    print(a)
+    print(b.uuid, b.task_name)
+    print(b.uuid, b.task_name)
+    print(Task.uuid.default)
+    print(Task.__class__)
+    print(type(a))
+    pass
+
+if __name__ == "__main__":
+    test()

@@ -39,7 +39,7 @@ class DialogTaskEdit(QDialog, Ui_Dialog):
         # 定义成员变量
         if task is None:
             self.__task = Task()
-            self.logger.debug('新建任务. [%s]', self.__task.uuid)
+            self.logger.debug('新建任务. [%s] %s', self.__task.uuid, self.__task)
         else:
             self.__task = task
             self.logger.debug('修改任务. [%s]', self.__task.uuid)
@@ -276,7 +276,7 @@ def test(arg=None):
 
     import sys
     
-    from PyQt6.QtWidgets import QApplication
+    from PySide6.QtWidgets import QApplication
     from playhouse.shortcuts import model_to_dict
 
     logging_format = '%(asctime)s %(levelname)5s %(name)s.%(funcName)s - %(message)s'

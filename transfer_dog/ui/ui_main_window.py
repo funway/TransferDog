@@ -16,8 +16,9 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QApplication, QHeaderView, QMainWindow, QSizePolicy,
-    QStatusBar, QToolBar, QTreeView, QWidget)
+from PySide6.QtWidgets import (QApplication, QHBoxLayout, QHeaderView, QMainWindow,
+    QSizePolicy, QStatusBar, QTableView, QToolBar,
+    QTreeView, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -39,9 +40,18 @@ class Ui_MainWindow(object):
         self.actionTest.setObjectName(u"actionTest")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
+        self.horizontalLayout = QHBoxLayout(self.centralwidget)
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.treeView = QTreeView(self.centralwidget)
         self.treeView.setObjectName(u"treeView")
-        self.treeView.setGeometry(QRect(50, 90, 211, 192))
+
+        self.horizontalLayout.addWidget(self.treeView)
+
+        self.tableView = QTableView(self.centralwidget)
+        self.tableView.setObjectName(u"tableView")
+
+        self.horizontalLayout.addWidget(self.tableView)
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.toolBar = QToolBar(MainWindow)
         self.toolBar.setObjectName(u"toolBar")

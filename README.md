@@ -19,7 +19,7 @@
 
 
 # Thanks to
-1. [PyQt](https://www.riverbankcomputing.com/software/pyqt/)
+1. [PySide6](https://pypi.org/project/PySide6/)
 2. [SQLite](https://www.sqlite.org/index.html)
 3. [peewee](https://github.com/coleifer/peewee)
 4. [flaticon](https://www.flaticon.com/icon-fonts-most-downloaded/2?weight=bold&corner=rounded&type=uicon)
