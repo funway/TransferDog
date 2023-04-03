@@ -50,7 +50,7 @@
   <action name="actionNewTask">
    <property name="icon">
     <iconset>
-     <normaloff>resource/img/add.png</normaloff>resource/img/add.png</iconset>
+     <normaloff>../transfer_dog/resource/img/add.png</normaloff>../transfer_dog/resource/img/add.png</iconset>
    </property>
    <property name="text">
     <string>NewTask</string>
@@ -62,7 +62,7 @@
   <action name="actionEditTask">
    <property name="icon">
     <iconset>
-     <normaloff>resource/img/list.png</normaloff>resource/img/list.png</iconset>
+     <normaloff>../resource/img/notebook.png</normaloff>../resource/img/notebook.png</iconset>
    </property>
    <property name="text">
     <string>EditTask</string>

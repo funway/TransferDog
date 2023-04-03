@@ -12,7 +12,7 @@
 # 忽略目录（根目录下）
 /idea/
 /test/
-/transfer_dog/log/
+/log/
 
 # 忽略单个文件
-/transfer_dog/conf/app.db
+/conf/app.db

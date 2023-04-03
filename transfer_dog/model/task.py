@@ -38,21 +38,10 @@ class Task(Model):
     dest_passive_mode = BooleanField(default=True)
     dest_path = CharField(default='')
 
+    def __str__(self):
+        """返回任务的 uuid 与对象地址
 
-def test():
-    a = Task()
-    b = Task()
-    print(a)
-    a.task_name = '你好'
-    print(a.uuid, a.task_name)
-    print(a.uuid, a.task_name)
-    print(a)
-    print(b.uuid, b.task_name)
-    print(b.uuid, b.task_name)
-    print(Task.uuid.default)
-    print(Task.__class__)
-    print(type(a))
-    pass
-
-if __name__ == "__main__":
-    test()
+        Returns:
+            string: uuid + object
+        """
+        return self.uuid + ', ' + object.__repr__(self)

@@ -12,8 +12,8 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QFontMetrics
 from PySide6.QtWidgets import QDialog, QFileDialog, QButtonGroup, QLineEdit
 
-from model.task import Task
-from ui.ui_dialog_task_edit import Ui_Dialog
+from transfer_dog.model.task import Task
+from transfer_dog.ui.ui_dialog_task_edit import Ui_Dialog
 
 
 task_valid_time_options = {
@@ -34,7 +34,7 @@ class DialogTaskEdit(QDialog, Ui_Dialog):
 
         # 设置 logger
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.logger.debug('Init a %s instance' % self.__class__.__name__)
+        self.logger.debug('Init a %s instance', self.__class__.__name__)
 
         # 定义成员变量
         if task is None:

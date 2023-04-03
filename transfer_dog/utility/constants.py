@@ -4,16 +4,23 @@
 # Author:  funway.wang
 # Created: 2022/12/26 15:15:50
 
-from os import path
+# from os import path
+from pathlib import Path
 
 APP_NAME = 'TransferDog'
 APP_VERSION = '0.0.1'
 
-# 程序主目录
-BASE_PATH = path.dirname(path.dirname(__file__))
+# 包目录
+PACKAGE_PATH = Path(__file__).parent.parent
+
+# 项目目录
+PROJECT_PATH = PACKAGE_PATH.parent
 
 # 日志配置文件
-LOGGING_CONFIG = BASE_PATH + '/conf/logging.conf'
+LOGGING_CONFIG = PROJECT_PATH / 'conf/logging.conf'
 
-# 程序配置库
-CONFIG_DB = BASE_PATH + '/conf/app.db'
+# 程序配置文件
+CONFIG_DB = PROJECT_PATH / 'conf/app.db'
+
+# 静态资源目录
+RESOURCE_PATH = PACKAGE_PATH / 'resource'
