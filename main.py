@@ -6,8 +6,7 @@
 
 import sys
 
-from transfer_dog import transfer_dog
-
+from transfer_dog import app
 
 if __name__ == "__main__":
-    sys.exit(transfer_dog.run())
+    sys.exit(app.run())
