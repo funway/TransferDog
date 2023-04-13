@@ -1,12 +1,51 @@
 /*
 Author:  funway.wang
 Created: 2022.11.04 00:00
- */
+
+Example:
+
+1. * 号表示全匹配 
+* { color: red }
+
+2. 控件匹配，匹配 QPushButton 以及它的任意派生类
+QPushButton { color: red }
+
+3. 逗号隔开多个匹配
+QPushButton, QLineEdit, QComboBox { color: red }
+
+4. 控件+属性匹配，中括号 [ ] 里的属性是 Qt
+QPushButton[flat="false"] { color: red }
+
+5. 类匹配，只匹配 QPushButton 不匹配它的派生类
+.QPushButton { color: red }
+
+6. id 匹配，匹配实例名为 okButton 的 QPushButton 控件
+QPushButton#okButton { color: red }
+
+7. 子孙节点选择，QPushButton 可以是 QDialog 的直接子节点或者孙子节点
+QDialog QPushButton
+
+8. 子节点选择，QPushButton 必须是 QDialog 的子节点
+QDialog > QPushButton
+
+9. 子部件（sub-control）选择，drop-down 是 QComboBox 的下拉部件
+QComboBox::drop-down { image: url(dropdown.png) }
+
+更多子部件参考：https://doc.qt.io/qt-6/stylesheet-reference.html#list-of-sub-controls
+
+10. 控件状态匹配
+QPushButton:hover { color: white }
+
+qss 语法参考：
+	https://doc.qt.io/qt-6/stylesheet-syntax.html
+	https://doc.qt.io/qt-6/stylesheet-reference.html
+
+*/
+
 
 QToolBar {
 	/* set style for QToolBar */
 }
-
 QToolBar QToolButton {
 	/* set style for QToolButtons in QToolBar */
 	font-size: 15px;
@@ -17,4 +56,14 @@ QToolBar QToolButton:hover {
 }
 QToolBar QToolButton:pressed {
 	background-color: grey;
+}
+
+QTreeView::item:hover {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);
+}
+QTreeView::item:selected:active {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6ea1f1, stop: 1 #567dbc);
+}
+QTreeView::item:selected:!active {
+	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ced3db, stop: 1 #bbbdc1);
 }

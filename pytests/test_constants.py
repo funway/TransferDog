@@ -5,7 +5,6 @@
 # Created: 2023/04/01 14:59:17
 
 from transfer_dog.utility.constants import *
-import pytest
 
 def test_logging_config():
     assert LOGGING_CONFIG.exists()

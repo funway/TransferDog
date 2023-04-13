@@ -19,7 +19,21 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QTreeView" name="treeView"/>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QLineEdit" name="lineEdit">
+        <property name="placeholderText">
+         <string>Search Task</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTreeView" name="treeView"/>
+      </item>
+     </layout>
     </item>
     <item>
      <widget class="QTableView" name="tableView"/>
@@ -50,7 +64,7 @@
   <action name="actionNewTask">
    <property name="icon">
     <iconset>
-     <normaloff>../transfer_dog/resource/img/add.png</normaloff>../transfer_dog/resource/img/add.png</iconset>
+     <normaloff>../transfer_dog/resource/img/file-add-line.png</normaloff>../transfer_dog/resource/img/file-add-line.png</iconset>
    </property>
    <property name="text">
     <string>NewTask</string>
@@ -62,7 +76,7 @@
   <action name="actionEditTask">
    <property name="icon">
     <iconset>
-     <normaloff>../resource/img/notebook.png</normaloff>../resource/img/notebook.png</iconset>
+     <normaloff>../transfer_dog/resource/img/file-edit-line.png</normaloff>../transfer_dog/resource/img/file-edit-line.png</iconset>
    </property>
    <property name="text">
     <string>EditTask</string>

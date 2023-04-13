@@ -16,9 +16,9 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QApplication, QHBoxLayout, QHeaderView, QMainWindow,
-    QSizePolicy, QStatusBar, QTableView, QToolBar,
-    QTreeView, QWidget)
+from PySide6.QtWidgets import (QApplication, QHBoxLayout, QHeaderView, QLineEdit,
+    QMainWindow, QSizePolicy, QStatusBar, QTableView,
+    QToolBar, QTreeView, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -29,12 +29,12 @@ class Ui_MainWindow(object):
         self.actionNewTask = QAction(MainWindow)
         self.actionNewTask.setObjectName(u"actionNewTask")
         icon = QIcon()
-        icon.addFile(u"transfer_dog/resource/img/add.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(u"/transfer_dog/resource/img/file-add-line.png", QSize(), QIcon.Normal, QIcon.Off)
         self.actionNewTask.setIcon(icon)
         self.actionEditTask = QAction(MainWindow)
         self.actionEditTask.setObjectName(u"actionEditTask")
         icon1 = QIcon()
-        icon1.addFile(u"../resource/img/notebook.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon1.addFile(u"transfer_dog/resource/img/file-edit-line.png", QSize(), QIcon.Normal, QIcon.Off)
         self.actionEditTask.setIcon(icon1)
         self.actionTest = QAction(MainWindow)
         self.actionTest.setObjectName(u"actionTest")
@@ -42,10 +42,21 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.verticalLayout = QVBoxLayout()
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.lineEdit = QLineEdit(self.centralwidget)
+        self.lineEdit.setObjectName(u"lineEdit")
+        self.lineEdit.setClearButtonEnabled(True)
+
+        self.verticalLayout.addWidget(self.lineEdit)
+
         self.treeView = QTreeView(self.centralwidget)
         self.treeView.setObjectName(u"treeView")
 
-        self.horizontalLayout.addWidget(self.treeView)
+        self.verticalLayout.addWidget(self.treeView)
+
+
+        self.horizontalLayout.addLayout(self.verticalLayout)
 
         self.tableView = QTableView(self.centralwidget)
         self.tableView.setObjectName(u"tableView")
@@ -82,6 +93,7 @@ class Ui_MainWindow(object):
         self.actionEditTask.setToolTip(QCoreApplication.translate("MainWindow", u"Edit a task's property", None))
 #endif // QT_CONFIG(tooltip)
         self.actionTest.setText(QCoreApplication.translate("MainWindow", u"Test", None))
+        self.lineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Search Task", None))
         self.toolBar.setWindowTitle(QCoreApplication.translate("MainWindow", u"toolBar", None))
     # retranslateUi
 

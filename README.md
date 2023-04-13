@@ -16,10 +16,15 @@
    另外，iis 又不支持 mlsd()，干。
 8. sftp 用 Paramiko 库
 
+决定了！
+就用 setparent 来搞，
+然后在 item 进行 show hide 以及后续的 enable disable running pause
+
 
 
 # Thanks to
-1. [PySide6](https://pypi.org/project/PySide6/)
-2. [SQLite](https://www.sqlite.org/index.html)
-3. [peewee](https://github.com/coleifer/peewee)
-4. [flaticon](https://www.flaticon.com/icon-fonts-most-downloaded/2?weight=bold&corner=rounded&type=uicon)
+1. [PySide6](https://pypi.org/project/PySide6/) for GUI
+2. [SQLite](https://www.sqlite.org/index.html) for Database
+3. [peewee](https://github.com/coleifer/peewee) for ORM
+4. [remixicon](https://remixicon.com/) for Icon
+4. [flaticon](https://www.flaticon.com/icon-fonts-most-downloaded/2?weight=bold&corner=rounded&type=uicon) for Icon

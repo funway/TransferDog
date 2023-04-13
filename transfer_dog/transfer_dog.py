@@ -9,9 +9,9 @@ import sys, logging, logging.config
 from PySide6.QtWidgets import QApplication, QMessageBox
 from peewee import SqliteDatabase
 
-from transfer_dog.main_window import MainWindow
 from transfer_dog.model import Task
 from transfer_dog.utility.constants import *
+from transfer_dog.view.main_window import MainWindow
 
 
 class TransferDog(object):
@@ -69,7 +69,11 @@ def run():
         QMessageBox.critical(None, '配置文件错误', 'Fail to load logging config: [ %s ]' % LOGGING_CONFIG)
         return -1
     
-    # 加载配置文件
+    # 设置 QApplication 的程序名与版本号
+    app.setApplicationName(APP_NAME)
+    app.setApplicationVersion(APP_VERSION)
+    
+    # 创建 TransferDog 单例并加载配置
     doggy = TransferDog()
     doggy.load_config()
 
