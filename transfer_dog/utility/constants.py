@@ -17,7 +17,7 @@ PACKAGE_PATH = Path(__file__).parent.parent
 PROJECT_PATH = PACKAGE_PATH.parent
 
 # 日志配置文件
-LOGGING_CONFIG = PROJECT_PATH / 'conf/logging.conf'
+LOGGING_CONFIG = PROJECT_PATH / 'conf/app_logging.conf'
 
 # 程序配置文件
 CONFIG_DB = PROJECT_PATH / 'conf/app.db'

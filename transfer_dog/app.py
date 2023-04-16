@@ -4,9 +4,9 @@
 # Author:  funway.wang
 # Created: 2023/04/13 20:41:06
 
-import sys, logging, logging.config
+import sys, logging, logging.config, random
 
-from PySide6.QtWidgets import QApplication, QMessageBox
+from PySide6.QtWidgets import QApplication, QMessageBox, QStyleFactory
 
 from transfer_dog.transfer_dog import TransferDog
 from transfer_dog.utility.constants import *
@@ -22,10 +22,10 @@ def run():
 
     # 设置日志 logging
     try:
-        logging.config.fileConfig(LOGGING_CONFIG)
+        logging.config.fileConfig(LOGGING_CONFIG, encoding='UTF8')
     except Exception as e:
-        logging.exception('load logging config file failed! [%s]', LOGGING_CONFIG)
-        QMessageBox.critical(None, '配置文件错误', 'Fail to load logging config: [ %s ]' % LOGGING_CONFIG)
+        logging.exception('Load logging config file failed! [%s]', LOGGING_CONFIG)
+        QMessageBox.critical(None, '配置文件错误', '<b>Failed to load [ %s ]</b><br><br>%s' % (LOGGING_CONFIG, e))
         return -1
     
     # 设置 QApplication 的程序名与版本号
@@ -38,15 +38,26 @@ def run():
     # 加载 stylesheet
     #   由于 QtDesigner 工具不支持加载外部 qss 文件，所以如果想要在 QtDesigner 中预览样式，
     #   就需要在根节点（比如 QMainWindow）上右键选择 "Change styleSheet"，然后将 qss 文件内容拷贝进去
-    with open(RESOURCE_PATH / 'qss/default.qss', 'r') as qss_file:
-        qss = qss_file.read()
-        q_app.setStyleSheet(qss)
-        # 还可以选择 QT 内建的主题，使用 QStyleFactory.keys() 可以返回可用的 styleName。
-        # app.setStyle(QStyleFactory.create(styleName))
-
+    qss_file = str(RESOURCE_PATH / 'qss/default.qss')
+    try:
+        with open(qss_file, 'r', encoding='UTF8') as qf:
+            qss = qf.read()
+            q_app.setStyleSheet(qss)
+    except Exception as e:
+        logging.exception('Load qss file failed! [%s]', qss_file)
+        QMessageBox.warning(None, '配置文件错误', '<b>Failed to load [ %s ]</b><br><br>%s' % (qss_file, e))
+    
     # 生成并显示主窗口
     main_window = MainWindow()
     main_window.show()
 
-    # 进入主程序循环
-    return q_app.exec()
+    # 启动 TransferDog 运行子线程
+    doggy.run()
+    
+    # 进入 QApplication 事件循环线程（主线程）
+    result = q_app.exec()
+    
+    # 停止 TransferDog 子线程
+    doggy.stop()
+    
+    return result

@@ -45,7 +45,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 获取有效任务
         tasks = [task for task in Task.select()]
         for task in tasks:
-            self.logger.debug('task: %s', task)
+            self.logger.debug('Task: %s', task)
 
         # 获取任务组
         groups = list(set([task.group_name for task in tasks]))
