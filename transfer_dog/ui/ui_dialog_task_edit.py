@@ -19,13 +19,13 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QButtonGroup, QChe
     QComboBox, QDialog, QDialogButtonBox, QFrame,
     QGridLayout, QGroupBox, QHBoxLayout, QLabel,
     QLineEdit, QPushButton, QRadioButton, QSizePolicy,
-    QSpacerItem, QVBoxLayout, QWidget)
+    QSpacerItem, QSpinBox, QVBoxLayout, QWidget)
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(650, 704)
+        Dialog.resize(650, 739)
         Dialog.setStyleSheet(u"QGroupBox {\n"
 "    font: bold;\n"
 "    border: 1px solid silver;\n"
@@ -108,14 +108,12 @@ class Ui_Dialog(object):
         self.buttonGroup_src_protocol.setObjectName(u"buttonGroup_src_protocol")
         self.buttonGroup_src_protocol.addButton(self.radioButton_src_local)
         self.radioButton_src_local.setObjectName(u"radioButton_src_local")
-        self.radioButton_src_local.setChecked(True)
 
         self.horizontalLayout.addWidget(self.radioButton_src_local)
 
         self.radioButton_src_ftp = QRadioButton(self.groupBox_2)
         self.buttonGroup_src_protocol.addButton(self.radioButton_src_ftp)
         self.radioButton_src_ftp.setObjectName(u"radioButton_src_ftp")
-        self.radioButton_src_ftp.setChecked(False)
 
         self.horizontalLayout.addWidget(self.radioButton_src_ftp)
 
@@ -164,10 +162,10 @@ class Ui_Dialog(object):
 
         self.gridLayout_2.addItem(self.horizontalSpacer_3, 3, 3, 1, 1)
 
-        self.lineEdit_src_server_address = QLineEdit(self.groupBox_src_server)
-        self.lineEdit_src_server_address.setObjectName(u"lineEdit_src_server_address")
+        self.lineEdit_src_server_netloc = QLineEdit(self.groupBox_src_server)
+        self.lineEdit_src_server_netloc.setObjectName(u"lineEdit_src_server_netloc")
 
-        self.gridLayout_2.addWidget(self.lineEdit_src_server_address, 0, 1, 1, 3)
+        self.gridLayout_2.addWidget(self.lineEdit_src_server_netloc, 0, 1, 1, 3)
 
 
         self.verticalLayout_2.addWidget(self.groupBox_src_server)
@@ -208,24 +206,10 @@ class Ui_Dialog(object):
         self.groupBox_3.setSizePolicy(sizePolicy1)
         self.gridLayout_3 = QGridLayout(self.groupBox_3)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
-        self.pushButton_2 = QPushButton(self.groupBox_3)
-        self.pushButton_2.setObjectName(u"pushButton_2")
+        self.label_10 = QLabel(self.groupBox_3)
+        self.label_10.setObjectName(u"label_10")
 
-        self.gridLayout_3.addWidget(self.pushButton_2, 0, 2, 1, 1)
-
-        self.checkBox_scan_subdir = QCheckBox(self.groupBox_3)
-        self.checkBox_scan_subdir.setObjectName(u"checkBox_scan_subdir")
-
-        self.gridLayout_3.addWidget(self.checkBox_scan_subdir, 1, 2, 1, 1)
-
-        self.horizontalSpacer_4 = QSpacerItem(164, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.gridLayout_3.addItem(self.horizontalSpacer_4, 0, 3, 1, 1)
-
-        self.checkBox_delete_source = QCheckBox(self.groupBox_3)
-        self.checkBox_delete_source.setObjectName(u"checkBox_delete_source")
-
-        self.gridLayout_3.addWidget(self.checkBox_delete_source, 1, 3, 1, 1)
+        self.gridLayout_3.addWidget(self.label_10, 1, 2, 1, 1)
 
         self.label_9 = QLabel(self.groupBox_3)
         self.label_9.setObjectName(u"label_9")
@@ -237,15 +221,31 @@ class Ui_Dialog(object):
 
         self.gridLayout_3.addWidget(self.comboBox_filter_valid_time, 1, 1, 1, 1)
 
+        self.label_8 = QLabel(self.groupBox_3)
+        self.label_8.setObjectName(u"label_8")
+
+        self.gridLayout_3.addWidget(self.label_8, 0, 0, 1, 1)
+
+        self.pushButton_2 = QPushButton(self.groupBox_3)
+        self.pushButton_2.setObjectName(u"pushButton_2")
+
+        self.gridLayout_3.addWidget(self.pushButton_2, 0, 2, 1, 1)
+
         self.lineEdit_filter_filename = QLineEdit(self.groupBox_3)
         self.lineEdit_filter_filename.setObjectName(u"lineEdit_filter_filename")
 
         self.gridLayout_3.addWidget(self.lineEdit_filter_filename, 0, 1, 1, 1)
 
-        self.label_8 = QLabel(self.groupBox_3)
-        self.label_8.setObjectName(u"label_8")
+        self.spinBox_subdir_recursion = QSpinBox(self.groupBox_3)
+        self.spinBox_subdir_recursion.setObjectName(u"spinBox_subdir_recursion")
+        self.spinBox_subdir_recursion.setMaximum(999)
 
-        self.gridLayout_3.addWidget(self.label_8, 0, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.spinBox_subdir_recursion, 1, 3, 1, 1)
+
+        self.checkBox_delete_source = QCheckBox(self.groupBox_3)
+        self.checkBox_delete_source.setObjectName(u"checkBox_delete_source")
+
+        self.gridLayout_3.addWidget(self.checkBox_delete_source, 0, 3, 1, 1)
 
 
         self.verticalLayout.addWidget(self.groupBox_3)
@@ -266,7 +266,6 @@ class Ui_Dialog(object):
         self.buttonGroup_dest_protocol.setObjectName(u"buttonGroup_dest_protocol")
         self.buttonGroup_dest_protocol.addButton(self.radioButton_dest_local)
         self.radioButton_dest_local.setObjectName(u"radioButton_dest_local")
-        self.radioButton_dest_local.setChecked(True)
 
         self.horizontalLayout_5.addWidget(self.radioButton_dest_local)
 
@@ -321,10 +320,10 @@ class Ui_Dialog(object):
 
         self.gridLayout_5.addItem(self.horizontalSpacer_8, 3, 3, 1, 1)
 
-        self.lineEdit_dest_server_address = QLineEdit(self.groupBox_dest_server)
-        self.lineEdit_dest_server_address.setObjectName(u"lineEdit_dest_server_address")
+        self.lineEdit_dest_server_netloc = QLineEdit(self.groupBox_dest_server)
+        self.lineEdit_dest_server_netloc.setObjectName(u"lineEdit_dest_server_netloc")
 
-        self.gridLayout_5.addWidget(self.lineEdit_dest_server_address, 0, 1, 1, 3)
+        self.gridLayout_5.addWidget(self.lineEdit_dest_server_netloc, 0, 1, 1, 3)
 
 
         self.verticalLayout_4.addWidget(self.groupBox_dest_server)
@@ -398,21 +397,18 @@ class Ui_Dialog(object):
         QWidget.setTabOrder(self.checkBox_task_enabled, self.radioButton_src_local)
         QWidget.setTabOrder(self.radioButton_src_local, self.radioButton_src_ftp)
         QWidget.setTabOrder(self.radioButton_src_ftp, self.radioButton_src_sftp)
-        QWidget.setTabOrder(self.radioButton_src_sftp, self.lineEdit_src_server_address)
-        QWidget.setTabOrder(self.lineEdit_src_server_address, self.comboBox_src_server_encoding)
+        QWidget.setTabOrder(self.radioButton_src_sftp, self.lineEdit_src_server_netloc)
+        QWidget.setTabOrder(self.lineEdit_src_server_netloc, self.comboBox_src_server_encoding)
         QWidget.setTabOrder(self.comboBox_src_server_encoding, self.checkBox_src_server_passive)
         QWidget.setTabOrder(self.checkBox_src_server_passive, self.lineEdit_src_dir)
         QWidget.setTabOrder(self.lineEdit_src_dir, self.pushButton_src_browse)
         QWidget.setTabOrder(self.pushButton_src_browse, self.lineEdit_filter_filename)
-        QWidget.setTabOrder(self.lineEdit_filter_filename, self.pushButton_2)
-        QWidget.setTabOrder(self.pushButton_2, self.comboBox_filter_valid_time)
-        QWidget.setTabOrder(self.comboBox_filter_valid_time, self.checkBox_scan_subdir)
-        QWidget.setTabOrder(self.checkBox_scan_subdir, self.checkBox_delete_source)
-        QWidget.setTabOrder(self.checkBox_delete_source, self.radioButton_dest_local)
+        QWidget.setTabOrder(self.lineEdit_filter_filename, self.comboBox_filter_valid_time)
+        QWidget.setTabOrder(self.comboBox_filter_valid_time, self.radioButton_dest_local)
         QWidget.setTabOrder(self.radioButton_dest_local, self.radioButton_dest_ftp)
         QWidget.setTabOrder(self.radioButton_dest_ftp, self.radioButton_dest_sftp)
-        QWidget.setTabOrder(self.radioButton_dest_sftp, self.lineEdit_dest_server_address)
-        QWidget.setTabOrder(self.lineEdit_dest_server_address, self.comboBox_dest_server_encoding)
+        QWidget.setTabOrder(self.radioButton_dest_sftp, self.lineEdit_dest_server_netloc)
+        QWidget.setTabOrder(self.lineEdit_dest_server_netloc, self.comboBox_dest_server_encoding)
         QWidget.setTabOrder(self.comboBox_dest_server_encoding, self.checkBox_dest_server_passive)
         QWidget.setTabOrder(self.checkBox_dest_server_passive, self.lineEdit_dest_dir)
         QWidget.setTabOrder(self.lineEdit_dest_dir, self.pushButton_dest_browse)
@@ -444,16 +440,16 @@ class Ui_Dialog(object):
         self.comboBox_src_server_encoding.setItemText(1, QCoreApplication.translate("Dialog", u"GB2312", None))
 
         self.label_5.setText(QCoreApplication.translate("Dialog", u"Address", None))
-        self.lineEdit_src_server_address.setPlaceholderText(QCoreApplication.translate("Dialog", u"username:password@host:port", None))
+        self.lineEdit_src_server_netloc.setPlaceholderText(QCoreApplication.translate("Dialog", u"username:password@host:port", None))
         self.label_7.setText(QCoreApplication.translate("Dialog", u"Directory", None))
         self.pushButton_src_browse.setText(QCoreApplication.translate("Dialog", u"Browse", None))
         self.groupBox_3.setTitle(QCoreApplication.translate("Dialog", u"Filter / Middleware", None))
-        self.pushButton_2.setText(QCoreApplication.translate("Dialog", u"Test", None))
-        self.checkBox_scan_subdir.setText(QCoreApplication.translate("Dialog", u"Scan Subdirectories", None))
-        self.checkBox_delete_source.setText(QCoreApplication.translate("Dialog", u"Delete Source", None))
+        self.label_10.setText(QCoreApplication.translate("Dialog", u"Subdir Recursion", None))
         self.label_9.setText(QCoreApplication.translate("Dialog", u"Valid Time", None))
-        self.lineEdit_filter_filename.setText(QCoreApplication.translate("Dialog", u".*", None))
         self.label_8.setText(QCoreApplication.translate("Dialog", u"Filename RegEx", None))
+        self.pushButton_2.setText(QCoreApplication.translate("Dialog", u"Test", None))
+        self.lineEdit_filter_filename.setText(QCoreApplication.translate("Dialog", u".*", None))
+        self.checkBox_delete_source.setText(QCoreApplication.translate("Dialog", u"Delete Source", None))
         self.groupBox_4.setTitle(QCoreApplication.translate("Dialog", u"Destination", None))
         self.label_16.setText(QCoreApplication.translate("Dialog", u"Protocol", None))
         self.radioButton_dest_local.setText(QCoreApplication.translate("Dialog", u"Local", None))
@@ -466,7 +462,7 @@ class Ui_Dialog(object):
         self.comboBox_dest_server_encoding.setItemText(1, QCoreApplication.translate("Dialog", u"GB2312", None))
 
         self.label_15.setText(QCoreApplication.translate("Dialog", u"Address", None))
-        self.lineEdit_dest_server_address.setPlaceholderText(QCoreApplication.translate("Dialog", u"username:password@host:port", None))
+        self.lineEdit_dest_server_netloc.setPlaceholderText(QCoreApplication.translate("Dialog", u"username:password@host:port", None))
         self.label_17.setText(QCoreApplication.translate("Dialog", u"Directory", None))
         self.pushButton_dest_browse.setText(QCoreApplication.translate("Dialog", u"Browse", None))
         self.label_error_msg.setText("")

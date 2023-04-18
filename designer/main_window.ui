@@ -58,6 +58,14 @@
    </attribute>
    <addaction name="actionNewTask"/>
    <addaction name="actionEditTask"/>
+   <addaction name="actionCopyTask"/>
+   <addaction name="actionDeleteTask"/>
+   <addaction name="separator"/>
+   <addaction name="actionStartTask"/>
+   <addaction name="actionStopTask"/>
+   <addaction name="actionOpenSource"/>
+   <addaction name="actionOpenDest"/>
+   <addaction name="separator"/>
    <addaction name="actionTest"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -86,8 +94,75 @@
    </property>
   </action>
   <action name="actionTest">
+   <property name="icon">
+    <iconset>
+     <normaloff>../transfer_dog/resource/img/question-line.png</normaloff>../transfer_dog/resource/img/question-line.png</iconset>
+   </property>
    <property name="text">
     <string>Test</string>
+   </property>
+  </action>
+  <action name="actionDeleteTask">
+   <property name="icon">
+    <iconset>
+     <normaloff>../transfer_dog/resource/img/file-reduce-line.png</normaloff>../transfer_dog/resource/img/file-reduce-line.png</iconset>
+   </property>
+   <property name="text">
+    <string>DeleteTask</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete selected task</string>
+   </property>
+  </action>
+  <action name="actionOpenSource">
+   <property name="icon">
+    <iconset>
+     <normaloff>../transfer_dog/resource/img/folder-download-line.png</normaloff>../transfer_dog/resource/img/folder-download-line.png</iconset>
+   </property>
+   <property name="text">
+    <string>OpenSource</string>
+   </property>
+   <property name="toolTip">
+    <string>Open source path</string>
+   </property>
+  </action>
+  <action name="actionOpenDest">
+   <property name="icon">
+    <iconset>
+     <normaloff>../transfer_dog/resource/img/folder-upload-line.png</normaloff>../transfer_dog/resource/img/folder-upload-line.png</iconset>
+   </property>
+   <property name="text">
+    <string>OpenDest</string>
+   </property>
+   <property name="toolTip">
+    <string>Open destination path</string>
+   </property>
+  </action>
+  <action name="actionCopyTask">
+   <property name="icon">
+    <iconset>
+     <normaloff>../transfer_dog/resource/img/file-copy-2-line.png</normaloff>../transfer_dog/resource/img/file-copy-2-line.png</iconset>
+   </property>
+   <property name="text">
+    <string>CopyTask</string>
+   </property>
+  </action>
+  <action name="actionStopTask">
+   <property name="icon">
+    <iconset>
+     <normaloff>../transfer_dog/resource/img/stop-circle-line.png</normaloff>../transfer_dog/resource/img/stop-circle-line.png</iconset>
+   </property>
+   <property name="text">
+    <string>StopTask</string>
+   </property>
+  </action>
+  <action name="actionStartTask">
+   <property name="icon">
+    <iconset>
+     <normaloff>../transfer_dog/resource/img/play-circle-line.png</normaloff>../transfer_dog/resource/img/play-circle-line.png</iconset>
+   </property>
+   <property name="text">
+    <string>StartTask</string>
    </property>
   </action>
  </widget>

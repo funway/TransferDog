@@ -8,8 +8,8 @@ import sys, logging, logging.config, threading, time, timeit
 
 from peewee import SqliteDatabase
 
-from transfer_dog.model import Task
 from transfer_dog.utility.constants import *
+from transfer_worker.model import Task
 
 
 class TransferDog(object):
@@ -39,13 +39,14 @@ class TransferDog(object):
                 if not cls._initialized:
                     # 在此处进行成员变量的声明与初始化
                     self.logger = logging.getLogger(cls.__name__)
-                    self.logger.info('Init %s singleton', cls.__name__)
+                    self.logger.debug('Init %s singleton', cls.__name__)
+                    self.logger.setLevel(logging.INFO)
 
                     self._stop = False
 
                     self.db = None
                     self.load_config()
-                    self.tasks = [task for task in Task.select()]
+                    self.tasks = {task.uuid: task for task in Task.select()}
 
                     cls._initialized = True
                     pass
@@ -57,7 +58,7 @@ class TransferDog(object):
         self.logger.debug('Delete %s singleton', self.__class__.__name__)
         pass
 
-    def load_config(self, db_file=CONFIG_DB):
+    def load_config(self, db_file=TASK_DB):
         # 从指定文件创建数据库链接（如果不存在该文件，会主动创建）
         self.db = SqliteDatabase(db_file, autoconnect=False)
         self.db.connect()
@@ -75,7 +76,7 @@ class TransferDog(object):
             
             # do your running job
             # create subprocess for task
-            for task in self.tasks:
+            for task in self.tasks.values():
                 """
                 1. 判断上次 task 是否还在运行
                     1.1 如果还在运行且未超时，continue 下一个任务
@@ -96,15 +97,24 @@ class TransferDog(object):
             time.sleep(0.2)
 
             t2 = timeit.default_timer()
-            self.logger.info(t2 - t1)
+            self.logger.debug(t2 - t1)
             pass
         pass
 
-    def run(self):
-        running_thread = threading.Thread(target=self._run)
+    def run(self, daemon: bool = True):
+        """启动任务调度子线程。对到点运行的任务，启动一个 subprocess 进行处理
+
+        Args:
+            daemon (bool, optional): 子线程是否运行在 daemon 模式。Defaults to True.
+                如果是，则程序主线程退出后，子线程自动退出；
+                如果不是，需要手工调用 stop() 停止子线程，否则子线程、主线程均不会退出。
+        """
+        running_thread = threading.Thread(target=self._run, daemon=daemon)
         running_thread.start()
         pass
 
     def stop(self):
+        """手动停止任务调度子线程（通过 self._stop 标记位）
+        """
         self._stop = True
         pass

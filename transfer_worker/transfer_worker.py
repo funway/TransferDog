@@ -4,9 +4,11 @@
 # Author:  funway.wang
 # Created: 2023/04/16 10:09:37
 
-import logging
+import logging, time
 
-from transfer_dog.model.task import Task
+from peewee import OperationalError
+
+from transfer_worker.model.task import Task
 
 class TransferWorker(object):
     """docstring for TransferWorker."""
@@ -21,19 +23,22 @@ class TransferWorker(object):
         pass
 
     def load_task(self, task_uuid):
-        try:
-            assert Task.table_exists(), 'Task 表不存在！'
-        except Exception as e:
-            self.logger.error('Task 表不存在！')
-            raise e
-
         self.logger.debug('Load task [%s]', task_uuid)
-        task = Task.get_or_none(Task.uuid == task_uuid)
 
+        # try:
+        #     assert Task.table_exists(), 'Task 表不存在！'
+        # except Exception as e:
+        #     self.logger.error('Task 表不存在！')
+        #     raise e
+        
         try:
+            task = Task.get_or_none(Task.uuid == task_uuid)
             assert task is not None, 'Can not find the task!'
+        except OperationalError as e:
+            self.logger.exception('Task 表异常!')
+            raise e
         except Exception as e:
-            self.logger.error('Can not find the task!')
+            self.logger.exception('无法找任务[%s]!', task_uuid)
             raise e
         
         return task
@@ -46,6 +51,7 @@ class TransferWorker(object):
         """
         
         
-        self.logger.debug('Working...')
-        
+        while True:
+            self.logger.debug('Working...')
+            time.sleep(1)
         return 0

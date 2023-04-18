@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>650</width>
-    <height>704</height>
+    <height>739</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -112,9 +112,6 @@ QLabel#label_error_msg {
           <property name="text">
            <string>Local</string>
           </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
           <attribute name="buttonGroup">
            <string notr="true">buttonGroup_src_protocol</string>
           </attribute>
@@ -124,9 +121,6 @@ QLabel#label_error_msg {
          <widget class="QRadioButton" name="radioButton_src_ftp">
           <property name="text">
            <string>FTP</string>
-          </property>
-          <property name="checked">
-           <bool>false</bool>
           </property>
           <attribute name="buttonGroup">
            <string notr="true">buttonGroup_src_protocol</string>
@@ -222,7 +216,7 @@ QLabel#label_error_msg {
           </spacer>
          </item>
          <item row="0" column="1" colspan="3">
-          <widget class="QLineEdit" name="lineEdit_src_server_address">
+          <widget class="QLineEdit" name="lineEdit_src_server_netloc">
            <property name="placeholderText">
             <string>username:password@host:port</string>
            </property>
@@ -280,37 +274,10 @@ QLabel#label_error_msg {
       <string>Filter / Middleware</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="2">
-       <widget class="QPushButton" name="pushButton_2">
-        <property name="text">
-         <string>Test</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="2">
-       <widget class="QCheckBox" name="checkBox_scan_subdir">
+       <widget class="QLabel" name="label_10">
         <property name="text">
-         <string>Scan Subdirectories</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <spacer name="horizontalSpacer_4">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>164</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="1" column="3">
-       <widget class="QCheckBox" name="checkBox_delete_source">
-        <property name="text">
-         <string>Delete Source</string>
+         <string>Subdir Recursion</string>
         </property>
        </widget>
       </item>
@@ -324,6 +291,20 @@ QLabel#label_error_msg {
       <item row="1" column="1">
        <widget class="QComboBox" name="comboBox_filter_valid_time"/>
       </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Filename RegEx</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="text">
+         <string>Test</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="1">
        <widget class="QLineEdit" name="lineEdit_filter_filename">
         <property name="text">
@@ -331,10 +312,17 @@ QLabel#label_error_msg {
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_8">
+      <item row="1" column="3">
+       <widget class="QSpinBox" name="spinBox_subdir_recursion">
+        <property name="maximum">
+         <number>999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QCheckBox" name="checkBox_delete_source">
         <property name="text">
-         <string>Filename RegEx</string>
+         <string>Delete Source</string>
         </property>
        </widget>
       </item>
@@ -360,9 +348,6 @@ QLabel#label_error_msg {
          <widget class="QRadioButton" name="radioButton_dest_local">
           <property name="text">
            <string>Local</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
           </property>
           <attribute name="buttonGroup">
            <string notr="true">buttonGroup_dest_protocol</string>
@@ -468,7 +453,7 @@ QLabel#label_error_msg {
           </spacer>
          </item>
          <item row="0" column="1" colspan="3">
-          <widget class="QLineEdit" name="lineEdit_dest_server_address">
+          <widget class="QLineEdit" name="lineEdit_dest_server_netloc">
            <property name="placeholderText">
             <string>username:password@host:port</string>
            </property>
@@ -592,20 +577,17 @@ QLabel#label_error_msg {
   <tabstop>radioButton_src_local</tabstop>
   <tabstop>radioButton_src_ftp</tabstop>
   <tabstop>radioButton_src_sftp</tabstop>
-  <tabstop>lineEdit_src_server_address</tabstop>
+  <tabstop>lineEdit_src_server_netloc</tabstop>
   <tabstop>comboBox_src_server_encoding</tabstop>
   <tabstop>checkBox_src_server_passive</tabstop>
   <tabstop>lineEdit_src_dir</tabstop>
   <tabstop>pushButton_src_browse</tabstop>
   <tabstop>lineEdit_filter_filename</tabstop>
-  <tabstop>pushButton_2</tabstop>
   <tabstop>comboBox_filter_valid_time</tabstop>
-  <tabstop>checkBox_scan_subdir</tabstop>
-  <tabstop>checkBox_delete_source</tabstop>
   <tabstop>radioButton_dest_local</tabstop>
   <tabstop>radioButton_dest_ftp</tabstop>
   <tabstop>radioButton_dest_sftp</tabstop>
-  <tabstop>lineEdit_dest_server_address</tabstop>
+  <tabstop>lineEdit_dest_server_netloc</tabstop>
   <tabstop>comboBox_dest_server_encoding</tabstop>
   <tabstop>checkBox_dest_server_passive</tabstop>
   <tabstop>lineEdit_dest_dir</tabstop>

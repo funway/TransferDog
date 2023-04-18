@@ -7,25 +7,40 @@
 import logging, random
 
 from PySide6 import QtCore
-from PySide6.QtGui import QIcon, QFont, QStandardItem, QPainter, QPalette
+from PySide6.QtGui import QIcon, QFont, QStandardItem, QStandardItemModel, QPainter, QMovie
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QStyledItemDelegate, QStyle, QStyleOption
 
 from transfer_dog.utility.constants import *
+from transfer_worker.model import Task
 
 
 class TaskInfoItem(QStandardItem):
     """表示在 QStandardItemModel 中的每一个 item 项"""
-    def __init__(self, title: str = 'Task Title', description: str = 'Description...'):
-        super(TaskInfoItem, self).__init__(title)
+    def __init__(self, task: Task):
+        super(TaskInfoItem, self).__init__(task.task_name)
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.logger.debug('Init a %s instance. title[%s]', self.__class__.__name__, title)
+        self.logger.debug('Init a %s instance. title[%s]', self.__class__.__name__, task.task_name)
 
-        self.setData(title, role=QtCore.Qt.ItemDataRole.DisplayRole)
-
-        self.widget = TaskInfoWidget(title, description)
-        self.setData(self.widget, role=QtCore.Qt.ItemDataRole.UserRole)
-
+        self.task_uuid = task.uuid
+        self.widget = TaskInfoWidget(task.task_name)
+        
+        self.setData(task.task_name, role=QtCore.Qt.ItemDataRole.DisplayRole)
         self.setEditable(False)
+        pass
+
+    def __str__(self):
+        """返回 task_uuid 与实例地址
+
+        Returns:
+            string: uuid + object
+        """
+        return '[%s], %s' % (self.task_uuid, object.__repr__(self))
+
+    def __del__(self):
+        self.logger.debug('Delete a %s instance. [%s]', self.__class__.__name__, self.task_uuid)
+        
+        # 将自定义 widget 的 parent 设置为 None 后，它才会被释放。
+        self.widget.setParent(None)
         pass
 
 class TaskInfoWidget(QWidget):
@@ -40,10 +55,8 @@ class TaskInfoWidget(QWidget):
 
         super().__init__(parent)
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.logger.debug('Init a %s instance', self.__class__.__name__)
-
-        self._option = None
-
+        self.logger.debug('Init a %s instance. title[%s]', self.__class__.__name__, title)
+        
         # 1. 图标
         self.label_icon = QLabel(self)
         self.label_icon.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
@@ -52,6 +65,13 @@ class TaskInfoWidget(QWidget):
         # 1.1 QLabel 加载图片
         ## 使用 QIcon 来获得缩放后的 QPixmap
         self.label_icon.setPixmap(QIcon( str(RESOURCE_PATH / "img/dog.png") ).pixmap(32, 32))
+
+        # 1.2 QLabel 加载 gif
+        # self.movie = QMovie(str( RESOURCE_PATH / 'img/loading.gif' ))
+        # self.movie.setScaledSize(QtCore.QSize(32, 32))
+        # self.movie.setCacheMode(QMovie.CacheMode.CacheAll)
+        # self.label_icon.setMovie(self.movie)
+        # self.movie.start()
 
         # 2. title
         self.label_title = QLabel(self)
@@ -113,6 +133,86 @@ class TaskInfoWidget(QWidget):
         painter = QPainter(self)
         self.style().drawPrimitive(QStyle.PrimitiveElement.PE_Widget, opt, painter, self)
         pass
+    
+    def __del__(self):
+        self.logger.debug('Delete a %s instance. [%s]', self.__class__.__name__, self.label_title.text())
+        pass
+
+
+class TaskInfoItemModel(QStandardItemModel):
+    """docstring for TaskInfoItemModel."""
+    def __init__(self):
+        super(TaskInfoItemModel, self).__init__()
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.debug('Init a %s instance', self.__class__.__name__)
+        
+        self.task_item_dict = {}  # {task_uuid: TaskInfoItem}
+        pass
+
+    def add_tasks(self, tasks):
+        for task in tasks:
+            self.add_task(task)
+        pass
+    
+    def add_task(self, task: Task) -> TaskInfoItem:
+        """使用 task 信息新建一个 TaskInfoItem 对象，并添加到 TaskInfoItemModel 中。如果已存在，则重复添加。
+
+        Args:
+            task (Task): _description_
+
+        Returns:
+            TaskInfoItem: 返回新建（或已存在）的 TaskInfoItem 对象
+        """
+        self.logger.debug('准备添加任务节点 [%s - %s]', task.task_name, task.uuid)
+
+        # 1. 已有的 task 不再添加
+        if task.uuid in self.task_item_dict:
+            self.logger.warning('%s 中已经存在 TaskInfoItem[%s]', __class__, task.uuid)
+            return self.task_item_dict[task.uuid]
+
+        # 2. 找到任务组节点（如果不存在则新建一个）
+        group_items = self.findItems(task.group_name, flags=QtCore.Qt.MatchFlag.MatchExactly)
+        if len(group_items) > 0:
+            group_item = group_items[0]
+        else:
+            self.logger.debug('不存在任务组节点 [%s]. 新建一个', task.group_name)
+            group_item = QStandardItem(task.group_name)
+            self.appendRow(group_item)
+        
+        # 3. 新建任务节点 (TaskInfoItem) 并添加到任务组节点下面
+        self.logger.debug('新建 item 并添加到 model. [%s - %s]', task.task_name, task.uuid)
+        tk_item = TaskInfoItem(task)
+        group_item.appendRow(tk_item)
+        
+        # 4. 将 uuid:item 写入 task_item_dict 字典，方便后续查询
+        self.task_item_dict[task.uuid] = tk_item
+        return tk_item
+
+    def find_task(self, uuid: str) -> TaskInfoItem:
+        """根据 uuid 在 model 中查找对应 task 的 TaskInfoItem
+
+        Args:
+            uuid (str): 任务的 uuid
+
+        Returns:
+            TaskInfoItem: 如果没找到，返回 None
+        """
+        return self.task_item_dict[uuid] if uuid in self.task_item_dict else None
+    
+    def remove_task(self, uuid: str):
+        task_item = self.find_task(uuid)
+        task_idx = self.indexFromItem(task_item)
+        parent_idx = task_idx.parent()
+        self.logger.debug('从 %s 中删除任务节点 [%s] @ (%s, %s) in group [%s]', 
+                         __class__.__name__, task_idx.data(), task_idx.row(), task_idx.column(), parent_idx.data())
+        
+        # 从 QStandardModel 中删除
+        self.task_item_dict.pop(uuid)
+        self.removeRow(task_idx.row(), parent_idx)
+        if self.rowCount(parent_idx) == 0:
+            self.logger.debug('上层节点 [%s] 不再有子节点，删除', parent_idx.data())
+            self.removeRow(parent_idx.row(), parent_idx.parent())
+        pass
 
 
 class TaskInfoDelegate(QStyledItemDelegate):
@@ -122,8 +222,6 @@ class TaskInfoDelegate(QStyledItemDelegate):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.debug('Init a %s instance' % self.__class__.__name__)
         
-        # 关闭 debug 输出
-        # self.logger.setLevel(logging.INFO)
         pass
 
     def paint(self, painter, option, index):
@@ -149,9 +247,15 @@ class TaskInfoDelegate(QStyledItemDelegate):
         tree_widget.style().drawPrimitive(QStyle.PrimitiveElement.PE_PanelItemViewItem, option, painter, tree_widget)
 
         # 4. 绘制二级节点
-        task_widget = index.data(role=QtCore.Qt.ItemDataRole.UserRole)
+        item = index.model().itemFromIndex(index)
+        assert type(item) is TaskInfoItem
+        task_widget = item.widget
         task_widget.setGeometry(option.rect)
         # 使用父节点自动绘制子节点的方式，不需要手工绘制
+        if task_widget.parentWidget() != tree_widget.viewport():
+            task_widget.setParent(tree_widget.viewport())
+            task_widget.installEventFilter(tree_widget)
+            task_widget.show()
 
         # painter.save()
         # painter.translate(option.rect.topLeft())
@@ -162,16 +266,15 @@ class TaskInfoDelegate(QStyledItemDelegate):
 
     def sizeHint(self, option, index):
         """绘制自定义 widget 时，需要重写 sizeHint 来返回自定义 widget 的大小，来占位。 """
-        # 如果是一级节点，返回父类的 sizeHint
-        if index.parent().isValid() == False:
-            self.logger.debug('一级节点: %s', index.data())
+        
+        item = index.model().itemFromIndex(index)
+        if type(item) is TaskInfoItem:
+            self.logger.debug('任务节点: Task[%s]', index.data())
+            return item.widget.sizeHint()
+        else:
+            self.logger.debug('非任务节点: [%s]', index.data())
             return super().sizeHint(option, index)
         
-        # 如果是二级节点，返回自定义 widget 的 sizeHint
-        self.logger.debug('二级节点: %s', index.data())
-        task_widget = index.data(role=QtCore.Qt.ItemDataRole.UserRole)
-        return task_widget.sizeHint()
-
 
 class TaskSearchProxyModel(QtCore.QSortFilterProxyModel):
     def __init__(self):
@@ -183,7 +286,6 @@ class TaskSearchProxyModel(QtCore.QSortFilterProxyModel):
         self.setFilterCaseSensitivity(QtCore.Qt.CaseSensitivity.CaseInsensitive)
         pass
 
-    
     def filterAcceptsRow(self, sourceRow: int, sourceParent: QtCore.QModelIndex) -> bool:
         """重写父类方法，判断节点是否满足过滤条件。
         节点可以通过 sourceParent[sourceRow] 定位，注意实参都是 sourceModel 的节点。
@@ -232,4 +334,32 @@ class TaskSearchProxyModel(QtCore.QSortFilterProxyModel):
             if type(item) is TaskInfoItem:
                 item.widget.hide()
             return False
+
+    def itemFromIndex(self, index: QtCore.QModelIndex) -> QStandardItem:
+        """返回 index 对应的 item
+
+        Args:
+            index (QtCore.QModelIndex): index in this ProxyModel
+
+        Returns:
+            QStandardItem: item in SourceModel
+        """
+        assert index.isValid()
+        assert isinstance(self.sourceModel(), QStandardItemModel)
+
+        source_index = self.mapToSource(index)
+        return self.sourceModel().itemFromIndex(source_index)
     
+    def indexFromItem(self, item: QStandardItem) -> QtCore.QModelIndex:
+        """返回 item 在该 model 中对应的 index。
+
+        Args:
+            item (QStandardItem): item
+
+        Returns:
+            QtCore.QModelIndex: index
+        """
+        assert isinstance(self.sourceModel(), QStandardItemModel)
+
+        source_index = self.sourceModel().indexFromItem(item)
+        return self.mapFromSource(source_index)

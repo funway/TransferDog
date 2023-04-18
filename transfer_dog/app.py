@@ -51,13 +51,10 @@ def run():
     main_window = MainWindow()
     main_window.show()
 
-    # 启动 TransferDog 运行子线程
+    # 启动 TransferDog 运行子线程，进行任务调度
     doggy.run()
     
     # 进入 QApplication 事件循环线程（主线程）
     result = q_app.exec()
-    
-    # 停止 TransferDog 子线程
-    doggy.stop()
     
     return result

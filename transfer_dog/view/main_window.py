@@ -10,10 +10,11 @@ from playhouse.shortcuts import model_to_dict
 from PySide6.QtWidgets import QMainWindow, QDialog, QAbstractItemView, QLineEdit
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 
-from transfer_dog.model import Task
+from transfer_dog.transfer_dog import TransferDog
 from transfer_dog.ui.ui_main_window import Ui_MainWindow
 from transfer_dog.view.dialog_task_edit import DialogTaskEdit
 from transfer_dog.view.task_info import *
+from transfer_worker.model import Task
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -27,58 +28,64 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.logger.debug('Init a %s instance', self.__class__.__name__)
         
         # 定义成员变量
-        self.tree_model = QStandardItemModel()
+        self.doggy = TransferDog()
+        self.source_model = TaskInfoItemModel()
+        self.proxy_model = TaskSearchProxyModel()
 
         # 调用父类 Ui_MainWindow 的函数装载 UI
         self.setupUi(self)
         
         # 绑定信号-槽
         self.actionNewTask.triggered.connect(lambda: self.show_dialog_task_edit(None))
+        self.actionEditTask.triggered.connect(self._action_edit_task)
+        self.actionDeleteTask.triggered.connect(self._action_delete_task)
+        self.actionCopyTask.triggered.connect(self._action_copy_task)
+        self.actionTest.triggered.connect(self.test_func)
 
         self.update_UI()
         pass
 
+    def test_func(self):
+        self.logger.info('测试测试')
+        pass
+
+    def add_task(self, task: Task):
+        """新增 task：将 task 加入到 TransferDog 单例中，加入到 TaskInfoModel 中，并给其对应的 widget 设置父节点。
+
+        Args:
+            task (Task): _description_
+        """
+        # 1. 将 task 加入到 doggy 的 task 字典
+        if task.uuid in self.doggy.tasks:
+            self.logger.warning('task[%s] 已存在于 TransferDog 单例中！', task.uuid)
+        else:
+            self.doggy.tasks[task.uuid] = task
+
+        # 2. 将 task 加入到 source_model 中
+        self.source_model.add_task(task)
+
+        # 3. 给 TaskInfoItem.widget 设置父节点，绑定到 treeView 中
+        item = self.source_model.find_task(task.uuid)
+        item.widget.setParent(self.treeView.viewport())
+        item.widget.show()
+
+        # 4. 在 treeview 中展开 item 对应的任务组
+        idx = self.proxy_model.indexFromItem(item)
+        self.treeView.expand(idx.parent())
+        pass
+    
     def update_UI(self):
         """执行一些无法在 setupUi() 中完成的界面更新
         """
+        # 设置 Model
+        self.source_model.add_tasks(self.doggy.tasks.values())
 
-        # 获取有效任务
-        tasks = [task for task in Task.select()]
-        for task in tasks:
-            self.logger.debug('Task: %s', task)
-
-        # 获取任务组
-        groups = list(set([task.group_name for task in tasks]))
-        groups.sort()   # sort() 并不能很好地处理中文排序，因为它只是按照字符编码进行排序，而中文的编码顺序与拼音顺序无关。
-        self.logger.debug('There are %s taskgroups: %s', len(groups), groups)
-
-        # 设置 model
-        root_item = self.tree_model.invisibleRootItem()
-        
-        # 添加 model 子节点
-        group_index = {}
-        # 添加一级节点 任务组
-        for group in groups:
-            # 添加一级节点 任务组
-            gp_item = QStandardItem(group)
-            root_item.appendRow(gp_item)
-            group_index[group] = root_item.rowCount() - 1
-            pass
-        # 添加二级节点 任务
-        for task in tasks:
-            tk_item = TaskInfoItem(task.task_name)
-            root_item.child(group_index[task.group_name]).appendRow(tk_item)
-            # 将每个 tk_item.widget 的 parent 设置为当前 QTreeView
-            tk_item.widget.setParent(self.treeView.viewport())
-            tk_item.widget.installEventFilter(self.treeView)
-            pass
-
-        # 定义 ProxyModel
-        self.proxy_model = TaskSearchProxyModel()
-        self.proxy_model.setSourceModel(self.tree_model)
+        # 设置 ProxyModel
+        self.proxy_model.setSourceModel(self.source_model)
 
         # 给 QTreeView 设置数据
         self.treeView.setModel(self.proxy_model)
+        self.treeView.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
         
         # 给 QTreeView 设置自定义的 ItemDelegate
         delegate = TaskInfoDelegate()
@@ -101,6 +108,55 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lineEdit.textChanged.connect(self._search_text_changed)
         pass
 
+    def _action_delete_task(self):
+        ss = self.treeView.selectedIndexes()
+        if len(ss) == 0:
+            self.logger.debug('用户没有选中任何节点')
+            return
+        idx = ss[0]
+        item = idx.model().itemFromIndex(idx)
+        if type(item) is TaskInfoItem:
+            self.logger.debug('用户选中删除任务节点 [%s]', idx.data())
+            self.source_model.remove_task(item.task_uuid)
+            task = self.doggy.tasks.pop(item.task_uuid)
+            task.delete_instance()
+        else:
+            self.logger.debug('用户选中的不是任务节点')
+        pass
+
+    def _action_edit_task(self):
+        ss = self.treeView.selectedIndexes()
+        if len(ss) == 0:
+            self.logger.debug('用户没有选中任何节点')
+            return
+        
+        idx = ss[0]
+        item = idx.model().itemFromIndex(idx)
+        if type(item) is TaskInfoItem:
+            self.logger.debug('用户选中编辑任务节点 [%s]', idx.data())
+            self.show_dialog_task_edit(task=self.doggy.tasks[item.task_uuid])
+        else:
+            self.logger.debug('用户选中的不是任务节点')
+        pass
+    
+    def _action_copy_task(self):
+        ss = self.treeView.selectedIndexes()
+        if len(ss) == 0:
+            self.logger.debug('用户没有选中任何节点')
+            return
+        idx = ss[0]
+        item = idx.model().itemFromIndex(idx)
+        if type(item) is TaskInfoItem:
+            self.logger.info('用户选中复制任务节点 [%s]', idx.data())
+            src_task = self.doggy.tasks[item.task_uuid]
+            copy_task = src_task.copy()
+            copy_task.save()
+            self.add_task(copy_task)
+        else:
+            self.logger.debug('用户选中的不是任务节点')
+        pass
+        pass
+
     def show_dialog_task_edit(self, task:Task=None):
         self.logger.debug('show dialog_task_edit with task: %s', task)
         
@@ -110,10 +166,40 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.logger.debug("dialog save clicked!")
             task = dialog.retrieve_task()
             self.logger.debug('retrieve task: %s', model_to_dict(task))
+            self.logger.debug('dirty fields: %s', task.dirty_fields)
+            
             try:
-                task.save()
+                if task.uuid not in self.doggy.tasks:
+                    self.logger.debug('保存新建的 task. %s', task)
+                    self.add_task(task)
+                    task.save()
+                    pass
+                elif task.is_dirty():
+                    self.logger.debug('保存修改的 task. %s', task)
+                    item = self.source_model.find_task(task.uuid)
+                    
+                    for dirty_field in task.dirty_fields:
+                        if Task.group_name is dirty_field:
+                            self.logger.debug('修改了 task 的任务组，需要对任务列表进行重排')
+                            self.source_model.remove_task(task.uuid)
+                            self.source_model.add_task(task)
+                            
+                            item = self.source_model.find_task(task.uuid)
+                            item.widget.setParent(self.treeView.viewport())
+                            item.widget.show()
+                            
+                            idx = self.proxy_model.indexFromItem(item)
+                            self.treeView.expand(idx.parent())
+                            self.treeView.selectionModel().select(idx,
+                                QtCore.QItemSelectionModel.SelectionFlag.ClearAndSelect)
+                            break
+                    
+                    item.widget.label_title.setText(task.task_name)
+                    task.save()
+                    pass
             except Exception as e:
                 self.logger.exception('保存任务失败！')
+                pass
         else:
             self.logger.debug("dialog cancel clicked")
         pass
@@ -123,7 +209,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 隐藏其下的任务子节点
         for row in range(idx.model().rowCount(idx)):
             child_idx = idx.model().index(row, 0, idx)
-            child_item = self.tree_model.itemFromIndex(idx.model().mapToSource(child_idx))
+            child_item = idx.model().itemFromIndex(child_idx)
             child_item.widget.hide()
             pass
         pass
@@ -133,8 +219,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 显示其下的任务子节点
         for row in range(idx.model().rowCount(idx)):
             child_idx = idx.model().index(row, 0, idx)
-            tk_widget = child_idx.data(role=QtCore.Qt.ItemDataRole.UserRole)
-            tk_widget.show()
+            child_item = idx.model().itemFromIndex(child_idx)
+            child_item.widget.show()
+            # tk_widget = child_idx.data(role=QtCore.Qt.ItemDataRole.UserRole)
+            # tk_widget.show()
             pass
         pass
 
@@ -142,7 +230,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.logger.debug('idx clicked! [%s]', idx.data())
         
         # 获取当前被点击的 QStandardItem
-        item = self.tree_model.itemFromIndex(idx.model().mapToSource(idx))
+        item = idx.model().itemFromIndex(idx)
         # self.logger.debug(item.data(role=QtCore.Qt.ItemDataRole.DisplayRole))
         pass
 

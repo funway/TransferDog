@@ -15,4 +15,5 @@
 /log/
 
 # 忽略单个文件
+/conf/task.db
 /conf/app.db

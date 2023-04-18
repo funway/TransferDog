@@ -4,16 +4,25 @@
 # Author:  funway.wang
 # Created: 2023/01/11 19:56:02
 
+if __name__ == "__main__":
+    import sys
+    from pathlib import Path
+
+    sys.path.append( str(Path(__file__).parent.parent.parent) )
+    pass
+
+
 import logging, re
-from urllib.parse import urlparse
+from urllib import parse
 
 from croniter import croniter
+from peewee import fn
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFontMetrics
-from PySide6.QtWidgets import QDialog, QFileDialog, QButtonGroup, QLineEdit
+from PySide6.QtWidgets import QDialog, QFileDialog, QLineEdit
 
-from transfer_dog.model.task import Task
 from transfer_dog.ui.ui_dialog_task_edit import Ui_Dialog
+from transfer_worker.model.task import Task
 
 
 task_valid_time_options = {
@@ -38,22 +47,23 @@ class DialogTaskEdit(QDialog, Ui_Dialog):
 
         # 定义成员变量
         if task is None:
-            self.__task = Task()
-            self.logger.debug('新建任务. [%s] %s', self.__task.uuid, self.__task)
+            self._task = Task()
+            self.logger.debug('新建任务. [%s] %s', self._task.uuid, self._task)
         else:
-            self.__task = task
-            self.logger.debug('修改任务. [%s]', self.__task.uuid)
+            self._task = task
+            self.logger.debug('修改任务. [%s]', self._task.uuid)
 
         # 装载 UI
         self.setupUi(self)
-        self.update_UI()
 
         # 绑定 信号-槽
-        self.buttonGroup_src_protocol.buttonToggled.connect(self.update_groupBox_src_server)
-        self.buttonGroup_dest_protocol.buttonToggled.connect(self.update_groupBox_dest_server)
+        self.buttonGroup_src_protocol.buttonToggled.connect(self.on_src_protocol_toggled)
+        self.buttonGroup_dest_protocol.buttonToggled.connect(self.on_dest_protocol_toggled)
         self.pushButton_src_browse.clicked.connect(lambda: self.open_file_dialog_to(self.lineEdit_src_dir))
         self.pushButton_dest_browse.clicked.connect(lambda: self.open_file_dialog_to(self.lineEdit_dest_dir))
 
+        # 根据 _task 更新 UI
+        self.update_UI()
         pass
 
     def open_file_dialog_to(self, lineEdit: QLineEdit):
@@ -67,52 +77,14 @@ class DialogTaskEdit(QDialog, Ui_Dialog):
             lineEdit.setText(path)
         pass
 
-    def retrieve_task(self) -> Task:
-        """从对话框实例中获取 Task 实例。
-
-        Returns:
-            Task: 返回 self.__task。在返回之前，需要先从对话框面板获取更新数据。
-        """
-
-        # general group
-        self.__task.task_name = self.lineEdit_task_name.text()
-        self.__task.group_name = self.comboBox_task_group.currentText()
-        self.__task.schedule = self.lineEdit_task_schedule.text()
-        self.__task.enabled = self.checkBox_task_enabled.isChecked()
-
-        # source group
-        self.__task.source_server = self.get_server_url(self.buttonGroup_src_protocol, self.lineEdit_src_server_address)
-        self.__task.source_encoding = self.comboBox_src_server_encoding.currentText()
-        self.__task.source_passive_mode = self.checkBox_src_server_passive.isChecked()
-        self.__task.source_path = self.lineEdit_src_dir.text()
-
-
-        # filter gruop
-        self.__task.filter_filename = self.lineEdit_filter_filename.text()
-        self.__task.filter_valid_time = self.comboBox_filter_valid_time.currentData()
-        self.__task.scan_subdir = self.checkBox_scan_subdir.isChecked()
-        self.__task.delete_source = self.checkBox_delete_source.isChecked()
-
-        # destination group
-        self.__task.dest_server = self.get_server_url(self.buttonGroup_dest_protocol, self.lineEdit_dest_server_address)
-        self.__task.dest_encoding = self.comboBox_dest_server_encoding.currentText()
-        self.__task.dest_passive_mode = self.checkBox_dest_server_passive.isChecked()
-        self.__task.dest_path = self.lineEdit_dest_dir.text()
-
-        return self.__task
-
     def update_UI(self):
-        """update dialog UI according to the self.__task.
-        """
-        
-        # 执行 setupUI() 无法完成的其他初始化设置
-        #   初始化任务分组下拉框
-        self.comboBox_task_group.addItem('Default')
-        #   初始化有效时间下拉框
-        for key, text in task_valid_time_options.items():
-            self.comboBox_filter_valid_time.addItem(text, key)
+        """Update dialog UI according to the self._task. Do some UI updating that cannot be done in setupUI().
+        """        
+        task = self._task
 
-        task = self.__task
+        #   初始化任务分组下拉框
+        groups = [row['group_name'] for row in Task.select( fn.Distinct(Task.group_name) ).dicts()]
+        self.comboBox_task_group.addItems(groups)
 
         # update general group
         self.lineEdit_task_name.setText(task.task_name)
@@ -121,53 +93,65 @@ class DialogTaskEdit(QDialog, Ui_Dialog):
         self.checkBox_task_enabled.setChecked(task.enabled)
 
         # update source group
-        o = urlparse(task.source_server)
+        o = parse.urlparse(task.source_url)
         if o.scheme == 'local':
             self.radioButton_src_local.setChecked(True)
         elif o.scheme == 'ftp':
             self.radioButton_src_ftp.setChecked(True)
         elif o.scheme == 'sftp':
             self.radioButton_src_sftp.setChecked(True)
-        self.lineEdit_src_server_address.setText(o.netloc)
-        self.comboBox_src_server_encoding.setCurrentText(task.source_encoding)
-        self.checkBox_src_server_passive.setChecked(task.source_passive_mode)
-        self.lineEdit_src_dir.setText(task.source_path)
+        self.lineEdit_src_server_netloc.setText(o.netloc)
+        querys = dict(parse.parse_qsl(o.query))
+        self.comboBox_src_server_encoding.setCurrentText(querys.get('encoding', 'UTF8'))
+        self.checkBox_src_server_passive.setChecked(querys.get('passive', 'False').upper() == 'TRUE')
+        self.lineEdit_src_dir.setText(o.path)
 
         # update filter group
+        #   文件名过滤
         self.lineEdit_filter_filename.setText(task.filter_filename)
-        self.checkBox_scan_subdir.setChecked(task.scan_subdir)
+        #   子目录递归
+        self.spinBox_subdir_recursion.setValue(task.subdir_recursion)
+        #   删除源文件
         self.checkBox_delete_source.setChecked(task.delete_source)
+        #   有效时间过滤
+        for key, text in task_valid_time_options.items():
+            self.comboBox_filter_valid_time.addItem(text, key)
         try:
-            self.comboBox_filter_valid_time.setCurrentText(task_valid_time_options[self.__task.filter_valid_time])
+            self.comboBox_filter_valid_time.setCurrentText(task_valid_time_options[self._task.filter_valid_time])
         except Exception as e:
             logging.exception('task.filter_valid_time 异常！无法找到对应的选项')
             self.comboBox_filter_valid_time.setCurrentIndex(0)
 
         # update destination group
-        o = urlparse(task.dest_server)
+        o = parse.urlparse(task.dest_url)
         if o.scheme == 'local':
-            self.radioButton_src_local.setChecked(True)
+            # 由 radioButton.setChecked 触发 buttonGroup.buttonToggled 信号
+            self.radioButton_dest_local.setChecked(True)
         elif o.scheme == 'ftp':
-            self.radioButton_src_ftp.setChecked(True)
+            self.radioButton_dest_ftp.setChecked(True)
         elif o.scheme == 'sftp':
-            self.radioButton_src_sftp.setChecked(True)
-        self.lineEdit_dest_server_address.setText(o.netloc)
-        self.comboBox_dest_server_encoding.setCurrentText(task.dest_encoding)
-        self.checkBox_dest_server_passive.setChecked(task.dest_passive_mode)
-        self.lineEdit_dest_dir.setText(task.dest_path)
+            self.radioButton_dest_sftp.setChecked(True)
+        self.lineEdit_dest_server_netloc.setText(o.netloc)
+        querys = dict(parse.parse_qsl(o.query))
+        self.comboBox_dest_server_encoding.setCurrentText(querys.get('encoding', 'UTF8'))
+        self.checkBox_dest_server_passive.setChecked( querys.get('passive', 'False').upper() == 'TRUE' )
+        self.lineEdit_dest_dir.setText(o.path)
 
         pass
 
-    def update_groupBox_src_server(self, btn, checked):
+    def on_src_protocol_toggled(self, btn, checked):
         """Signal/Slot 槽函数，根据用户选择的服务器协议类型，自动 enable/disable 部分用户设置。
+        注意，当用户切换选中的 QRadioButton 时, QButtonGroup::buttonToggled 会触发两次。
+        一次代表 A toggled to False, 一次代表 B toggled to True. 
 
         Args:
             btn (_type_): 代表用户点击的 QRadioButton 按钮
-            checked (_type_): 该按钮是被 Checked 还是 Unchecked
+            checked (bool): 该按钮是被 Checked 还是 Unchecked
         """
-        # self.logger.debug('btn %s, toggled to %s', btn.objectName(), checked)
+        self.logger.debug('btn %s, toggled to %s', btn.objectName(), checked)
 
         if not checked:
+            # Toggled to False 的不处理
             return
         elif btn is self.radioButton_src_local:
             self.logger.debug('radioButton_src_local checked!')
@@ -179,10 +163,11 @@ class DialogTaskEdit(QDialog, Ui_Dialog):
             self.pushButton_src_browse.setEnabled(False)
         pass
 
-    def update_groupBox_dest_server(self, btn, checked):
-        # self.logger.debug('btn %s, toggled to %s', btn.objectName(), checked)
+    def on_dest_protocol_toggled(self, btn, checked):
+        self.logger.debug('btn %s, toggled to %s', btn.objectName(), checked)
         
         if not checked:
+            # Toggled to False 的不处理
             return
         elif btn is self.radioButton_dest_local:
             self.logger.debug('radioButton_dest_local checked!')
@@ -195,18 +180,62 @@ class DialogTaskEdit(QDialog, Ui_Dialog):
 
         pass
     
-    def get_server_url(self, btng:QButtonGroup, le:QLineEdit) -> str:
-        """从 服务器协议选择按钮 与 服务器地址文本框 中获取服务器 URL 地址。
-
-        Args:
-            btng (QButtonGroup): 选择协议的 QRadioButton group
-            le (QLineEdit): 地址输入框
+    def retrieve_task(self) -> Task:
+        """从对话框实例中获取 Task 实例。
 
         Returns:
-            str: 以 protocol://address 的格式返回 URL 字符串。
+            Task: 返回 self._task。在返回之前，需要先从对话框面板获取更新数据。
         """
-        protocol = btng.checkedButton().text().lower()
-        return protocol + '://' + le.text()
+
+        # general group
+        if self._task.task_name != self.lineEdit_task_name.text():
+            self._task.task_name = self.lineEdit_task_name.text()
+        if self._task.group_name != self.comboBox_task_group.currentText():
+            self._task.group_name = self.comboBox_task_group.currentText()
+        if self._task.schedule != self.lineEdit_task_schedule.text():
+            self._task.schedule = self.lineEdit_task_schedule.text()
+        if self._task.enabled != self.checkBox_task_enabled.isChecked():
+            self._task.enabled = self.checkBox_task_enabled.isChecked()
+
+        # source group
+        source_url = parse.urlunparse(parse.ParseResult(
+            scheme = self.buttonGroup_src_protocol.checkedButton().text().lower(),
+            netloc = self.lineEdit_src_server_netloc.text(),
+            path = self.lineEdit_src_dir.text(),
+            params = '',
+            query = parse.urlencode({ 'encoding': self.comboBox_src_server_encoding.currentText(),
+                                      'passive': self.checkBox_src_server_passive.isChecked() }),
+            fragment = ''
+        ))
+        if self._task.source_url != source_url:
+            self._task.source_url = source_url
+        self.logger.debug('Get source url: %s', source_url)
+
+        # filter gruop
+        if self._task.filter_filename != self.lineEdit_filter_filename.text():
+            self._task.filter_filename = self.lineEdit_filter_filename.text()
+        if self._task.filter_valid_time != self.comboBox_filter_valid_time.currentData():
+            self._task.filter_valid_time = self.comboBox_filter_valid_time.currentData()
+        if self._task.subdir_recursion != self.spinBox_subdir_recursion.value():
+            self._task.subdir_recursion = self.spinBox_subdir_recursion.value()
+        if self._task.delete_source != self.checkBox_delete_source.isChecked(): 
+            self._task.delete_source = self.checkBox_delete_source.isChecked()
+
+        # destination group
+        dest_url = parse.urlunparse(parse.ParseResult(
+            scheme = self.buttonGroup_dest_protocol.checkedButton().text().lower(),
+            netloc = self.lineEdit_dest_server_netloc.text(),
+            path = self.lineEdit_dest_dir.text(),
+            params = '',
+            query = parse.urlencode({ 'encoding': self.comboBox_dest_server_encoding.currentText(),
+                                      'passive': self.checkBox_dest_server_passive.isChecked() }),
+            fragment = ''
+        ))
+        if self._task.dest_url != dest_url:
+            self._task.dest_url = dest_url
+        self.logger.debug('Get dest url: %s', dest_url)
+
+        return self._task
 
     def validate_user_input(self) -> str | None:
         """validate user input from dialog.
@@ -226,13 +255,19 @@ class DialogTaskEdit(QDialog, Ui_Dialog):
         
         # 验证 源服务器地址
         try:
-            o = urlparse(self.get_server_url(self.buttonGroup_src_protocol, self.lineEdit_src_server_address))
-            if o.scheme != 'local':
-                assert o.hostname is not None, 'Host is None.'
+            o = parse.ParseResult(
+                    scheme = self.buttonGroup_src_protocol.checkedButton().text().lower(),
+                    netloc = self.lineEdit_src_server_netloc.text(),
+                    path = self.lineEdit_src_dir.text(),
+                    params = '',
+                    query = parse.urlencode({ 'encoding': self.comboBox_src_server_encoding.currentText(),
+                                            'passive': self.checkBox_src_server_passive.isChecked() }),
+                    fragment = ''
+                )
             o.port # urlparse 执行时不会对 port 错误抛出异常，只有在调用 port 的时候才会。
         except Exception as e:
-            self.lineEdit_src_server_address.setFocus()
-            self.logger.warning('源服务器地址输入有误: %s - %s', self.lineEdit_src_server_address.text(), str(e))
+            self.lineEdit_src_server_netloc.setFocus()
+            self.logger.warning('源服务器地址输入有误: %s - %s', self.lineEdit_src_server_netloc.text(), str(e))
             return 'Source address error! ' + str(e)
         self.logger.debug('源服务器地址验证通过')
         
@@ -247,13 +282,19 @@ class DialogTaskEdit(QDialog, Ui_Dialog):
 
         # 验证 目标服务器地址
         try:
-            o = urlparse(self.get_server_url(self.buttonGroup_dest_protocol, self.lineEdit_dest_server_address))
-            if o.scheme != 'local':
-                assert o.hostname is not None, 'Host is None.'
+            o = parse.ParseResult(
+                    scheme = self.buttonGroup_dest_protocol.checkedButton().text().lower(),
+                    netloc = self.lineEdit_dest_server_netloc.text(),
+                    path = self.lineEdit_dest_dir.text(),
+                    params = '',
+                    query = parse.urlencode({ 'encoding': self.comboBox_dest_server_encoding.currentText(),
+                                            'passive': self.checkBox_dest_server_passive.isChecked() }),
+                    fragment = ''
+                )
             o.port # urlparse 执行时不会对 port 错误抛出异常，只有在调用 port 的时候才会。
         except Exception as e:
-            self.lineEdit_dest_server_address.setFocus()
-            self.logger.warning('目标服务器地址输入有误: %s - %s', self.lineEdit_dest_server_address.text(), str(e))
+            self.lineEdit_dest_server_netloc.setFocus()
+            self.logger.warning('目标服务器地址输入有误: %s - %s', self.lineEdit_dest_server_netloc.text(), str(e))
             return 'Destination address error! ' + str(e)
         self.logger.debug('目标服务器地址验证通过')
 
@@ -272,18 +313,27 @@ class DialogTaskEdit(QDialog, Ui_Dialog):
             self.label_error_msg.setText(QFontMetrics(self.label_error_msg.font()).elidedText(msg, Qt.TextElideMode.ElideRight, 250))
             self.label_error_msg.setToolTip(msg)
 
-def test(arg=None):
 
-    import sys
+def test(arg=None):
     
     from PySide6.QtWidgets import QApplication
+    from peewee import SqliteDatabase, fn
     from playhouse.shortcuts import model_to_dict
+    
+    from transfer_dog.utility.constants import TASK_DB
 
     logging_format = '%(asctime)s %(levelname)5s %(name)s.%(funcName)s - %(message)s'
     logging.basicConfig(level=logging.DEBUG, format=logging_format)
 
+    Task.bind(SqliteDatabase(str(TASK_DB)))
     app = QApplication(sys.argv)
     dialog = DialogTaskEdit()
+    
+
+    for group in Task.select( fn.Distinct(Task.group_name) ).dicts():
+        logging.info(group)
+    groups = [row['group_name'] for row in Task.select( fn.Distinct(Task.group_name) ).dicts()]
+    logging.info(groups)
 
     if dialog.exec() == QDialog.DialogCode.Accepted:
         logging.debug("dialog save!")

@@ -1,14 +1,13 @@
 from PySide6.QtCore import QRegularExpression
+from playhouse.shortcuts import model_to_dict, dict_to_model
 
-from transfer_dog.model import Task
+from transfer_worker.model import Task
 
 def test_Task():
     t = Task()
-    print('')
-    print(t)
-    print(t.id)
-    print(t.created_at)
-    print(t.update_at)
+    print(model_to_dict(t))
+    tt = t.replica()
+    print(model_to_dict(tt))
 
 def test_QRegularExpression():
     text = 'xeshi任务'
