@@ -7,7 +7,7 @@
 import os, sys, logging
 
 from playhouse.shortcuts import model_to_dict
-from PySide6.QtWidgets import QMainWindow, QDialog, QAbstractItemView, QLineEdit
+from PySide6.QtWidgets import QMainWindow, QDialog, QAbstractItemView, QLineEdit, QMessageBox
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 
 from transfer_dog.transfer_dog import TransferDog
@@ -117,9 +117,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         item = idx.model().itemFromIndex(idx)
         if type(item) is TaskInfoItem:
             self.logger.debug('用户选中删除任务节点 [%s]', idx.data())
-            self.source_model.remove_task(item.task_uuid)
-            task = self.doggy.tasks.pop(item.task_uuid)
-            task.delete_instance()
+            reply = QMessageBox.question(self, 'Message', 'You sure to delete task [{0}]?'.format(idx.data()),
+                                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
+            if reply == QMessageBox.Yes:
+                self.logger.debug('用户选择了 Yes')
+                self.source_model.remove_task(item.task_uuid)
+                task = self.doggy.tasks.pop(item.task_uuid)
+                task.delete_instance()
+            else:
+                self.logger.debug('用户选择了 No')
         else:
             self.logger.debug('用户选中的不是任务节点')
         pass
@@ -147,11 +153,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         idx = ss[0]
         item = idx.model().itemFromIndex(idx)
         if type(item) is TaskInfoItem:
-            self.logger.info('用户选中复制任务节点 [%s]', idx.data())
+            self.logger.debug('用户选中复制任务节点 [%s]', idx.data())
             src_task = self.doggy.tasks[item.task_uuid]
             copy_task = src_task.copy()
-            copy_task.save()
-            self.add_task(copy_task)
+            self.show_dialog_task_edit(task=copy_task)
         else:
             self.logger.debug('用户选中的不是任务节点')
         pass

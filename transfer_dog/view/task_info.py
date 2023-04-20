@@ -43,6 +43,7 @@ class TaskInfoItem(QStandardItem):
         self.widget.setParent(None)
         pass
 
+
 class TaskInfoWidget(QWidget):
 
     def __init__(self, title: str = 'Title', description: str = 'Description...', parent: QWidget = None):

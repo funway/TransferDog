@@ -15,14 +15,14 @@ from transfer_worker.model.task import Task
 def suicide_when_parent_exited():
     
     def _polling_in_sub_thread(parent_proc):
-        logging.debug('Start a sub thread, polling to check parent process [%s]', parent_proc.pid)
+        logging.debug('Start a sub thread, polling to check parent process [p%s]', parent_proc.pid)
 
         # 每 {polling_gap} 秒轮询一次，检查父进程是否已死
         polling_gap = 0.5
         while parent_proc.is_running():  
             time.sleep(polling_gap)
 
-        logging.warning('Parent process dead. commit suicide.')
+        logging.warning('Parent process dead. Commit suicide.')
         psutil.Process().kill()
         pass
 
@@ -30,11 +30,11 @@ def suicide_when_parent_exited():
     try:
         parent_proc = psutil.Process(pid=self_proc.ppid())
     except Exception as e:
-        logging.exception('Can not get parent process. commit suicide.')
+        logging.exception('Can not get parent process. Commit suicide.')
         self_proc.kill()
     
     if parent_proc.pid == 1:
-        logging.warning('Parent process dead (ppid=1). commit suicide.')
+        logging.warning('Parent process dead (ppid=1). Commit suicide.')
         self_proc.kill()
 
     t = threading.Thread(target=_polling_in_sub_thread, kwargs={'parent_proc': parent_proc}, daemon=True)
@@ -100,7 +100,8 @@ LOG_FORMAT = {
 
 if __name__ == "__main__":
     args = parse_arguments()
-    print(args)
+    print('Command Line Args:', args)
+
     # 设置 logging
     if args.log_config is not None:
         try:

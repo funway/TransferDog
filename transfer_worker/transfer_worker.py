@@ -25,12 +25,6 @@ class TransferWorker(object):
     def load_task(self, task_uuid):
         self.logger.debug('Load task [%s]', task_uuid)
 
-        # try:
-        #     assert Task.table_exists(), 'Task 表不存在！'
-        # except Exception as e:
-        #     self.logger.error('Task 表不存在！')
-        #     raise e
-        
         try:
             task = Task.get_or_none(Task.uuid == task_uuid)
             assert task is not None, 'Can not find the task!'
@@ -49,9 +43,13 @@ class TransferWorker(object):
         Returns:
             int: 运行结果。0 表示正常结束，1 表示执行异常
         """
-        
-        
-        while True:
+        self.logger.info('开始作业 [%s]: %s', self.task.uuid, self.task.task_name)
+
+        count = len(self.task.task_name) * 10
+        while count > 0:
             self.logger.debug('Working...')
-            time.sleep(1)
+            count -= 1
+            time.sleep(3)
+        
+        self.logger.info('完成作业 [%s]: %s', self.task.uuid, self.task.task_name)
         return 0

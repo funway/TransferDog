@@ -24,6 +24,9 @@ class Task(Model):
     # 是否启用
     enabled = BooleanField(default=False)
 
+    # 超时时间，以秒为单位
+    timeout = IntegerField(default=60*60)
+
     # 源地址/目标地址
     # 采用 URL 的格式
     #   协议支持：local, http, ftp, sftp, ftps
