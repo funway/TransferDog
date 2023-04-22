@@ -160,9 +160,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.treeView.setItemDelegate(delegate)
 
         # 关联 QTreeView 的 节点展开、收缩 事件
-        self.treeView.expanded.connect(self._tree_view_item_expanded)
-        self.treeView.collapsed.connect(self._tree_view_item_collapsed)
-        self.treeView.clicked.connect(self._tree_view_item_clicked)
+        self.treeView.expanded.connect(self._treeview_item_expanded)
+        self.treeView.collapsed.connect(self._treeview_item_collapsed)
+        self.treeView.clicked.connect(self._treeview_clicked)
+        self.treeView.doubleClicked.connect(self._treeview_double_clicked)
 
         # 给 QTreeView 设置其他参数
         self.treeView.setHeaderHidden(True)
@@ -283,7 +284,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.logger.debug("dialog cancel clicked")
         pass
     
-    def _tree_view_item_collapsed(self, idx):
+    def _treeview_item_collapsed(self, idx):
         self.logger.debug('QTreeView collpase at node [%s]', idx.data())
         # 隐藏其下的任务子节点
         for row in range(idx.model().rowCount(idx)):
@@ -293,7 +294,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             pass
         pass
 
-    def _tree_view_item_expanded(self, idx):
+    def _treeview_item_expanded(self, idx):
         self.logger.debug('QTreeView expand at node [%s]', idx.data())
 
         self._ensure_outrange_taskinfo_hidden()
@@ -311,11 +312,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.doggy.hide(uuid)
         pass
 
-    def _tree_view_item_clicked(self, idx):
-        self.logger.debug('idx clicked! [%s]', idx.data())
+    def _treeview_clicked(self, idx):
+        self.logger.debug('idx clicked. [%s]', idx.data())
         
         # 获取当前被点击的 QStandardItem
         item = idx.model().itemFromIndex(idx)
+        pass
+
+    def _treeview_double_clicked(self, idx):
+        self.logger.debug('idx double clicked. [%s]', idx.data())
+        item = idx.model().itemFromIndex(idx)
+        if type(item) is TaskItem:
+            self.logger.debug('用户双击任务节点 [%s]', idx.data())
+            self.show_dialog_task_edit(task=self.doggy.dict_tasks[item.task_uuid], window_title='Edit Task')
+        else:
+            self.logger.debug('用户双击的不是任务节点')
         pass
 
     def _search_text_changed(self, text):
