@@ -84,6 +84,7 @@ class DialogTaskEdit(QDialog, Ui_Dialog):
 
         #   初始化任务分组下拉框
         groups = [row['group_name'] for row in Task.select( fn.Distinct(Task.group_name) ).dicts()]
+        groups.sort()
         self.comboBox_task_group.addItems(groups)
 
         # update general group

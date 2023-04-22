@@ -61,7 +61,7 @@ class Task(Model):
         return '[%s], %s' % (self.uuid, object.__repr__(self))
 
     def save(self, force_insert=False, only=None):
-        """重写 save()。每次保存之前，先更新 update_at 字段。然后再调用父类方法。
+        """重写 save()。每次保存之前，先更新 updated_at 字段。然后再调用父类方法。
 
         Args:
             force_insert (bool, optional): _description_. Defaults to False.
@@ -70,11 +70,11 @@ class Task(Model):
         Returns:
             _type_: _description_
         """
-        self.update_at = datetime.now()
+        self.updated_at = datetime.now()
         return super(Task, self).save(force_insert, only)
     
     def copy(self):
-        """Return a copy of the model instance, with [id]=None, [uuid]=new_value, [task_name]=task_name_copy, [enabled]=False, [create_at]=now
+        """Return a copy of the model instance, with [id]=None, [uuid]=new_value, [task_name]=task_name_copy, [enabled]=False, [created_at]=now
 
         Returns:
             _type_: _description_
