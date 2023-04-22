@@ -56,18 +56,19 @@ class TransferDog(object):
                     self.db = None
                     self.load_config()
                     
-                    # {uuid: task}
+                    # 任务字典 {uuid: task}
                     self.dict_tasks = {}
                     
-                    # {uuid: TaskStatus}
+                    # 任务运行状态的字典 {uuid: TaskStatus}
                     self.dict_task_statuses = {}
                     
-                    # {uuid: TaskInfoWidget}
+                    # 任务 widget 的字典 {uuid: TaskWidget}
                     self.dict_task_widgets = {}
 
-                    # {uuid}
+                    # 处于 treeview 可视区域的任务集合 {uuid}
                     self.set_visible_tasks = set()
 
+                    # 所有 taskwidget 共享这个 QMovie 对象，减少内存与 CPU 开销
                     self.running_gif = QMovie(str( RESOURCE_PATH / 'img/running.gif' ))
                     self.running_gif.setScaledSize(QtCore.QSize(32, 32))
                     self.running_gif.setCacheMode(QMovie.CacheMode.CacheAll)
@@ -226,7 +227,7 @@ class TransferDog(object):
         pass
 
     def update_task_widgets(self):
-        """刷新所有处于可视区域的 TaskInfoWidget
+        """刷新所有处于 treeview 可视区域的 TaskWidget
         """
         self.logger.debug('有 %s 个 task widget 在可视区域', len(self.doggy.set_visible_tasks))
         for task_uuid in self.doggy.set_visible_tasks:

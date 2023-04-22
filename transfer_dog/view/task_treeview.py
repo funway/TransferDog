@@ -5,53 +5,21 @@
 # Created: 2023/04/04 22:11:13
 
 import logging, random
-from datetime import datetime
 
-import psutil
-from croniter import croniter
 from PySide6 import QtCore
 from PySide6.QtGui import QIcon, QFont, QStandardItem, QStandardItemModel, QPainter, QMovie
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QStyledItemDelegate, QStyle, QStyleOption
 
 from transfer_dog.utility.constants import *
 from transfer_dog.transfer_dog import TransferDog
+from transfer_dog.model.task_status import TaskStatus
 from transfer_worker.model import Task
 
 
-class TaskStatus(object):
-    """表示任务运行状态的类型
-
-    Args:
-        object (_type_): _description_
-    """
-    def __init__(self, schedule:str, enabled:bool, process:psutil.Process=None):
-        super(TaskStatus, self).__init__()
-        self.schedule = schedule
-        self.enabled = enabled
-
-        self.next_time = croniter(schedule, datetime.now()).get_next(datetime) if enabled else None
-        self.last_time = None
-
-        self.process = process
-        
-        self.need_update = True
-        pass
-
-    def __str__(self):
-        s = '[p: {p}, last: {last}, next: {next}, schedule: {sche}], {repr}'.format(
-            p = None if self.process is None else self.process.pid,
-            last = self.last_time,
-            next = self.next_time,
-            sche = self.schedule,
-            repr = object.__repr__(self)
-        )
-        return s
-
-
-class TaskInfoItem(QStandardItem):
+class TaskItem(QStandardItem):
     """表示在 QStandardItemModel 中的每一个 item 项"""
     def __init__(self, task: Task):
-        super(TaskInfoItem, self).__init__(task.task_name)
+        super(TaskItem, self).__init__(task.task_name)
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.debug('Init a %s instance. title[%s]', self.__class__.__name__, task.task_name)
 
@@ -74,10 +42,10 @@ class TaskInfoItem(QStandardItem):
         pass
 
 
-class TaskInfoWidget(QWidget):
+class TaskWidget(QWidget):
 
     def __init__(self, title: str = 'Title', description: str = 'Description...', parent: QWidget = None):
-        """Init a TaskInfoWidget instance.
+        """Init a TaskWidget instance.
 
         Args:
             title (str, optional): _description_. Defaults to 'Title'. Supports HTML syntax.
@@ -147,7 +115,7 @@ class TaskInfoWidget(QWidget):
         还会接着自动调用所有 child widgets 的 paintEvent()！
         （其实并不是所有，只需要调用与该 event.rect() 有交集的 child widgets 的 paintEvent() 方法。）
 
-        3. 对于 TaskInfoWidget，我们本来不需要重写 paintEvent() 方法，只需由其 child widgets 自行绘制即可。
+        3. 对于 TaskWidget，我们本来不需要重写 paintEvent() 方法，只需由其 child widgets 自行绘制即可。
 
         4. 但是！如果想要让自定义的 QWidget 自己能够响应 StyleSheet 样式，就必须用如下代码重写 paintEvent()
 
@@ -194,14 +162,14 @@ class TaskInfoWidget(QWidget):
         pass
 
 
-class TaskInfoItemModel(QStandardItemModel):
-    """docstring for TaskInfoItemModel."""
+class TaskItemModel(QStandardItemModel):
+    """docstring for TaskItemModel."""
     def __init__(self):
-        super(TaskInfoItemModel, self).__init__()
+        super(TaskItemModel, self).__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.debug('Init a %s instance', self.__class__.__name__)
         
-        self.dict_task_item = {}  # {task_uuid: TaskInfoItem}
+        self.dict_task_item = {}  # {task_uuid: TaskItem}
         pass
 
     def add_tasks(self, tasks):
@@ -209,20 +177,20 @@ class TaskInfoItemModel(QStandardItemModel):
             self.add_task(task)
         pass
     
-    def add_task(self, task: Task) -> TaskInfoItem:
-        """使用 task 信息新建一个 TaskInfoItem 对象，并添加到 TaskInfoItemModel 中。如果已存在，则重复添加。
+    def add_task(self, task: Task) -> TaskItem:
+        """使用 task 信息新建一个 TaskItem 对象，并添加到 TaskItemModel 中。如果已存在，则重复添加。
 
         Args:
             task (Task): _description_
 
         Returns:
-            TaskInfoItem: 返回新建（或已存在）的 TaskInfoItem 对象
+            TaskItem: 返回新建（或已存在）的 TaskItem 对象
         """
         self.logger.debug('准备添加任务节点 [%s - %s]', task.task_name, task.uuid)
 
         # 1. 已有的 task 不再添加
         if task.uuid in self.dict_task_item:
-            self.logger.warning('%s 中已经存在 TaskInfoItem[%s]', __class__, task.uuid)
+            self.logger.warning('%s 中已经存在 TaskItem[%s]', __class__, task.uuid)
             return self.dict_task_item[task.uuid]
 
         # 2. 找到任务组节点（如果不存在则新建一个）
@@ -234,23 +202,23 @@ class TaskInfoItemModel(QStandardItemModel):
             group_item = QStandardItem(task.group_name)
             self.appendRow(group_item)
         
-        # 3. 新建任务节点 (TaskInfoItem) 并添加到任务组节点下面
+        # 3. 新建任务节点 (TaskItem) 并添加到任务组节点下面
         self.logger.debug('新建 item 并添加到 model. [%s - %s]', task.task_name, task.uuid)
-        tk_item = TaskInfoItem(task)
+        tk_item = TaskItem(task)
         group_item.appendRow(tk_item)
         
         # 4. 将 uuid:item 写入 task_item_dict 字典，方便后续查询
         self.dict_task_item[task.uuid] = tk_item
         return tk_item
 
-    def find_task(self, uuid: str) -> TaskInfoItem:
-        """根据 uuid 在 model 中查找对应 task 的 TaskInfoItem
+    def find_task(self, uuid: str) -> TaskItem:
+        """根据 uuid 在 model 中查找对应 task 的 TaskItem
 
         Args:
             uuid (str): 任务的 uuid
 
         Returns:
-            TaskInfoItem: 如果没找到，返回 None
+            TaskItem: 如果没找到，返回 None
         """
         return self.dict_task_item[uuid] if uuid in self.dict_task_item else None
     
@@ -270,9 +238,9 @@ class TaskInfoItemModel(QStandardItemModel):
         pass
 
 
-class TaskInfoDelegate(QStyledItemDelegate):
+class TaskItemDelegate(QStyledItemDelegate):
     def __init__(self, parent = None):
-        super(TaskInfoDelegate, self).__init__(parent)
+        super(TaskItemDelegate, self).__init__(parent)
         
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.debug('Init a %s instance' % self.__class__.__name__)
@@ -303,7 +271,7 @@ class TaskInfoDelegate(QStyledItemDelegate):
 
         # 4. 绘制二级节点
         item = index.model().itemFromIndex(index)
-        assert type(item) is TaskInfoItem
+        assert type(item) is TaskItem
         task_widget = TransferDog().dict_task_widgets[item.task_uuid]
         task_widget.setGeometry(option.rect)
         task_widget.show()
@@ -320,7 +288,7 @@ class TaskInfoDelegate(QStyledItemDelegate):
         """绘制自定义 widget 时，需要重写 sizeHint 来返回自定义 widget 的大小，来占位。 """
         
         item = index.model().itemFromIndex(index)
-        if type(item) is TaskInfoItem:
+        if type(item) is TaskItem:
             self.logger.debug('任务节点: Task[%s]', index.data())
             return TransferDog().dict_task_widgets[item.task_uuid].sizeHint()
         else:
@@ -363,7 +331,7 @@ class TaskSearchProxyModel(QtCore.QSortFilterProxyModel):
 
         # 如果匹配表达式为空字符串，直接返回 True
         if self.filterRegularExpression().pattern() == '' or not self.filterRegularExpression().isValid():
-            if type(item) is TaskInfoItem:
+            if type(item) is TaskItem:
                 widget = TransferDog().dict_task_widgets[item.task_uuid]
                 widget.label_title.setText(text)
             if not self.filterRegularExpression().isValid():
@@ -374,7 +342,7 @@ class TaskSearchProxyModel(QtCore.QSortFilterProxyModel):
         match_result = self.filterRegularExpression().match(text)
         if match_result.hasMatch():
             self.logger.debug('匹配 [%s]: %s', text, match_result)
-            if type(item) is TaskInfoItem:
+            if type(item) is TaskItem:
                 captured = self.filterRegularExpression().match(text).captured()
                 self.logger.debug('captured substring: %s', captured)
                 display_text = '<span style="color:red;">{}</span>'.format(captured).join(text.split(captured)) if captured != '' else text
@@ -383,7 +351,7 @@ class TaskSearchProxyModel(QtCore.QSortFilterProxyModel):
             return True
         else:
             self.logger.debug('不匹配 [%s]', text)
-            if type(item) is TaskInfoItem:
+            if type(item) is TaskItem:
                 TransferDog().hide(item.task_uuid)
             return False
 

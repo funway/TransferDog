@@ -13,7 +13,7 @@ from PySide6.QtGui import QStandardItemModel, QStandardItem
 from transfer_dog.transfer_dog import TransferDog
 from transfer_dog.ui.ui_main_window import Ui_MainWindow
 from transfer_dog.view.dialog_task_edit import DialogTaskEdit
-from transfer_dog.view.task_info import *
+from transfer_dog.view.task_treeview import *
 from transfer_worker.model import Task
 
 
@@ -29,7 +29,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         # 定义成员变量
         self.doggy = TransferDog()
-        self.source_model = TaskInfoItemModel()
+        self.source_model = TaskItemModel()
         self.proxy_model = TaskSearchProxyModel()
         
         # 调用父类 Ui_MainWindow 的函数装载 UI
@@ -94,7 +94,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.doggy.dict_tasks[task.uuid] = task
             self.doggy.dict_task_statuses[task.uuid] = TaskStatus(schedule=task.schedule, enabled=task.enabled)
-            widget = TaskInfoWidget(task.task_name)
+            widget = TaskWidget(task.task_name)
             widget.setParent(self.treeView.viewport())
             widget.installEventFilter(self.treeView)
             self.doggy.dict_task_widgets[task.uuid] = widget
@@ -156,7 +156,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.treeView.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
         
         # 给 QTreeView 设置自定义的 ItemDelegate
-        delegate = TaskInfoDelegate()
+        delegate = TaskItemDelegate()
         self.treeView.setItemDelegate(delegate)
 
         # 关联 QTreeView 的 节点展开、收缩 事件
@@ -184,7 +184,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         idx = ss[0]
         item = idx.model().itemFromIndex(idx)
         
-        if type(item) is TaskInfoItem:
+        if type(item) is TaskItem:
             self.logger.debug('用户选中删除任务节点 [%s]', idx.data())
             reply = QMessageBox.question(self, 'Delete Task', 'You sure to delete task [{0}]?'.format(idx.data()),
                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
@@ -211,7 +211,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         idx = ss[0]
         item = idx.model().itemFromIndex(idx)
-        if type(item) is TaskInfoItem:
+        if type(item) is TaskItem:
             self.logger.debug('用户选中编辑任务节点 [%s]', idx.data())
             self.show_dialog_task_edit(task=self.doggy.dict_tasks[item.task_uuid], window_title='Edit Task')
         else:
@@ -225,7 +225,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return
         idx = ss[0]
         item = idx.model().itemFromIndex(idx)
-        if type(item) is TaskInfoItem:
+        if type(item) is TaskItem:
             self.logger.debug('用户选中复制任务节点 [%s]', idx.data())
             src_task = self.doggy.dict_tasks[item.task_uuid]
             copy_task = src_task.copy()
