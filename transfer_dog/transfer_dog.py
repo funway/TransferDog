@@ -69,7 +69,7 @@ class TransferDog(object):
                     self.set_visible_tasks = set()
 
                     # 所有 taskwidget 共享这个 QMovie 对象，减少内存与 CPU 开销
-                    self.running_gif = QMovie(str( RESOURCE_PATH / 'img/running.gif' ))
+                    self.running_gif = QMovie(str( RESOURCE_PATH / 'img/running2.gif' ))
                     self.running_gif.setScaledSize(QtCore.QSize(32, 32))
                     self.running_gif.setCacheMode(QMovie.CacheMode.CacheAll)
                     self.running_gif.start()
@@ -181,7 +181,10 @@ class TransferDog(object):
                             uuid = task.uuid
                             )
                         self.logger.debug('子进程命令: %s', cmd_line)
-                        status.process = psutil.Popen(shlex.split(cmd_line))
+                        args = shlex.split(cmd_line, posix=('win' not in sys.platform))
+                        self.logger.debug('拆解命令: %s', args)
+                        status.process = psutil.Popen(args)
+                        
                         status.next_time = croniter(task.schedule, now).get_next(datetime)
                         status.last_time = datetime.fromtimestamp(status.process.create_time())
                         status.need_update = True
