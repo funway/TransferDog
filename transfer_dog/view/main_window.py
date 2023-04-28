@@ -5,7 +5,9 @@
 # Created: 2022/11/03 20:23:34
 
 import os, sys, logging
+from datetime import datetime
 
+import psutil
 from playhouse.shortcuts import model_to_dict
 from PySide6.QtWidgets import QMainWindow, QDialog, QAbstractItemView, QLineEdit, QMessageBox
 from PySide6.QtGui import QStandardItemModel, QStandardItem
@@ -40,8 +42,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionEditTask.triggered.connect(self._action_edit_task)
         self.actionDeleteTask.triggered.connect(self._action_delete_task)
         self.actionCopyTask.triggered.connect(self._action_copy_task)
+        self.actionStartTask.triggered.connect(self._action_start_task)
+        self.actionStopTask.triggered.connect(self._action_kill_task)
         self.actionTest.triggered.connect(self.test_func)
-        self.treeView.verticalScrollBar().valueChanged.connect(self._on_v_scroll_changed)
 
         self.update_UI()
         
@@ -164,6 +167,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.treeView.collapsed.connect(self._treeview_item_collapsed)
         self.treeView.clicked.connect(self._treeview_clicked)
         self.treeView.doubleClicked.connect(self._treeview_double_clicked)
+        self.treeView.verticalScrollBar().valueChanged.connect(self._on_v_scroll_changed)
 
         # 给 QTreeView 设置其他参数
         self.treeView.setHeaderHidden(True)
@@ -175,12 +179,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 设置搜索栏
         self.lineEdit.addAction(QIcon(str(RESOURCE_PATH / 'img/search-line.png')), QLineEdit.ActionPosition.LeadingPosition)
         self.lineEdit.textChanged.connect(self._search_text_changed)
+
+        self.statusBar.addWidget(QLabel('© %s funway' % datetime.now().strftime('%Y')), )
+        self.statusBar.addPermanentWidget(QLabel(text='Started at %s' % datetime.fromtimestamp(psutil.Process().create_time()).strftime(TIME_FORMAT)))
         pass
 
     def _action_delete_task(self):
         ss = self.treeView.selectedIndexes()
         if len(ss) == 0:
             self.logger.debug('用户没有选中任何节点')
+            self.statusBar.showMessage('未选中任务', timeout=3000)
             return
         idx = ss[0]
         item = idx.model().itemFromIndex(idx)
@@ -202,12 +210,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.logger.debug('用户选择了 No')
         else:
             self.logger.debug('用户选中的不是任务节点')
+            self.statusBar.showMessage('未选中任务', timeout=3000)
         pass
 
     def _action_edit_task(self):
         ss = self.treeView.selectedIndexes()
         if len(ss) == 0:
             self.logger.debug('用户没有选中任何节点')
+            self.statusBar.showMessage('未选中任务', timeout=3000)
             return
         
         idx = ss[0]
@@ -217,12 +227,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.show_dialog_task_edit(task=self.doggy.dict_tasks[item.task_uuid], window_title='Edit Task')
         else:
             self.logger.debug('用户选中的不是任务节点')
+            self.statusBar.showMessage('未选中任务', timeout=3000)
         pass
     
     def _action_copy_task(self):
         ss = self.treeView.selectedIndexes()
         if len(ss) == 0:
             self.logger.debug('用户没有选中任何节点')
+            self.statusBar.showMessage('未选中任务', timeout=3000)
             return
         idx = ss[0]
         item = idx.model().itemFromIndex(idx)
@@ -233,6 +245,39 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.show_dialog_task_edit(task=copy_task, window_title='New Task (copy)')
         else:
             self.logger.debug('用户选中的不是任务节点')
+            self.statusBar.showMessage('未选中任务', timeout=3000)
+        pass
+
+    def _action_start_task(self):
+        ss = self.treeView.selectedIndexes()
+        if len(ss) == 0:
+            self.logger.debug('用户没有选中任何节点')
+            self.statusBar.showMessage('未选中任务', timeout=3000)
+            return
+        idx = ss[0]
+        item = idx.model().itemFromIndex(idx)
+        if type(item) is TaskItem:
+            self.logger.debug('用户选中启动任务 [%s]', idx.data())
+            self.doggy.start_task(item.task_uuid)
+        else:
+            self.logger.debug('用户选中的不是任务节点')
+            self.statusBar.showMessage('未选中任务', timeout=3000)
+        pass
+
+    def _action_kill_task(self):
+        ss = self.treeView.selectedIndexes()
+        if len(ss) == 0:
+            self.logger.debug('用户没有选中任何节点')
+            self.statusBar.showMessage('未选中任务', timeout=3000)
+            return
+        idx = ss[0]
+        item = idx.model().itemFromIndex(idx)
+        if type(item) is TaskItem:
+            self.logger.debug('用户选中杀死任务 [%s]', idx.data())
+            self.doggy.kill_task(item.task_uuid)
+        else:
+            self.logger.debug('用户选中的不是任务节点')
+            self.statusBar.showMessage('未选中任务', timeout=3000)
         pass
 
     def show_dialog_task_edit(self, task:Task=None, window_title=None):
@@ -317,6 +362,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         # 获取当前被点击的 QStandardItem
         item = idx.model().itemFromIndex(idx)
+        # if type(item) is TaskItem:
+        #     self.logger.debug('用户单击任务节点 [%s]', idx.data())
+        #     for action in self.toolBar.actions():
+        #         action.setEnabled(True)
+        # else:
+        #     self.logger.debug('用户单击的不是任务节点')
+        #     for action in self.toolBar.actions():
+        #         action.setEnabled(False)
         pass
 
     def _treeview_double_clicked(self, idx):

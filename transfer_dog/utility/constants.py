@@ -27,3 +27,5 @@ TASK_DB = PROJECT_PATH / 'conf/task.db'
 
 # 静态资源目录
 RESOURCE_PATH = PACKAGE_PATH / 'resource'
+
+TIME_FORMAT = '%Y-%m-%d %H:%M:%S'

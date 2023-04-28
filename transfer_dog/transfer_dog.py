@@ -24,7 +24,7 @@ class TransferDog(object):
     # 类成员变量 _instance 用作该类的单例
     _instance = None
 
-    # 生成单例时需要加锁
+    # 生成单例时需要加锁，创建 status.process 时也要加锁
     _lock = threading.Lock()
 
     # 表示单例是否已经初始化了
@@ -149,12 +149,10 @@ class TransferDog(object):
                     # 2.1 如果任务在运行且已经超时，则杀掉任务进程。进入步骤3
                     if status.process.is_running() and (now.timestamp() - status.process.create_time()) > task.timeout:
                         self.logger.warning('[%s] 任务进程 [p%s] 超时！ kill it!', task.uuid, status.process.pid)
-                        status.process.kill()
-                        status.process = None
-                        status.need_update = True
+                        self.kill_task(task.uuid)
                     # 2.2 如果任务正在运行且未超时，则跳转到下一个任务
                     elif status.process.is_running():
-                        self.logger.info('[%s] 任务进程 [p%s] 正在运行...', task.uuid, status.process.pid)
+                        self.logger.debug('[%s] 任务进程 [p%s] 正在运行...', task.uuid, status.process.pid)
                         if status.need_update:
                             self._update_task_widget(task.uuid)
                         continue
@@ -172,22 +170,8 @@ class TransferDog(object):
                     # 3.2 已到（或者已超过）计划时间，启动任务子进程，并计算下一次运行时间
                     else:
                         self.logger.info('[%s] 任务 (%s) 已到运行时间，启动任务子进程', task.uuid, task.task_name)
-                        # 启动子进程
-                        # python3 worker.py --log_config conf/worker_logging.conf -d conf/task.db -i 71b63d312b0a4c7284843033ab7f6b92
-                        cmd_line = 'python3 {py_file} --daemon --log_config {log_config} -d {db_file} -i {uuid}'.format(
-                            py_file = str(PROJECT_PATH / 'worker.py'),
-                            log_config = str(LOGGING_CONFIG.parent / 'worker_logging.conf'),
-                            db_file = str(TASK_DB),
-                            uuid = task.uuid
-                            )
-                        self.logger.debug('子进程命令: %s', cmd_line)
-                        args = shlex.split(cmd_line, posix=('win' not in sys.platform))
-                        self.logger.debug('拆解命令: %s', args)
-                        status.process = psutil.Popen(args)
-                        
-                        status.next_time = croniter(task.schedule, now).get_next(datetime)
-                        status.last_time = datetime.fromtimestamp(status.process.create_time())
-                        status.need_update = True
+                        # 启动任务子进程
+                        self.start_task(task.uuid)
                 else:
                     self.logger.debug('[%s] 任务未启用', task.uuid)
 
@@ -217,6 +201,46 @@ class TransferDog(object):
         """手动停止任务调度子线程（通过 self._stop 标记位）
         """
         self._stop = True
+        pass
+
+    def start_task(self, uuid):
+        task = self.dict_tasks[uuid]
+        status = self.dict_task_statuses[uuid]
+
+        # python3 worker.py --log_config conf/worker_logging.conf -d conf/task.db -i 71b63d312b0a4c7284843033ab7f6b92
+        cmd_line = 'python3 {py_file} --daemon --log_config {log_config} -d {db_file} -i {uuid}'.format(
+            py_file = str(PROJECT_PATH / 'worker.py'),
+            log_config = str(LOGGING_CONFIG.parent / 'worker_logging.conf'),
+            db_file = str(TASK_DB),
+            uuid = task.uuid
+            )
+        self.logger.debug('子进程命令: %s', cmd_line)
+        
+        args = shlex.split(cmd_line, posix=('win' not in sys.platform))
+        self.logger.debug('拆解命令: %s', args)
+        
+        with __class__._lock:
+            if status.process is not None and status.process.is_running():
+                self.logger.warning('[%s] 任务进程正在运行', task.task_name)
+                return
+            
+            try:
+                status.process = psutil.Popen(args)
+            except Exception as e:
+                self.logger.exception('无法启动任务子进程: %s', args)
+                raise e
+            else:
+                status.next_time = croniter(task.schedule, datetime.now()).get_next(datetime)
+                status.last_time = datetime.fromtimestamp(status.process.create_time())
+                status.need_update = True
+        pass
+
+    def kill_task(self, uuid):
+        status = self.dict_task_statuses[uuid]
+        
+        if status.process is not None:
+            status.process.kill()
+            status.process.wait()  # 必须调用 wait() 处理子进程退后保留的信息，否则子进程会变成僵尸进程
         pass
 
     def hide(self, uuid: str):
