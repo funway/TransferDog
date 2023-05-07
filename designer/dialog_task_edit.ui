@@ -274,13 +274,6 @@ QLabel#label_error_msg {
       <string>Filter / Middleware</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="1" column="2">
-       <widget class="QLabel" name="label_10">
-        <property name="text">
-         <string>Subdir Recursion</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_9">
         <property name="text">
@@ -288,8 +281,29 @@ QLabel#label_error_msg {
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="1" column="2">
        <widget class="QComboBox" name="comboBox_filter_valid_time"/>
+      </item>
+      <item row="0" column="3">
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="text">
+         <string>Test</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QCheckBox" name="checkBox_delete_source">
+        <property name="text">
+         <string>Delete Source</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QSpinBox" name="spinBox_subdir_recursion">
+        <property name="maximum">
+         <number>999</number>
+        </property>
+       </widget>
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label_8">
@@ -299,13 +313,6 @@ QLabel#label_error_msg {
        </widget>
       </item>
       <item row="0" column="2">
-       <widget class="QPushButton" name="pushButton_2">
-        <property name="text">
-         <string>Test</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
        <widget class="QLineEdit" name="lineEdit_filter_filename">
         <property name="text">
          <string>.*</string>
@@ -313,18 +320,31 @@ QLabel#label_error_msg {
        </widget>
       </item>
       <item row="1" column="3">
-       <widget class="QSpinBox" name="spinBox_subdir_recursion">
-        <property name="maximum">
-         <number>999</number>
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>Subdir Recursion</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
-       <widget class="QCheckBox" name="checkBox_delete_source">
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_11">
         <property name="text">
-         <string>Delete Source</string>
+         <string>Middleware</string>
         </property>
        </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QComboBox" name="comboBox_middleware"/>
+      </item>
+      <item row="2" column="3">
+       <widget class="QLabel" name="label_12">
+        <property name="text">
+         <string>Middleware Arg</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4">
+       <widget class="QLineEdit" name="lineEdit_middleware_arg"/>
       </item>
      </layout>
     </widget>
@@ -629,7 +649,7 @@ QLabel#label_error_msg {
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup_dest_protocol"/>
   <buttongroup name="buttonGroup_src_protocol"/>
+  <buttongroup name="buttonGroup_dest_protocol"/>
  </buttongroups>
 </ui>

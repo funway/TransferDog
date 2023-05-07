@@ -16,6 +16,9 @@ PACKAGE_PATH = Path(__file__).parent.parent
 # 项目目录
 PROJECT_PATH = PACKAGE_PATH.parent
 
+# 中间件目录
+MIDDLEWARE_PATH = PROJECT_PATH / 'plugin/middleware/'
+
 # 项目配置文件
 APP_CONFIG = PROJECT_PATH / 'conf/app.conf'
 

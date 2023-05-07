@@ -13,6 +13,7 @@
 /idea/
 /test/
 /log/
+/processed/
 
 # 忽略单个文件
 /conf/task.db

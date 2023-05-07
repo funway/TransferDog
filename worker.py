@@ -5,9 +5,9 @@
 # Created: 2023/04/16 10:29:58
 
 import argparse, logging, logging.config, sys, threading, time
+from pathlib import Path
 
 import psutil
-from peewee import SqliteDatabase
 
 from transfer_worker.transfer_worker import TransferWorker
 from transfer_worker.model.task import Task
@@ -56,6 +56,10 @@ def parse_arguments():
                         dest='db',
                         required=True,
                         help='Task config database')
+    
+    parser.add_argument('-p', '--processed',
+                        dest='processed',
+                        help='Processed history. Default is \'working_path/processed/uuid.db\'')
     
     parser.add_argument('--daemon',
                         dest='daemon',
@@ -112,18 +116,16 @@ if __name__ == "__main__":
     # This function does nothing if the root logger already has handlers configured.
     logging.basicConfig(filename=args.log_file, level=LOG_LEVEL[args.log_level], format=LOG_FORMAT[args.log_format])
 
+    if args.processed is None:
+        processed = Path(__file__).parent.joinpath('processed', args.task_uuid + '.db')
+        processed.parent.mkdir(parents=True, exist_ok=True)
+        args.processed = str(processed)
+
     # 启动子线程轮询父进程是否退出
     if args.daemon:
         suicide_when_parent_exited()
         pass
     
-    # 连接数据库（如果数据库文件不存在，会自动创建）
-    db = SqliteDatabase(args.db, autoconnect=False)
-    db.connect()
-    # 绑定模型与表（不自动创建表）
-    models = [Task, ]
-    db.bind(models)
-
     # 创建并启动作业
-    worker = TransferWorker(args.task_uuid)
+    worker = TransferWorker(args.task_uuid, args.db, args.processed)
     sys.exit(worker.run())

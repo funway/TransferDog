@@ -206,11 +206,6 @@ class Ui_Dialog(object):
         self.groupBox_3.setSizePolicy(sizePolicy1)
         self.gridLayout_3 = QGridLayout(self.groupBox_3)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
-        self.label_10 = QLabel(self.groupBox_3)
-        self.label_10.setObjectName(u"label_10")
-
-        self.gridLayout_3.addWidget(self.label_10, 1, 2, 1, 1)
-
         self.label_9 = QLabel(self.groupBox_3)
         self.label_9.setObjectName(u"label_9")
 
@@ -219,33 +214,58 @@ class Ui_Dialog(object):
         self.comboBox_filter_valid_time = QComboBox(self.groupBox_3)
         self.comboBox_filter_valid_time.setObjectName(u"comboBox_filter_valid_time")
 
-        self.gridLayout_3.addWidget(self.comboBox_filter_valid_time, 1, 1, 1, 1)
+        self.gridLayout_3.addWidget(self.comboBox_filter_valid_time, 1, 2, 1, 1)
+
+        self.pushButton_2 = QPushButton(self.groupBox_3)
+        self.pushButton_2.setObjectName(u"pushButton_2")
+
+        self.gridLayout_3.addWidget(self.pushButton_2, 0, 3, 1, 1)
+
+        self.checkBox_delete_source = QCheckBox(self.groupBox_3)
+        self.checkBox_delete_source.setObjectName(u"checkBox_delete_source")
+
+        self.gridLayout_3.addWidget(self.checkBox_delete_source, 0, 4, 1, 1)
+
+        self.spinBox_subdir_recursion = QSpinBox(self.groupBox_3)
+        self.spinBox_subdir_recursion.setObjectName(u"spinBox_subdir_recursion")
+        self.spinBox_subdir_recursion.setMaximum(999)
+
+        self.gridLayout_3.addWidget(self.spinBox_subdir_recursion, 1, 4, 1, 1)
 
         self.label_8 = QLabel(self.groupBox_3)
         self.label_8.setObjectName(u"label_8")
 
         self.gridLayout_3.addWidget(self.label_8, 0, 0, 1, 1)
 
-        self.pushButton_2 = QPushButton(self.groupBox_3)
-        self.pushButton_2.setObjectName(u"pushButton_2")
-
-        self.gridLayout_3.addWidget(self.pushButton_2, 0, 2, 1, 1)
-
         self.lineEdit_filter_filename = QLineEdit(self.groupBox_3)
         self.lineEdit_filter_filename.setObjectName(u"lineEdit_filter_filename")
 
-        self.gridLayout_3.addWidget(self.lineEdit_filter_filename, 0, 1, 1, 1)
+        self.gridLayout_3.addWidget(self.lineEdit_filter_filename, 0, 2, 1, 1)
 
-        self.spinBox_subdir_recursion = QSpinBox(self.groupBox_3)
-        self.spinBox_subdir_recursion.setObjectName(u"spinBox_subdir_recursion")
-        self.spinBox_subdir_recursion.setMaximum(999)
+        self.label_10 = QLabel(self.groupBox_3)
+        self.label_10.setObjectName(u"label_10")
 
-        self.gridLayout_3.addWidget(self.spinBox_subdir_recursion, 1, 3, 1, 1)
+        self.gridLayout_3.addWidget(self.label_10, 1, 3, 1, 1)
 
-        self.checkBox_delete_source = QCheckBox(self.groupBox_3)
-        self.checkBox_delete_source.setObjectName(u"checkBox_delete_source")
+        self.label_11 = QLabel(self.groupBox_3)
+        self.label_11.setObjectName(u"label_11")
 
-        self.gridLayout_3.addWidget(self.checkBox_delete_source, 0, 3, 1, 1)
+        self.gridLayout_3.addWidget(self.label_11, 2, 0, 1, 1)
+
+        self.comboBox_middleware = QComboBox(self.groupBox_3)
+        self.comboBox_middleware.setObjectName(u"comboBox_middleware")
+
+        self.gridLayout_3.addWidget(self.comboBox_middleware, 2, 2, 1, 1)
+
+        self.label_12 = QLabel(self.groupBox_3)
+        self.label_12.setObjectName(u"label_12")
+
+        self.gridLayout_3.addWidget(self.label_12, 2, 3, 1, 1)
+
+        self.lineEdit_middleware_arg = QLineEdit(self.groupBox_3)
+        self.lineEdit_middleware_arg.setObjectName(u"lineEdit_middleware_arg")
+
+        self.gridLayout_3.addWidget(self.lineEdit_middleware_arg, 2, 4, 1, 1)
 
 
         self.verticalLayout.addWidget(self.groupBox_3)
@@ -444,12 +464,14 @@ class Ui_Dialog(object):
         self.label_7.setText(QCoreApplication.translate("Dialog", u"Directory", None))
         self.pushButton_src_browse.setText(QCoreApplication.translate("Dialog", u"Browse", None))
         self.groupBox_3.setTitle(QCoreApplication.translate("Dialog", u"Filter / Middleware", None))
-        self.label_10.setText(QCoreApplication.translate("Dialog", u"Subdir Recursion", None))
         self.label_9.setText(QCoreApplication.translate("Dialog", u"Valid Time", None))
-        self.label_8.setText(QCoreApplication.translate("Dialog", u"Filename RegEx", None))
         self.pushButton_2.setText(QCoreApplication.translate("Dialog", u"Test", None))
-        self.lineEdit_filter_filename.setText(QCoreApplication.translate("Dialog", u".*", None))
         self.checkBox_delete_source.setText(QCoreApplication.translate("Dialog", u"Delete Source", None))
+        self.label_8.setText(QCoreApplication.translate("Dialog", u"Filename RegEx", None))
+        self.lineEdit_filter_filename.setText(QCoreApplication.translate("Dialog", u".*", None))
+        self.label_10.setText(QCoreApplication.translate("Dialog", u"Subdir Recursion", None))
+        self.label_11.setText(QCoreApplication.translate("Dialog", u"Middleware", None))
+        self.label_12.setText(QCoreApplication.translate("Dialog", u"Middleware Arg", None))
         self.groupBox_4.setTitle(QCoreApplication.translate("Dialog", u"Destination", None))
         self.label_16.setText(QCoreApplication.translate("Dialog", u"Protocol", None))
         self.radioButton_dest_local.setText(QCoreApplication.translate("Dialog", u"Local", None))

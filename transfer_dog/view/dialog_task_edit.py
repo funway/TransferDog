@@ -23,6 +23,7 @@ from PySide6.QtWidgets import QDialog, QFileDialog, QLineEdit
 
 from transfer_dog.ui.ui_dialog_task_edit import Ui_Dialog
 from transfer_worker.model.task import Task
+from transfer_dog.utility.constants import *
 
 
 task_valid_time_options = {
@@ -122,6 +123,14 @@ class DialogTaskEdit(QDialog, Ui_Dialog):
         except Exception as e:
             logging.exception('task.filter_valid_time 异常！无法找到对应的选项')
             self.comboBox_filter_valid_time.setCurrentIndex(0)
+        #   中间件
+        self.comboBox_middleware.addItem('None', None)
+        middlewares = [fname.name for fname in MIDDLEWARE_PATH.glob('*.py')]
+        middlewares.sort()
+        for mw in middlewares:
+            self.comboBox_middleware.addItem(mw, mw)
+        self.comboBox_middleware.setCurrentIndex(self.comboBox_middleware.findText('None' if task.middleware is None else task.middleware))
+        self.lineEdit_middleware_arg.setText(task.middleware_arg)
 
         # update destination group
         o = parse.urlparse(task.dest_url)
@@ -221,6 +230,10 @@ class DialogTaskEdit(QDialog, Ui_Dialog):
             self._task.subdir_recursion = self.spinBox_subdir_recursion.value()
         if self._task.delete_source != self.checkBox_delete_source.isChecked(): 
             self._task.delete_source = self.checkBox_delete_source.isChecked()
+        if self._task.middleware != self.comboBox_middleware.currentData():
+            self._task.middleware = self.comboBox_middleware.currentData()
+        if self._task.middleware_arg != self.lineEdit_middleware_arg.text():
+            self._task.middleware_arg = self.lineEdit_middleware_arg.text()
 
         # destination group
         dest_url = parse.urlunparse(parse.ParseResult(
@@ -329,12 +342,14 @@ def test(arg=None):
     Task.bind(SqliteDatabase(str(TASK_DB)))
     app = QApplication(sys.argv)
     dialog = DialogTaskEdit()
-    
 
-    for group in Task.select( fn.Distinct(Task.group_name) ).dicts():
-        logging.info(group)
     groups = [row['group_name'] for row in Task.select( fn.Distinct(Task.group_name) ).dicts()]
     logging.info(groups)
+
+    from transfer_dog.utility.constants import PROJECT_PATH
+    for f in (PROJECT_PATH / 'plugin/middleware').glob('*.py'):
+        logging.info(f.name)
+
 
     if dialog.exec() == QDialog.DialogCode.Accepted:
         logging.debug("dialog save!")

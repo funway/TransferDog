@@ -42,22 +42,27 @@ class DialogRegularExpress(QDialog, Ui_Dialog):
 
     def _start_match(self):
         self.logger.debug('start match')
+        self.pte_output.clear()
         self.pte_output.appendPlainText('=== start match =========================================')
 
         pattern = self.lineEdit.text().strip()
-        q_reg = QRegularExpression(pattern, options=QRegularExpression.PatternOption.CaseInsensitiveOption)
-        p_reg = re.compile(pattern, flags=re.IGNORECASE)
+        # q_reg = QRegularExpression(pattern, options=QRegularExpression.PatternOption.CaseInsensitiveOption)
+        # p_reg = re.compile(pattern, flags=re.IGNORECASE)
+        # 应该由输入的表达式来指定要不要忽略大小写，在正则表达式前头添加 (?i) 表示忽略大小写
+        q_reg = QRegularExpression(pattern)
+        p_reg = re.compile(pattern)
+
 
         for row in self.pte_input.toPlainText().splitlines():
-            self.pte_output.appendPlainText('开始匹配使用 (%s) 匹配 [%s]' % (pattern, row))
+            self.pte_output.appendPlainText('使用「%s」匹配 [%s]' % (pattern, row))
 
             match_result = q_reg.match(row)
-            self.pte_output.appendPlainText(str(match_result))
+            self.pte_output.appendPlainText('QRegularExpression match result: %s' % match_result)
             self.pte_output.appendPlainText('QRegularExpression captured: %s' % match_result.captured())
             
             p_result = p_reg.search(row)
-            self.pte_output.appendPlainText(str(p_result))
-            self.pte_output.appendPlainText('Python re searched: %s' % p_result[0] if p_result else 'None')
+            self.pte_output.appendPlainText('Python re search result: %s' % p_result)
+            self.pte_output.appendPlainText('Python re searched: %s' % (p_result[0] if p_result else 'None'))
 
             self.pte_output.appendPlainText('============================')
             pass

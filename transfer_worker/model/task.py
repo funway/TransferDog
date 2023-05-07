@@ -37,11 +37,14 @@ class Task(Model):
     # 文件名过滤规则
     filter_filename = CharField(default='.*')
 
-    # 有效时间过滤规则（只处理 mtime 间隔在此时间内的）
+    # 有效时间过滤规则（只处理 mtime 间隔在此时间内的），以秒为单位
     filter_valid_time = IntegerField(default=-1)
 
     # 递归多少层子目录，默认为0，不递归子目录
     subdir_recursion = IntegerField(default=0)
+
+    middleware = CharField(default=None)
+    middleware_arg = CharField(default='')
 
     # 是否删除源文件
     delete_source = BooleanField(default=False)
