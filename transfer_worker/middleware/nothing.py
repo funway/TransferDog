@@ -8,6 +8,7 @@ import logging
 
 from transfer_worker.worker.middle_file import MiddleFile
 
+
 def pre_process(mid_file: MiddleFile, arg: str) -> None:
     logger = logging.getLogger(__name__)
     logger.debug('Just do nothing.')

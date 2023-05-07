@@ -7,6 +7,7 @@
 from enum import Enum
 from pathlib import Path
 
+
 class Abort(Enum):
     ABORT = 1
     """中止操作
@@ -19,6 +20,7 @@ class Abort(Enum):
     NO_ABORT = 0
     """不中止操作
     """
+
 
 class MiddleFile(object):
     def __init__(self, source: Path, source_mtime, middle = None, dest: Path = None, abort: Abort = Abort.NO_ABORT):

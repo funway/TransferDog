@@ -9,6 +9,7 @@ from datetime import datetime
 from peewee import Model
 from peewee import IntegerField, CharField, DateTimeField
 
+
 class Processed(Model):
     source = CharField(null=False)
     mtime = CharField(null=False)

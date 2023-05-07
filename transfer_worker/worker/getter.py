@@ -14,6 +14,7 @@ from transfer_worker.model.task import Task
 from transfer_worker.model.processed import Processed
 from transfer_worker.worker.middle_file import MiddleFile
 
+
 class GetterFactory(object):
     @classmethod
     def make_getter(clz, task: Task):
@@ -29,6 +30,7 @@ class GetterFactory(object):
             raise Exception('Unrecognized Source URL')
         pass
 
+
 class Getter(metaclass=ABCMeta):
     @abstractmethod
     def next(self):
@@ -41,6 +43,7 @@ class Getter(metaclass=ABCMeta):
     @abstractmethod
     def delete_source(self, mid_file: MiddleFile):
         pass
+   
     
 class LocalGetter(Getter):
     def __init__(self, task: Task):

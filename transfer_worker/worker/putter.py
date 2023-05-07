@@ -13,6 +13,7 @@ import logging, re, shutil
 from transfer_worker.model.task import Task
 from transfer_worker.worker.middle_file import MiddleFile
 
+
 class PutterFactory(object):
     @classmethod
     def make_putter(clz, task: Task):
@@ -28,10 +29,12 @@ class PutterFactory(object):
             raise Exception('Unrecognized Dest URL')
         pass
 
+
 class Putter(metaclass=ABCMeta):
     @abstractmethod
     def put(self):
         pass
+
 
 class LocalPutter(Putter):
     def __init__(self, task: Task):
