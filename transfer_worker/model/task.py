@@ -43,8 +43,12 @@ class Task(Model):
     # 递归多少层子目录，默认为0，不递归子目录
     subdir_recursion = IntegerField(default=0)
 
+    # 中间件
     middleware = CharField(default=None)
     middleware_arg = CharField(default='')
+
+    # 处理记录保存时间，以秒为单位
+    processed_reserve_time = IntegerField(3600*24*21)
 
     # 是否删除源文件
     delete_source = BooleanField(default=False)

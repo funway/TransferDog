@@ -6,6 +6,7 @@
 
 import logging, time, importlib, tempfile, os
 from pathlib import Path
+from datetime import datetime, timedelta
 
 from peewee import OperationalError, SqliteDatabase
 
@@ -38,6 +39,8 @@ class TransferWorker(object):
         self.processed_db.bind([Processed, ])
         # 如果不存在表，则创建表
         self.processed_db.create_tables([Processed], safe=True)
+        # 清理过期的处理记录
+        self.delete_outdated_processed()
 
         pass
 
@@ -152,7 +155,6 @@ class TransferWorker(object):
         self.logger.info('完成作业 [%s]: %s. 本次共处理文件 %s 个', self.task.uuid, self.task.task_name, count)
         return 0
 
-
     def load_middleware(self):
         """加载中间件
 
@@ -204,4 +206,12 @@ class TransferWorker(object):
     def save_processed(self, mid_file: MiddleFile):
         self.logger.debug('保存处理记录: (%s, %s)', mid_file.source, mid_file.source_mtime)
         Processed.create(source=mid_file.source, mtime=mid_file.source_mtime, pid=os.getpid())
+        pass
+    
+    def delete_outdated_processed(self):
+        outdated = datetime.now() - timedelta(seconds=self.task.processed_reserve_time)
+        self.logger.debug('清理过期的 processed 记录( before %s )', outdated)
+        
+        rows = Processed.delete().where(Processed.processed_at < outdated).execute()
+        self.logger.debug('删除 %s 行数据', rows)
         pass
