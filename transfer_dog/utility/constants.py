@@ -32,3 +32,6 @@ TASK_DB = PROJECT_PATH / 'conf/task.db'
 RESOURCE_PATH = PACKAGE_PATH / 'resource'
 
 TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+
+_IP_FIELD = '(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])'
+REGEX_IP_ADDRESS = '^' + _IP_FIELD + '\.' + _IP_FIELD + '\.' + _IP_FIELD + '\.' + _IP_FIELD + '$'

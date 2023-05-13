@@ -2,9 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # Author:  funway.wang
-# Created: 2023/05/03 11:59:04
+# Created: 2023/05/09 22:44:03
 
-from abc import ABCMeta, abstractmethod
 from datetime import datetime
 from urllib import parse
 from pathlib import Path
@@ -12,38 +11,9 @@ import logging, re, shutil
 
 from transfer_worker.model.task import Task
 from transfer_worker.model.processed import Processed
+from transfer_worker.worker.base import Getter, Putter
 from transfer_worker.worker.middle_file import MiddleFile
 
-
-class GetterFactory(object):
-    @classmethod
-    def make_getter(clz, task: Task):
-        logger = logging.getLogger(clz.__name__)
-
-        o = parse.urlparse(task.source_url)
-        logger.debug('src url: %s', task.source_url)
-        logger.debug('src url parse result: %s', o)
-
-        if o.scheme == 'local':
-            return LocalGetter(task)
-        else:
-            raise Exception('Unrecognized Source URL')
-        pass
-
-
-class Getter(metaclass=ABCMeta):
-    @abstractmethod
-    def next(self):
-        pass
-
-    @abstractmethod
-    def get(self, mid_file: MiddleFile, mid_path: Path, suffix: str):
-        pass
-    
-    @abstractmethod
-    def delete_source(self, mid_file: MiddleFile):
-        pass
-   
     
 class LocalGetter(Getter):
     def __init__(self, task: Task):
@@ -141,13 +111,42 @@ class LocalGetter(Getter):
             self.logger.exception('无法删除源文件: %s', f)
         pass
 
-    def get(self, mid_file: MiddleFile, mid_path: Path, suffix: str):
+    def get(self, mid_file: MiddleFile, mid_path: Path):
         if mid_path is None:
             # local >> remote
             # 中间文件就是源文件
             mid_file.middle = self.src_path.joinpath(mid_file.source)
         else:
             # local >> local
-            mid_file.middle = mid_path.joinpath(mid_file.source.name + suffix)
+            mid_file.middle = mid_path.joinpath(mid_file.source.name + self.task.suffix)
             shutil.copy(self.src_path.joinpath(mid_file.source), mid_file.middle)
             pass
+    
+
+class LocalPutter(Putter):
+    def __init__(self, task: Task):
+        super(LocalPutter, self).__init__()
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.debug('Init a %s instance', self.__class__.__name__)
+
+        self.task = task
+        
+        self.dest = parse.urlparse(task.dest_url)
+        querys = dict(parse.parse_qsl(self.dest.query))
+
+        # 目标目录
+        self.dest_path = Path(self.dest.path)
+        assert self.dest_path.is_dir(), '[{path}] is not a valid directory'.format(path=self.dest_path)
+        
+        pass
+    
+    def put(self, mid_file: MiddleFile):
+        self.logger.debug('开始上传文件: %s', mid_file)
+
+        dest_path = self.dest_path.joinpath(mid_file.dest).parent
+        if not dest_path.exists():
+            self.logger.debug('创建目标目录: %s', dest_path)
+            dest_path.mkdir(parents=True)
+        
+        shutil.move(mid_file.middle, self.dest_path.joinpath(mid_file.dest))
+        pass

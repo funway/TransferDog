@@ -29,10 +29,15 @@ class Task(Model):
 
     # 源地址/目标地址
     # 采用 URL 的格式
-    #   协议支持：local, http, ftp, sftp, ftps
+    #   协议支持：local, http, ftp, ftps, sftp
     #   将 encoding, passive, keyfile 这些跟服务器相关的参数放在 URL 查询子串中
     source_url = CharField(default='local://127.0.0.1/Users/funway/Downloads/src/?encoding=UTF8')
-    dest_url = CharField(default='ftp://funway:caac@172.16.191.128/temp/?encoding=UTF8&passive=True')
+    source_username = CharField(null=True)
+    source_password = CharField(null=True)
+    
+    dest_url = CharField(default='ftp://172.16.191.128/temp/?encoding=UTF8&passive=True')
+    dest_username = CharField(null=True)
+    dest_password = CharField(null=True)
 
     # 文件名过滤规则
     filter_filename = CharField(default='.*')
@@ -47,8 +52,11 @@ class Task(Model):
     middleware = CharField(default=None)
     middleware_arg = CharField(default='')
 
+    # 临时文件后缀
+    suffix = CharField(default='.tmp')
+
     # 处理记录保存时间，以秒为单位
-    processed_reserve_time = IntegerField(3600*24*21)
+    processed_reserve_time = IntegerField(default=3600*24*21)
 
     # 是否删除源文件
     delete_source = BooleanField(default=False)
@@ -60,12 +68,7 @@ class Task(Model):
     updated_at = DateTimeField()
 
     def __str__(self):
-        """返回任务实例的 uuid 与实例地址
-
-        Returns:
-            string: uuid + object
-        """
-        return '[%s], %s' % (self.uuid, object.__repr__(self))
+        return '[%s: %s], %s' % (self.uuid[-4:], self.task_name, object.__repr__(self))
 
     def save(self, force_insert=False, only=None):
         """重写 save()。每次保存之前，先更新 updated_at 字段。然后再调用父类方法。

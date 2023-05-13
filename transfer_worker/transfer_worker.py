@@ -12,8 +12,8 @@ from peewee import OperationalError, SqliteDatabase
 
 from transfer_worker.model.task import Task
 from transfer_worker.model.processed import Processed
-from transfer_worker.worker.getter import GetterFactory, LocalGetter
-from transfer_worker.worker.putter import PutterFactory, LocalPutter
+from transfer_worker.worker.factory import GetterFactory, PutterFactory
+from transfer_worker.worker.local_woker import LocalGetter, LocalPutter
 from transfer_worker.worker.middle_file import MiddleFile, Abort
 
 
@@ -111,7 +111,7 @@ class TransferWorker(object):
                 continue
 
             # 3. 下载源文件 > mid_file(source, source_mtime, middle)
-            g.get(mid_file, mid_path, p.temp_suffix)
+            g.get(mid_file, mid_path)
             self.logger.debug('got midfile: %s', mid_file)
 
             # 4. 中间件后处理 > mid_file(source, source_mtime, middle, dest)
