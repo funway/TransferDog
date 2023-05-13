@@ -13,16 +13,16 @@ if __name__ == "__main__":
 
 
 import logging, re
-from urllib import parse
 
 from croniter import croniter
 from peewee import fn
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFontMetrics, QIntValidator
-from PySide6.QtWidgets import QDialog, QFileDialog, QLineEdit, QFrame, QAbstractScrollArea
+from PySide6.QtWidgets import QDialog
 
 from transfer_dog.ui.ui_dialog_task_edit import Ui_Dialog
 from transfer_dog.view.server_widget import ServerWidget
+from transfer_dog.view.dialog_regular_express import DialogRegularExpress
 from transfer_worker.model.task import Task
 from transfer_dog.utility.constants import *
 
@@ -61,6 +61,7 @@ class DialogTaskEdit(QDialog, Ui_Dialog):
         self.sw_dest = ServerWidget(self._task.dest_url, self._task.dest_username, self._task.dest_password)
 
         # 绑定 信号-槽
+        self.pb_regex_test.clicked.connect(self.show_regex_test_dialog)
 
         # 根据 _task 更新 UI
         self.update_UI()
@@ -233,6 +234,10 @@ class DialogTaskEdit(QDialog, Ui_Dialog):
             self.label_error_msg.setText(QFontMetrics(self.label_error_msg.font()).elidedText(msg, Qt.TextElideMode.ElideRight, 250))
             self.label_error_msg.setToolTip(msg)
 
+    def show_regex_test_dialog(self):
+        dialog = DialogRegularExpress(self.le_filter_filename.text())
+        dialog.exec()
+        pass
 
 def test(arg=None):
     

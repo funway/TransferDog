@@ -62,49 +62,50 @@ class Ui_Form(object):
 
         self.verticalLayout.addLayout(self.hlayout_protocol)
 
-        self.gp_server = QGroupBox(Form)
-        self.gp_server.setObjectName(u"gp_server")
-        self.verticalLayout_3 = QVBoxLayout(self.gp_server)
+        self.gbox_server = QGroupBox(Form)
+        self.gbox_server.setObjectName(u"gbox_server")
+        self.verticalLayout_3 = QVBoxLayout(self.gbox_server)
+        self.verticalLayout_3.setSpacing(6)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.gridLayout = QGridLayout()
         self.gridLayout.setObjectName(u"gridLayout")
-        self.le_user = QLineEdit(self.gp_server)
+        self.le_user = QLineEdit(self.gbox_server)
         self.le_user.setObjectName(u"le_user")
 
         self.gridLayout.addWidget(self.le_user, 1, 1, 1, 1)
 
-        self.le_host = QLineEdit(self.gp_server)
+        self.le_host = QLineEdit(self.gbox_server)
         self.le_host.setObjectName(u"le_host")
 
         self.gridLayout.addWidget(self.le_host, 0, 1, 1, 1)
 
-        self.label_password = QLabel(self.gp_server)
+        self.label_password = QLabel(self.gbox_server)
         self.label_password.setObjectName(u"label_password")
         self.label_password.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
         self.gridLayout.addWidget(self.label_password, 1, 2, 1, 1)
 
-        self.le_port = QLineEdit(self.gp_server)
+        self.le_port = QLineEdit(self.gbox_server)
         self.le_port.setObjectName(u"le_port")
 
         self.gridLayout.addWidget(self.le_port, 0, 3, 1, 1)
 
-        self.le_password = QLineEdit(self.gp_server)
+        self.le_password = QLineEdit(self.gbox_server)
         self.le_password.setObjectName(u"le_password")
 
         self.gridLayout.addWidget(self.le_password, 1, 3, 1, 1)
 
-        self.label_2 = QLabel(self.gp_server)
+        self.label_2 = QLabel(self.gbox_server)
         self.label_2.setObjectName(u"label_2")
 
         self.gridLayout.addWidget(self.label_2, 0, 0, 1, 1)
 
-        self.label_6 = QLabel(self.gp_server)
+        self.label_6 = QLabel(self.gbox_server)
         self.label_6.setObjectName(u"label_6")
 
         self.gridLayout.addWidget(self.label_6, 1, 0, 1, 1)
 
-        self.label_5 = QLabel(self.gp_server)
+        self.label_5 = QLabel(self.gbox_server)
         self.label_5.setObjectName(u"label_5")
         self.label_5.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
@@ -115,13 +116,13 @@ class Ui_Form(object):
 
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.label_encoding = QLabel(self.gp_server)
+        self.label_encoding = QLabel(self.gbox_server)
         self.label_encoding.setObjectName(u"label_encoding")
         self.label_encoding.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
 
         self.horizontalLayout_3.addWidget(self.label_encoding)
 
-        self.comb_encoding = QComboBox(self.gp_server)
+        self.comb_encoding = QComboBox(self.gbox_server)
         self.comb_encoding.addItem("")
         self.comb_encoding.addItem("")
         self.comb_encoding.setObjectName(u"comb_encoding")
@@ -136,7 +137,7 @@ class Ui_Form(object):
 
         self.verticalLayout_3.addLayout(self.horizontalLayout_3)
 
-        self.stackedWidget = QStackedWidget(self.gp_server)
+        self.stackedWidget = QStackedWidget(self.gbox_server)
         self.stackedWidget.setObjectName(u"stackedWidget")
         self.page_ftp = QWidget()
         self.page_ftp.setObjectName(u"page_ftp")
@@ -191,7 +192,7 @@ class Ui_Form(object):
         self.verticalLayout_3.addWidget(self.stackedWidget)
 
 
-        self.verticalLayout.addWidget(self.gp_server)
+        self.verticalLayout.addWidget(self.gbox_server)
 
         self.hlayout_dir = QHBoxLayout()
         self.hlayout_dir.setObjectName(u"hlayout_dir")
@@ -228,7 +229,7 @@ class Ui_Form(object):
 
         self.retranslateUi(Form)
 
-        self.stackedWidget.setCurrentIndex(1)
+        self.stackedWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(Form)
@@ -240,7 +241,7 @@ class Ui_Form(object):
         self.rb_local.setText(QCoreApplication.translate("Form", u"Local", None))
         self.rb_ftp.setText(QCoreApplication.translate("Form", u"FTP(S)", None))
         self.rb_sftp.setText(QCoreApplication.translate("Form", u"SFTP", None))
-        self.gp_server.setTitle(QCoreApplication.translate("Form", u"Server", None))
+        self.gbox_server.setTitle(QCoreApplication.translate("Form", u"Server", None))
         self.label_password.setText(QCoreApplication.translate("Form", u"Password", None))
         self.label_2.setText(QCoreApplication.translate("Form", u"Host", None))
         self.label_6.setText(QCoreApplication.translate("Form", u"User", None))

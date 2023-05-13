@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>650</width>
-    <height>717</height>
+    <height>663</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -47,7 +47,7 @@ QScrollArea {
         <x>0</x>
         <y>0</y>
         <width>626</width>
-        <height>651</height>
+        <height>597</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">

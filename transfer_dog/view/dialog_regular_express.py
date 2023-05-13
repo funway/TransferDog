@@ -19,7 +19,7 @@ from transfer_dog.ui.ui_dialog_regular_express import Ui_Dialog
 
 class DialogRegularExpress(QDialog, Ui_Dialog):
 
-    def __init__(self):
+    def __init__(self, regex: str = ''):
         super().__init__()
 
         # 设置 logger
@@ -28,13 +28,15 @@ class DialogRegularExpress(QDialog, Ui_Dialog):
 
         self.setupUi(self)
 
-        default_inputs = 'ceshi\n' \
-                    '任务组ab\n' \
-                    'task_发送任务\n' \
-                    '收集+分发\n' \
-                    '08/12/1985\n' \
-                    '166test'
-        self.pte_input.setPlainText(default_inputs)
+        default_inputs = [
+            'PJJ8DSLM.120',
+            '123测试任务ab',
+            r'C:\\ftproot\fy2g\202305\sat_20230512_if.png',
+            '/data/radar/zggg_radar_ppip_202305201011.png'
+        ]
+        self.text_input.setPlainText('\n'.join(default_inputs))
+        self.le_regex.setText(regex)
+        self.setWindowTitle('RegularExpression Test')
 
         self.pushButton.clicked.connect(self._start_match)
 
@@ -42,29 +44,30 @@ class DialogRegularExpress(QDialog, Ui_Dialog):
 
     def _start_match(self):
         self.logger.debug('start match')
-        self.pte_output.clear()
-        self.pte_output.appendPlainText('=== start match =========================================')
+        self.text_output.clear()
 
-        pattern = self.lineEdit.text().strip()
+        pattern = self.le_regex.text().strip()
         # q_reg = QRegularExpression(pattern, options=QRegularExpression.PatternOption.CaseInsensitiveOption)
         # p_reg = re.compile(pattern, flags=re.IGNORECASE)
         # 应该由输入的表达式来指定要不要忽略大小写，在正则表达式前头添加 (?i) 表示忽略大小写
-        q_reg = QRegularExpression(pattern)
-        p_reg = re.compile(pattern)
+        qt_reg = QRegularExpression(pattern)
+        py_reg = re.compile(pattern)
 
 
-        for row in self.pte_input.toPlainText().splitlines():
-            self.pte_output.appendPlainText('使用「%s」匹配 [%s]' % (pattern, row))
+        for row in self.text_input.toPlainText().splitlines():
+            self.logger.debug('使用「%s」匹配 [%s]' % (pattern, row))
 
-            match_result = q_reg.match(row)
-            self.pte_output.appendPlainText('QRegularExpression match result: %s' % match_result)
-            self.pte_output.appendPlainText('QRegularExpression captured: %s' % match_result.captured())
+            qt_result = qt_reg.match(row)
+            self.logger.debug('QRegularExpression match result: %s' % qt_result)
+            self.logger.debug('QRegularExpression captured: %s' % qt_result.captured())
             
-            p_result = p_reg.search(row)
-            self.pte_output.appendPlainText('Python re search result: %s' % p_result)
-            self.pte_output.appendPlainText('Python re searched: %s' % (p_result[0] if p_result else 'None'))
-
-            self.pte_output.appendPlainText('============================')
+            py_result = py_reg.search(row)
+            self.logger.debug('Python re search result: %s' % py_result)
+            self.logger.debug('Python re searched[0]: %s' % (py_result[0] if py_result else 'None'))
+            
+            if py_result:
+                display_text = '<span style="color:red;">{}</span>'.format(py_result[0]).join(row.split(py_result[0]))
+                self.text_output.append(display_text)
             pass
         pass
     

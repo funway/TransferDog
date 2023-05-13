@@ -99,10 +99,10 @@ class ServerWidget(QWidget, Ui_Form):
         else:
             # 如果是按钮被 checked
             if btn is self.rb_local:
-                self.gp_server.setEnabled(False)
+                self.gbox_server.setEnabled(False)
                 self.pb_dir.setEnabled(True)
             else:
-                self.gp_server.setEnabled(True)
+                self.gbox_server.setEnabled(True)
                 self.pb_dir.setEnabled(False)
                 
                 self.label_encoding.setDisabled(btn is self.rb_sftp)
