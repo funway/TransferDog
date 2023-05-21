@@ -262,7 +262,7 @@ class TransferDog(object):
         pass
     
     def _update_task_widget(self, task_uuid: str):
-        self.logger.info('刷新任务状态 [%s]', task_uuid)
+        self.logger.debug('刷新任务状态 [%s]', task_uuid)
             
         task = self.dict_tasks[task_uuid]
         
