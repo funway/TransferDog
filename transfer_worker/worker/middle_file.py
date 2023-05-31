@@ -4,8 +4,10 @@
 # Author:  funway.wang
 # Created: 2023/05/04 23:03:13
 
+import logging
 from enum import Enum
 from pathlib import Path
+from io import BytesIO
 
 
 class Abort(Enum):
@@ -31,13 +33,15 @@ class MiddleFile(object):
 
             source_mtime (_type_): 源文件修改时间
 
-            middle (_type_, optional): 中间文件，本地(临时)文件的全路径，或者是一个内存流对象. Defaults to None.
+            middle (_type_, optional): 中间文件，本地(临时)文件的全路径(pathlib.Path 类型)，或者是一个内存流对象(io.BytesIO 类型). Defaults to None.
 
             dest (Path, optional): 目标文件（相对于 task.dest.path 的相对路径，前面没有 / 符号）. Defaults to None.
             
             abort (Abort, optional): 是否中止处理（不再进行 Putter 操作）. Defaults to Abort.NO_ABORT.
         """
         super(MiddleFile, self).__init__()
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.debug('Init a %s instance', self.__class__.__name__)
         
         # 源(相对于 task.source.path 的路径)
         self.source = source
@@ -57,4 +61,10 @@ class MiddleFile(object):
 
     def __str__(self) -> str:
         return str(self.__dict__)
+    
+    def __del__(self):
+        self.logger.debug('Del a %s instance: %s', self.__class__.__name__, self)
+        
+        if isinstance(self.middle, BytesIO):
+            self.middle.close()
     

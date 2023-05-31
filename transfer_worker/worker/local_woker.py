@@ -7,6 +7,7 @@
 from datetime import datetime
 from urllib import parse
 from pathlib import Path
+from io import BytesIO
 import logging, re, shutil
 
 from transfer_worker.model.task import Task
@@ -45,20 +46,20 @@ class LocalGetter(Getter):
             # 1. 判断文件修改时间
             mtime = f.stat().st_mtime
             dt_mtime = datetime.fromtimestamp(mtime)
-            self.logger.debug('文件修改时间: %s', dt_mtime)
+            self.logger.debug('  文件修改时间: %s', dt_mtime)
             if self.task.filter_valid_time > 0 and (datetime.now() - dt_mtime).seconds > self.task.filter_valid_time:
-                self.logger.debug('文件修改时间已超过 %s 秒, 忽略', self.task.filter_valid_time)
+                self.logger.debug('  文件修改时间已超过 %s 秒, 忽略', self.task.filter_valid_time)
                 continue
-            self.logger.debug('判断文件修改时间... 通过')
+            self.logger.debug('  判断文件修改时间... 通过')
 
             # 2. 判断文件名是否匹配正则表达式
             # 注意 re.search() 与 re.match() 的区别
             match = self.file_pattern.search(str(f))
             # match = self.file_pattern.search(str(f.name))
             if not match:
-                self.logger.debug('文件名不匹配, 忽略')
+                self.logger.debug('  文件名不匹配, 忽略')
                 continue
-            self.logger.debug('判断文件名匹配... 通过')
+            self.logger.debug('  判断文件名匹配... 通过')
 
             mid_file = MiddleFile(f.relative_to(self.src_path), str(mtime))
 
@@ -68,9 +69,9 @@ class LocalGetter(Getter):
             #                         Processed.source==str(mid_file.source), Processed.mtime==str(mid_file.source_mtime)
             #                     ).order_by(Processed.processed_at.desc()).get_or_none()
             if processed is not None:
-                self.logger.debug('文件已处理，忽略. processed = %s', processed)
+                self.logger.debug('  文件已处理，忽略. processed = %s', processed)
                 continue
-            self.logger.debug('判断是否未处理... 通过')
+            self.logger.debug('  判断是否未处理... 通过')
 
             # 4. yield 一个中间对象
             yield mid_file
@@ -85,10 +86,10 @@ class LocalGetter(Getter):
             sub (int, optional): 子目录递归层数. Defaults to 0. 负数表示不限制目录深度递归.
 
         Yields:
-            Iterator[Path]: 文件的 Path 对象
+            Iterator[Path]: 文件的 Path 对象(全路径)
         """
         assert path.is_dir(), 'path must be a directory'
-        self.logger.debug('开始遍历目录 %s, sub=%s', path, sub)
+        self.logger.debug('开始遍历目录: %s, recursive sub=%s', path, sub)
         for f in path.iterdir():
             self.logger.debug('%s %s', 'd' if f.is_dir() else 'f', f)
             if not f.is_dir():
@@ -112,6 +113,14 @@ class LocalGetter(Getter):
         pass
 
     def get(self, mid_file: MiddleFile, mid_path: Path):
+        """从源文件获取中间态文件，放到 mid_path 下。
+        1. local >> local:  mid_file.middle 就放 dest.path 目录, 所以需要拷贝一份文件到 dest.path
+        2. local >> remote: mid_file.middle 就是源文件
+
+        Args:
+            mid_file (MiddleFile): _description_
+            mid_path (Path): _description_
+        """
         if mid_path is None:
             # local >> remote
             # 中间文件就是源文件
@@ -148,5 +157,13 @@ class LocalPutter(Putter):
             self.logger.debug('创建目标目录: %s', dest_path)
             dest_path.mkdir(parents=True)
         
-        shutil.move(mid_file.middle, self.dest_path.joinpath(mid_file.dest))
+        if isinstance(mid_file.middle, Path):
+            # 如果 mid_file.middle 是一个文件路径
+            shutil.move(mid_file.middle, self.dest_path.joinpath(mid_file.dest))
+        elif isinstance(mid_file.middle, BytesIO):
+            # 如果 mid_file.middle 是一个内存对象
+            with open(self.dest_path.joinpath(mid_file.dest), 'wb') as fp:
+                fp.write(mid_file.middle.getvalue())
+        else:
+            raise Exception('无法识别的中间文件类型: %s', mid_file.middle)
         pass

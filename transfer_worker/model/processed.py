@@ -13,7 +13,7 @@ from peewee import IntegerField, CharField, DateTimeField
 class Processed(Model):
     source = CharField(null=False)
     mtime = CharField(null=False)
-    processed_at = DateTimeField(default=datetime.now())
+    processed_at = DateTimeField(default=lambda: datetime.now())
     pid = IntegerField(null=False)
 
     def __str__(self):
