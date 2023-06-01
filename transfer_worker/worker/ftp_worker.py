@@ -19,6 +19,19 @@ from transfer_worker.utility.ftps import MyFTP_TLS
 from transfer_worker.utility.constants import *
 
 
+__README = """
+在遍历 FTP 目录的时候，
+
+由于不同的 FTP 服务器对 LIST 命令的响应格式可能是不一致的！（尤其是 IIS 这个异类，虽然可以在它的配置 "iis - ftp目录浏览 - 目录列表样式" 中将其修改为 UNIX 类型）
+又由于有些 FTP 服务器不支持超好用的 MLSD 命令（还是 IIS 这个垃圾）
+
+所以最终选择的方案是:
+    使用 NLST 命令，列出目录下的所有 文件/子目录 的名字.
+    然后使用 SIZE 命令判断是文件还是子目录. (SIZE 命令遇到目录会返回异常)
+    然后使用 MDTM 命令获取文件的修改时间.
+"""
+
+
 class TransferTracker(object):
     def __init__(self, file_size):
         super(TransferTracker, self).__init__()
@@ -136,9 +149,15 @@ class FtpGetter(Getter):
             mtime = ret.split()[1]
             self.logger.debug('  文件修改时间: %s', mtime)
             dt_mtime = datetime.strptime(mtime, '%Y%m%d%H%M%S' if len(mtime.split('.')) == 1 else '%Y%m%d%H%M%S.%f')
+            
             if self.task.filter_valid_time > 0 and (datetime.utcnow() - dt_mtime).seconds > self.task.filter_valid_time:
-                self.logger.debug('  文件修改时间已超过 %s 秒, 忽略', self.task.filter_valid_time)
+                self.logger.debug('  文件修改时间(%s)与当前时间差超过 %s 秒, 忽略', dt_mtime, self.task.filter_valid_time)
                 continue
+            
+            if (datetime.utcnow() - dt_mtime).seconds < IGNORE_MTIME_IN_SECONDS:
+                self.logger.debug('  文件修改时间(%s)与当前时间差小于 %s 秒, 忽略', dt_mtime, IGNORE_MTIME_IN_SECONDS)
+                continue
+
             self.logger.debug('  判断文件修改时间... 通过')
 
             # 2. 判断文件名是否匹配正则表达式
@@ -245,7 +264,7 @@ class FtpGetter(Getter):
         transfered_size = 0
         while t.is_alive():
             # 阻塞主线程，直到超时或线程t结束
-            t.join(FTP_TRANSFER_THREAD_JOIN_INTERVAL)
+            t.join(TRANSFER_THREAD_JOIN_INTERVAL)
 
             self.ftp.voidcmd('NOOP')
 
@@ -354,7 +373,7 @@ class FtpPutter(Putter):
         transfered_size = 0
         while t.is_alive():
             # 阻塞主线程，直到超时或线程 t 结束
-            t.join(FTP_TRANSFER_THREAD_JOIN_INTERVAL)
+            t.join(TRANSFER_THREAD_JOIN_INTERVAL)
             
             # ftp 有两个通道：数据通道与命令通道。
             # 如果数据通道传输时间太久，而命令通道一直闲置着的话，可能会被防火墙强制关闭命令通道的连接。

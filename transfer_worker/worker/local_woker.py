@@ -14,6 +14,7 @@ from transfer_worker.model.task import Task
 from transfer_worker.model.processed import Processed
 from transfer_worker.worker.base import Getter, Putter
 from transfer_worker.worker.middle_file import MiddleFile
+from transfer_worker.utility.constants import *
 
     
 class LocalGetter(Getter):
@@ -47,9 +48,15 @@ class LocalGetter(Getter):
             mtime = f.stat().st_mtime
             dt_mtime = datetime.fromtimestamp(mtime)
             self.logger.debug('  文件修改时间: %s', dt_mtime)
+            
             if self.task.filter_valid_time > 0 and (datetime.now() - dt_mtime).seconds > self.task.filter_valid_time:
-                self.logger.debug('  文件修改时间已超过 %s 秒, 忽略', self.task.filter_valid_time)
+                self.logger.debug('  文件修改时间(%s)与当前时间差超过 %s 秒, 忽略', dt_mtime, self.task.filter_valid_time)
                 continue
+            
+            if (datetime.now() - dt_mtime).seconds < IGNORE_MTIME_IN_SECONDS:
+                self.logger.debug('  文件修改时间(%s)与当前时间差小于 %s 秒, 忽略', dt_mtime, IGNORE_MTIME_IN_SECONDS)
+                continue
+
             self.logger.debug('  判断文件修改时间... 通过')
 
             # 2. 判断文件名是否匹配正则表达式
