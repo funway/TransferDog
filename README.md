@@ -31,7 +31,9 @@ transfer_worker 模块是底层的任务执行代码，可以独立于 GUI 运�
    5. 返回一个 mid_file = MiddleFile(源文件相对路径, 源文件修改时间)
 4. middleware.pre_process() 进行预处理。<br>
    可以用来生成目标文件路径，或者修改 mid_file.abort 属性
-5. getter.get() 下载该文件，生成 mid_file.middle 中间临时文件
+5. getter.get() 下载该文件，生成 mid_file.middle 中间临时文件 <br>
+   如果源文件大小很小，并不落地生成中间文件，mid_file.middle 指向一个 BytesIO 对象
+   如果源文件大小较大，才落地生成中间文件，mid_file.middle 指向该中间文件的全路径（Path 对象）
 6. middleware.process() 进行后处理。<br>
    可以用来生成目标文件路径，或者修改 mid_file.abort 属性
 7. putter.put(mid_file) 将临时文件上传到目标路径。
@@ -39,12 +41,8 @@ transfer_worker 模块是底层的任务执行代码，可以独立于 GUI 运�
 
 
 # todo
-5. 小文件不落地，直接在内存里转发可以吗？
-7. 普通 ftp server 对 LIST 命令的响应 与 IIS ftp server 对 LIST 命令的响应不一样！
-   （可以在 iis - ftp目录浏览 - 目录列表样式 中将其修改为 unix 类型）
-   累了，不想去支持 iis！就输出个告警！让用户自己改去！
-   另外，iis 又不支持 mlsd()，干。
-8. sftp 用 Paramiko 库
+1. SFTP 使用的是 Paramiko 库，但是该库目前不支持非 UTF8 编码的服务器
+2. HTTP 下载(上传就不做了，因为 HTTP 上传跟服务器太相关了)
 
 
 # Thanks to

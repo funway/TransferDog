@@ -10,6 +10,7 @@ import logging
 from transfer_worker.model.task import Task
 from transfer_worker.worker.local_woker import LocalGetter, LocalPutter
 from transfer_worker.worker.ftp_worker import FtpGetter, FtpPutter
+from transfer_worker.worker.sftp_worker import SFTPGetter, SFTPPutter
 
 
 class GetterFactory(object):
@@ -25,6 +26,8 @@ class GetterFactory(object):
             return LocalGetter(task)
         elif o.scheme == 'ftp' or o.scheme == 'ftps':
             return FtpGetter(task)
+        elif o.scheme == 'sftp':
+            return SFTPGetter(task)
         else:
             raise Exception('Unrecognized Source URL')
         pass
@@ -43,6 +46,8 @@ class PutterFactory(object):
             return LocalPutter(task)
         elif o.scheme == 'ftp' or o.scheme == 'ftps':
             return FtpPutter(task)
+        elif o.scheme == 'sftp':
+            return SFTPPutter(task)
         else:
             raise Exception('Unrecognized Dest URL')
         pass

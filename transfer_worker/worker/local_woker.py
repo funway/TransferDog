@@ -49,12 +49,13 @@ class LocalGetter(Getter):
             dt_mtime = datetime.fromtimestamp(mtime)
             self.logger.debug('  文件修改时间: %s', dt_mtime)
             
-            if self.task.filter_valid_time > 0 and (datetime.now() - dt_mtime).seconds > self.task.filter_valid_time:
-                self.logger.debug('  文件修改时间(%s)与当前时间差超过 %s 秒, 忽略', dt_mtime, self.task.filter_valid_time)
+            now = datetime.now()
+            if self.task.filter_valid_time > 0 and (now - dt_mtime).seconds > self.task.filter_valid_time:
+                self.logger.debug('  文件修改时间(%s)与当前时间(%s)差超过 %s 秒, 忽略', dt_mtime, now, self.task.filter_valid_time)
                 continue
             
-            if (datetime.now() - dt_mtime).seconds < IGNORE_MTIME_IN_SECONDS:
-                self.logger.debug('  文件修改时间(%s)与当前时间差小于 %s 秒, 忽略', dt_mtime, IGNORE_MTIME_IN_SECONDS)
+            if (now - dt_mtime).seconds < IGNORE_MTIME_IN_SECONDS:
+                self.logger.debug('  文件修改时间(%s)与当前时间(%s)差小于 %s 秒, 忽略', dt_mtime, now, IGNORE_MTIME_IN_SECONDS)
                 continue
 
             self.logger.debug('  判断文件修改时间... 通过')

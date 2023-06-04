@@ -2,34 +2,65 @@
 # -*- coding: utf-8 -*-
 
 # Author:  funway.wang
-# Created: 2023/05/14 09:47:11
+# Created: 2023/05/31 16:12:25
 
-import logging, re, threading
+import logging, re, threading, stat
 from urllib import parse
-from ftplib import FTP
 from pathlib import Path
 from io import BytesIO
 from datetime import datetime
+
+import paramiko
 
 from transfer_worker.model.task import Task
 from transfer_worker.model.processed import Processed
 from transfer_worker.worker.base import Getter, Putter
 from transfer_worker.worker.middle_file import MiddleFile
-from transfer_worker.utility.ftps import MyFTP_TLS
 from transfer_worker.utility.constants import *
 
 
 __README = """
-在遍历 FTP 目录的时候，
-
-由于不同的 FTP 服务器对 LIST 命令的响应格式可能是不一致的！（尤其是 IIS 这个异类，虽然可以在它的配置 "iis - ftp目录浏览 - 目录列表样式" 中将其修改为 UNIX 类型）
-又由于有些 FTP 服务器不支持超好用的 MLSD 命令（还是 IIS 这个垃圾）
-
-所以最终选择的方案是:
-    使用 NLST 命令，列出目录下的所有 文件/子目录 的名字.
-    然后使用 SIZE 命令判断是文件还是子目录. (SIZE 命令遇到目录会返回异常)
-    然后使用 MDTM 命令获取文件的修改时间.
+Paramiko 库不支持非 UTF8 编码的 SFTP 服务器
 """
+
+
+def open_sftp(url: str, username: str = None, password: str = None):
+    """打开 sftp 连接
+
+    Args:
+        url (str): 以 url 形式表示的 sftp 连接参数。如 sftp://127.0.0.1:21/?keyfile=/home/user/.ssh/key
+        username (str, optional): _description_. Defaults to None.
+        password (str, optional): _description_. Defaults to None.
+
+    Returns:
+        paramiko.sftp_client.SFTPClient: 返回打开的 sftp 连接
+    """
+    o = parse.urlparse(url)
+    querys = dict(parse.parse_qsl(o.query))
+
+    # paramiko 额外写日志文件 (paramiko 会自动调用 logging.getLogger('paramiko.xxxx') 取日志对象)
+    # paramiko.util.log_to_file("paramiko.log")
+
+    # 1 创建 ssh 对象
+    ssh = paramiko.SSHClient()
+    
+    # 2 设置对远端服务器 key 的加载保存策略
+    # known_hosts = Path.home() / '.ssh/known_hosts'
+    # ssh.load_host_keys(known_hosts)
+    # 如果不设置 host_keys_file，那么 AutoAddPolicy 就不会保存未知的 host_key (但还是会允许访问)
+    ssh.set_missing_host_key_policy(paramiko.client.AutoAddPolicy)
+
+    # 3 连接 ssh
+    keyfile = querys.get('keyfile', None)
+    if keyfile is not None:
+        key = paramiko.RSAKey.from_private_key_file(keyfile)
+        ssh.connect(hostname=o.hostname, port=22 if o.port is None else o.port, username=username, pkey=key)
+    else:
+        ssh.connect(hostname=o.hostname, port=22 if o.port is None else o.port, username=username, password=password)
+
+    # 4 打开并返回 sftp
+    sftp = ssh.open_sftp()
+    return sftp
 
 
 class TransferTracker(object):
@@ -50,10 +81,11 @@ class TransferTracker(object):
         self.logger.debug('Delete a %s instance', self.__class__.__name__)
         return
 
-    def transfer_track(self, chunk):
-        self.transfered_size += len(chunk)
+    def transfer_track(self, transfered, total):
+        self.transfered_size = transfered
         self.logger.debug('  Transfer progress: %.2f%% [%s/%s bytes]', 100.0*self.get_progress(),
                           self.transfered_size, self.total_size)
+        assert total == self.total_size, '传输过程中, 文件大小异常变化'
         return
 
     def is_completed(self):
@@ -70,48 +102,12 @@ class TransferTracker(object):
         """
         # 分子分母都加0.001是为了防止分母(文件大小)为0的情况
         return (1.0*self.transfered_size+0.001)/(self.total_size+0.001)
-    
-
-def open_ftp(url: str, username: str = None, password: str = None):
-    """打开 ftp/ftps 连接
-
-    Args:
-        url (str): 以 url 形式表示的 ftp 连接参数。如 ftp://127.0.0.1:21/?encoding=utf8&passive=true 
-        username (str, optional): 用户名. Defaults to None.
-        password (str, optional): 密码. Defaults to None.
-
-    Raises:
-        Exception: _description_
-
-    Returns:
-        (FTP, MyFTP_TLS): 返回已建立连接的 ftp/ftps 对象
-    """
-    o = parse.urlparse(url)
-    querys = dict(parse.parse_qsl(o.query))
-
-    if o.scheme == 'ftp':
-        ftp = FTP(encoding=querys.get('encoding', 'UTF8'), timeout=FTP_CONNECT_TIMEOUT)
-    elif o.scheme == 'ftps':
-        ftp = MyFTP_TLS(encoding=querys.get('encoding', 'UTF8'), timeout=FTP_CONNECT_TIMEOUT)
-    else:
-        raise Exception('Unsupported Protocol: %s' % o.scheme)
-
-    ftp.set_debuglevel(FTP_DEBUG_LEVEL)
-    ftp.set_pasv(querys.get('passive', True))
-
-    ftp.connect(o.hostname, 21 if o.port is None else o.port)
-    ftp.login(username, password)
-
-    if isinstance(ftp, MyFTP_TLS):
-        ftp.prot_p()
-    
-    return ftp
 
 
-class FtpGetter(Getter):
-    """docstring for FtpGetter."""
+class SFTPGetter(Getter):
+    """docstring for SFTPGetter."""
     def __init__(self, task: Task):
-        super(FtpGetter, self).__init__()
+        super(SFTPGetter, self).__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.debug('Init a %s instance', self.__class__.__name__)
 
@@ -124,13 +120,13 @@ class FtpGetter(Getter):
         self.file_pattern = re.compile(self.task.filter_filename)
 
         self.logger.debug('打开连接: %s', self.task.source_url)
-        self.ftp = open_ftp(self.task.source_url, self.task.source_username, self.task.source_password)
+        self.sftp = open_sftp(self.task.source_url, self.task.source_username, self.task.source_password)
 
         pass
 
     def __del__(self):
         try:
-            self.ftp.close()
+            self.sftp.close()
         except Exception as e:
             self.logger.warning(e)
         pass
@@ -142,16 +138,13 @@ class FtpGetter(Getter):
             MiddleFile: {source, source_mtime}
         """
 
-        for f in self._iter_path(self.src_path, self.task.subdir_recursion):
+        for f, mtime in self._iter_path(self.src_path, self.task.subdir_recursion):
             # 通过 _iter_path 遍历目录下所有文件
             self.logger.debug('判断文件 %s', f)
 
             # 1. 判断文件修改时间
-            # MDTM 会以 YYYYmmddHHMMSS(.ms) 的形式返回文件的修改时间，并且是 UTC 的。
-            ret = self.ftp.voidcmd('MDTM %s' % f)
-            mtime = ret.split()[1]
-            self.logger.debug('  文件修改时间: %s', mtime)
-            dt_mtime = datetime.strptime(mtime, '%Y%m%d%H%M%S' if len(mtime.split('.')) == 1 else '%Y%m%d%H%M%S.%f')
+            dt_mtime = datetime.utcfromtimestamp(mtime)
+            self.logger.debug('  文件修改时间: %s, %s', mtime, dt_mtime)
             now = datetime.utcnow()
             if self.task.filter_valid_time > 0 and (now - dt_mtime).seconds > self.task.filter_valid_time:
                 self.logger.debug('  文件修改时间(%s UTC)与当前时间(%s UTC)差超过 %s 秒, 忽略', dt_mtime, now, self.task.filter_valid_time)
@@ -194,26 +187,20 @@ class FtpGetter(Getter):
             sub (int, optional): 子目录递归层数. Defaults to 0. 负数表示不限制目录深度递归.
 
         Yields:
-            Iterator[Path]: 文件的 Path 对象(全路径)
+            Iterator[(Path, timestamp)]: 返回一个元组 (文件的 Path 对象(全路径), 文件修改时间)
         """
         self.logger.debug('跳转到目录: %s', path)
-        self.ftp.cwd(str(path))
+        self.sftp.chdir(str(path))
 
         self.logger.debug('开始遍历目录: %s, recursive sub=%s', path, sub)
-        for f in self.ftp.nlst():
-            f_is_dir = False
-            try:
-                # 使用 SIZE 命令来测试 f 是文件还是目录。如果是目录，则 ftp.size() 会抛出异常
-                self.ftp.size(str(path.joinpath(f)))
-            except Exception as e:
-                f_is_dir = True
-            
-            self.logger.debug('%s %s', 'd' if f_is_dir else 'f', path.joinpath(f))
+        for f_attr in self.sftp.listdir_attr():
+            f_is_dir = stat.S_ISDIR(f_attr.st_mode)
+            self.logger.debug('%s %s', 'd' if f_is_dir else 'f', path.joinpath(f_attr.filename))
 
             if not f_is_dir:
-                yield path.joinpath(f)
+                yield path.joinpath(f_attr.filename), f_attr.st_mtime
             elif sub != 0:
-                yield from self._iter_path(path.joinpath(f), sub-1)
+                yield from self._iter_path(path.joinpath(f_attr.filename), sub-1)
             
         return 
     
@@ -234,7 +221,7 @@ class FtpGetter(Getter):
         src_file = str(self.src_path.joinpath(mid_file.source))
         local_tmp_file = mid_path.joinpath(mid_file.source.name + self.task.suffix)
 
-        file_size = self.ftp.size(src_file)
+        file_size = self.sftp.stat(src_file).st_size
         self.logger.debug('源文件大小: %s bytes', file_size)
 
         tracker = TransferTracker(file_size)
@@ -251,8 +238,7 @@ class FtpGetter(Getter):
                     fp = BytesIO()
                     mid_file.middle = fp
                 
-                self.ftp.retrbinary('RETR %s' % src_file,
-                               lambda chunk: (fp.write(chunk), tracker.transfer_track(chunk)))
+                self.sftp.getfo(src_file, fp, callback=tracker.transfer_track)
             except Exception as e:
                 self.logger.exception('  文件传输时发生异常:')
                 exit(-1)
@@ -268,8 +254,6 @@ class FtpGetter(Getter):
         while t.is_alive():
             # 阻塞主线程，直到超时或线程t结束
             t.join(TRANSFER_THREAD_JOIN_INTERVAL)
-
-            self.ftp.voidcmd('NOOP')
 
             # 打印传输进度
             self.logger.debug('  传输进度: %.2f%%', tracker.get_progress() * 100)
@@ -306,9 +290,10 @@ class FtpGetter(Getter):
         pass
 
 
-class FtpPutter(Putter):
-    def __init__(self, task: Task):
-        super(FtpPutter, self).__init__()
+class SFTPPutter(Putter):
+    """docstring for SFTPPutter."""
+    def __init__(self, task):
+        super(SFTPPutter, self).__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.debug('Init a %s instance', self.__class__.__name__)
 
@@ -317,17 +302,17 @@ class FtpPutter(Putter):
         self.base_path = Path(parse.urlparse(task.dest_url).path)
 
         self.logger.debug('打开连接: %s', self.task.dest_url)
-        self.ftp = open_ftp(self.task.dest_url, self.task.dest_username, self.task.dest_password)
+        self.sftp = open_sftp(self.task.dest_url, self.task.dest_username, self.task.dest_password)
         
         pass
 
     def __del__(self):
         try:
-            self.ftp.close()
+            self.sftp.close()
         except Exception as e:
             self.logger.warning(e)
         pass
-
+    
     def put(self, mid_file: MiddleFile):
         self.logger.debug('准备上传文件: %s', mid_file)
 
@@ -350,11 +335,11 @@ class FtpPutter(Putter):
         for d in mid_file.dest.parents[::-1]:
             try:
                 p = self.base_path.joinpath(d)
-                self.ftp.cwd(str(p))
+                self.sftp.chdir(str(p))
                 self.logger.debug('测试目录 [%s] 是否存在... 通过', p)
             except Exception as e:
                 self.logger.warning('目录 [%s] 未找到，新建该目录', p)
-                self.ftp.mkd(str(p))
+                self.sftp.mkdir(str(p))
 
         tracker = TransferTracker(file_size)
 
@@ -366,7 +351,7 @@ class FtpPutter(Putter):
                 else:
                     fp = mid_file.middle
                     fp.seek(0)
-                self.ftp.storbinary('STOR %s' % tmp_file, fp, callback=tracker.transfer_track)
+                self.sftp.putfo(fp, tmp_file, file_size=file_size, callback=tracker.transfer_track)
             except Exception as e:
                 self.logger.exception('  文件传输时发生异常:')
                 exit(-1)
@@ -381,11 +366,6 @@ class FtpPutter(Putter):
             # 阻塞主线程，直到超时或线程 t 结束
             t.join(TRANSFER_THREAD_JOIN_INTERVAL)
             
-            # ftp 有两个通道：数据通道与命令通道。
-            # 如果数据通道传输时间太久，而命令通道一直闲置着的话，可能会被防火墙强制关闭命令通道的连接。
-            # 发送空命令，尽可能保证命令通道不被关闭（不知道有没效果）
-            self.ftp.voidcmd('NOOP')
-
             # 打印传输进度
             self.logger.debug('  传输进度: %.2f%%', tracker.get_progress() * 100)
 
@@ -409,10 +389,10 @@ class FtpPutter(Putter):
             self.logger.debug('修改临时文件名: %s >> %s', tmp_file, dest_file)
             try:
                 # 如果已存在同名目标文件，删除先
-                self.ftp.delete(dest_file)
+                self.sftp.remove(dest_file)
             except Exception:
                 pass
             finally:
-                self.ftp.rename(tmp_file, dest_file)
+                self.sftp.rename(tmp_file, dest_file)
 
         pass
