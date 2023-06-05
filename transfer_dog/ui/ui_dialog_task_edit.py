@@ -66,16 +66,6 @@ class Ui_Dialog(object):
         self.gbox_general.setSizePolicy(sizePolicy)
         self.gridLayout = QGridLayout(self.gbox_general)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.chkb_task_enabled = QCheckBox(self.gbox_general)
-        self.chkb_task_enabled.setObjectName(u"chkb_task_enabled")
-
-        self.gridLayout.addWidget(self.chkb_task_enabled, 1, 2, 1, 1)
-
-        self.le_task_schedule = QLineEdit(self.gbox_general)
-        self.le_task_schedule.setObjectName(u"le_task_schedule")
-
-        self.gridLayout.addWidget(self.le_task_schedule, 1, 1, 1, 1)
-
         self.label_2 = QLabel(self.gbox_general)
         self.label_2.setObjectName(u"label_2")
 
@@ -86,21 +76,42 @@ class Ui_Dialog(object):
 
         self.gridLayout.addWidget(self.le_task_name, 0, 1, 1, 1)
 
-        self.label = QLabel(self.gbox_general)
-        self.label.setObjectName(u"label")
+        self.le_task_schedule = QLineEdit(self.gbox_general)
+        self.le_task_schedule.setObjectName(u"le_task_schedule")
 
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
-
-        self.label_3 = QLabel(self.gbox_general)
-        self.label_3.setObjectName(u"label_3")
-
-        self.gridLayout.addWidget(self.label_3, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.le_task_schedule, 1, 1, 1, 1)
 
         self.comb_task_group = QComboBox(self.gbox_general)
         self.comb_task_group.setObjectName(u"comb_task_group")
         self.comb_task_group.setEditable(True)
 
         self.gridLayout.addWidget(self.comb_task_group, 0, 3, 1, 1)
+
+        self.label_6 = QLabel(self.gbox_general)
+        self.label_6.setObjectName(u"label_6")
+        self.label_6.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.gridLayout.addWidget(self.label_6, 1, 2, 1, 1)
+
+        self.chkb_task_enabled = QCheckBox(self.gbox_general)
+        self.chkb_task_enabled.setObjectName(u"chkb_task_enabled")
+
+        self.gridLayout.addWidget(self.chkb_task_enabled, 1, 4, 1, 1)
+
+        self.le_timeout = QLineEdit(self.gbox_general)
+        self.le_timeout.setObjectName(u"le_timeout")
+
+        self.gridLayout.addWidget(self.le_timeout, 1, 3, 1, 1)
+
+        self.label_3 = QLabel(self.gbox_general)
+        self.label_3.setObjectName(u"label_3")
+
+        self.gridLayout.addWidget(self.label_3, 1, 0, 1, 1)
+
+        self.label = QLabel(self.gbox_general)
+        self.label.setObjectName(u"label")
+
+        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
 
 
         self.verticalLayout_3.addWidget(self.gbox_general)
@@ -290,16 +301,23 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Dialog", None))
         self.gbox_general.setTitle(QCoreApplication.translate("Dialog", u"General", None))
-        self.chkb_task_enabled.setText(QCoreApplication.translate("Dialog", u"Enable", None))
-        self.le_task_schedule.setPlaceholderText(QCoreApplication.translate("Dialog", u"* * * * *", None))
         self.label_2.setText(QCoreApplication.translate("Dialog", u"Task Group", None))
-        self.label.setText(QCoreApplication.translate("Dialog", u"Task Name", None))
+        self.le_task_schedule.setPlaceholderText(QCoreApplication.translate("Dialog", u"* * * * *", None))
+        self.label_6.setText(QCoreApplication.translate("Dialog", u"Timeout", None))
+        self.chkb_task_enabled.setText(QCoreApplication.translate("Dialog", u"Enable", None))
+#if QT_CONFIG(tooltip)
+        self.le_timeout.setToolTip(QCoreApplication.translate("Dialog", u"process timeout in seconds", None))
+#endif // QT_CONFIG(tooltip)
         self.label_3.setText(QCoreApplication.translate("Dialog", u"Schedule", None))
+        self.label.setText(QCoreApplication.translate("Dialog", u"Task Name", None))
         self.gbox_source.setTitle(QCoreApplication.translate("Dialog", u"Source", None))
         self.gbox_filter.setTitle(QCoreApplication.translate("Dialog", u"Filter / Middleware", None))
         self.label_8.setText(QCoreApplication.translate("Dialog", u"Filename RegEx", None))
         self.le_filter_filename.setText(QCoreApplication.translate("Dialog", u".*", None))
         self.pb_regex_test.setText(QCoreApplication.translate("Dialog", u"Test", None))
+#if QT_CONFIG(tooltip)
+        self.le_processed_reserve.setToolTip(QCoreApplication.translate("Dialog", u"reserve time of processed records in seconds", None))
+#endif // QT_CONFIG(tooltip)
         self.label_12.setText(QCoreApplication.translate("Dialog", u"Middleware Argument", None))
         self.label_11.setText(QCoreApplication.translate("Dialog", u"Middleware", None))
         self.label_4.setText(QCoreApplication.translate("Dialog", u"Temp Suffix", None))

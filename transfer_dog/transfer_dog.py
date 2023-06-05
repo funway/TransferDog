@@ -148,7 +148,7 @@ class TransferDog(object):
                     
                     # 2.1 如果任务在运行且已经超时，则杀掉任务进程。进入步骤3
                     if status.process.is_running() and (now.timestamp() - status.process.create_time()) > task.timeout:
-                        self.logger.warning('[%s] 任务进程 [p%s] 超时！ kill it!', task.uuid, status.process.pid)
+                        self.logger.warning('[%s] 任务进程 [p%s] 运行超时！ kill it!', task.uuid, status.process.pid)
                         self.kill_task(task.uuid)
                     # 2.2 如果任务正在运行且未超时，则跳转到下一个任务
                     elif status.process.is_running():

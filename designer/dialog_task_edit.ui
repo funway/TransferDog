@@ -75,20 +75,6 @@ QScrollArea {
           <string>General</string>
          </property>
          <layout class="QGridLayout" name="gridLayout">
-          <item row="1" column="2">
-           <widget class="QCheckBox" name="chkb_task_enabled">
-            <property name="text">
-             <string>Enable</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="le_task_schedule">
-            <property name="placeholderText">
-             <string>* * * * *</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="2">
            <widget class="QLabel" name="label_2">
             <property name="text">
@@ -99,10 +85,41 @@ QScrollArea {
           <item row="0" column="1">
            <widget class="QLineEdit" name="le_task_name"/>
           </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label">
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="le_task_schedule">
+            <property name="placeholderText">
+             <string>* * * * *</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QComboBox" name="comb_task_group">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="label_6">
             <property name="text">
-             <string>Task Name</string>
+             <string>Timeout</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="4">
+           <widget class="QCheckBox" name="chkb_task_enabled">
+            <property name="text">
+             <string>Enable</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QLineEdit" name="le_timeout">
+            <property name="toolTip">
+             <string>process timeout in seconds</string>
             </property>
            </widget>
           </item>
@@ -113,10 +130,10 @@ QScrollArea {
             </property>
            </widget>
           </item>
-          <item row="0" column="3">
-           <widget class="QComboBox" name="comb_task_group">
-            <property name="editable">
-             <bool>true</bool>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Task Name</string>
             </property>
            </widget>
           </item>
@@ -199,7 +216,11 @@ QScrollArea {
              <number>12</number>
             </property>
             <item row="2" column="4">
-             <widget class="QLineEdit" name="le_processed_reserve"/>
+             <widget class="QLineEdit" name="le_processed_reserve">
+              <property name="toolTip">
+               <string>reserve time of processed records in seconds</string>
+              </property>
+             </widget>
             </item>
             <item row="1" column="3">
              <widget class="QLabel" name="label_12">

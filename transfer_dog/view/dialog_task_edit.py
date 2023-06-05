@@ -82,7 +82,9 @@ class DialogTaskEdit(QDialog, Ui_Dialog):
         self.comb_task_group.setCurrentText(task.group_name)
         self.le_task_schedule.setText(task.schedule)
         self.chkb_task_enabled.setChecked(task.enabled)
-
+        self.le_timeout.setText(str(task.timeout))
+        self.le_timeout.setValidator(QIntValidator(0, 999999999))
+        
         # update source group
         self.gbox_source.layout().addWidget(self.sw_source)
 
