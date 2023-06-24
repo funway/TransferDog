@@ -320,7 +320,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.logger.debug('用户选中查看任务日志 [%s]', item.data(role=QtCore.Qt.ItemDataRole.DisplayRole))
             worker_log_file = None
             worker_log_config = configparser.ConfigParser(defaults={'task_uuid': item.task_uuid})
-            worker_log_config.read(WORKER_LOGGIN_CONFIG)
+            worker_log_config.read(WORKER_LOGGIN_CONFIG, encoding='UTF8')
             worker_log_config_args = worker_log_config.get('handler_fileHandler', 'args', fallback=None)
             if worker_log_config_args is not None:
                 worker_log_file_path = Path(literal_eval(worker_log_config_args)[0])
