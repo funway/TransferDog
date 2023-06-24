@@ -15,6 +15,7 @@ from transfer_worker.model.processed import Processed
 from transfer_worker.worker.factory import GetterFactory, PutterFactory
 from transfer_worker.worker.local_woker import LocalGetter, LocalPutter
 from transfer_worker.worker.middle_file import MiddleFile, Abort
+import transfer_worker.middleware.nothing as default_middleware
 
 
 class TransferWorker(object):
@@ -172,7 +173,8 @@ class TransferWorker(object):
         self.logger.debug('load middleware: %s, arg: %s', self.task.middleware, self.task.middleware_arg)
         try:
             if self.task.middleware is None:
-                middleware = importlib.import_module('.nothing', 'transfer_worker.middleware')
+                # middleware = importlib.import_module('.nothing', 'transfer_worker.middleware')
+                middleware = default_middleware
             else:
                 middleware = importlib.import_module('.%s' % Path(self.task.middleware).stem, 'plugin.middleware')
             
