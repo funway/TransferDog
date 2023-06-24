@@ -12,7 +12,10 @@ import psutil
 from transfer_worker.transfer_worker import TransferWorker
 from transfer_worker.model.task import Task
 
+
 def suicide_when_parent_exited():
+    """新建子线程，在子线程中定时轮询父进程是否已经死亡。如果父进程已死，则杀死自身进程。
+    """
     
     def _polling_in_sub_thread(parent_proc):
         logging.debug('Start a sub thread, polling to check parent process [p%s]', parent_proc.pid)
@@ -102,7 +105,7 @@ LOG_FORMAT = {
     'VERBOSE': '%(asctime)s %(levelname)5s [p%(process)d][t%(thread)d] %(name)s.%(funcName)s - %(message)s'
 }
 
-if __name__ == "__main__":
+def main():
     args = parse_arguments()
     print('Command Line Args:', args)
 
@@ -127,5 +130,16 @@ if __name__ == "__main__":
         pass
     
     # 创建并启动作业
-    worker = TransferWorker(args.task_uuid, args.db, args.processed)
-    sys.exit(worker.run())
+    worker = TransferWorker(task_uuid=args.task_uuid, task_db=args.db, processed_db=args.processed)
+    
+    # sys.exit(worker.run())
+    try:
+        ret = worker.run()
+    except Exception as e:
+        logging.exception('Unexpected running error!')
+        ret = 1
+    finally:
+        sys.exit(ret)
+
+if __name__ == "__main__":
+    main()

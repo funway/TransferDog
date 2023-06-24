@@ -19,24 +19,53 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QLineEdit" name="lineEdit">
-        <property name="placeholderText">
-         <string>Search Task</string>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QWidget" name="layoutWidget">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QLineEdit" name="lineEdit">
+          <property name="placeholderText">
+           <string>Search Task</string>
+          </property>
+          <property name="clearButtonEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTreeView" name="treeView"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QFrame" name="frame">
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="leftMargin">
+         <number>0</number>
         </property>
-        <property name="clearButtonEnabled">
-         <bool>true</bool>
+        <property name="topMargin">
+         <number>0</number>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QTreeView" name="treeView"/>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <widget class="QTableView" name="tableView"/>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QTableWidget" name="tb_processed"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -65,8 +94,10 @@
    <addaction name="actionStopTask"/>
    <addaction name="actionOpenSource"/>
    <addaction name="actionOpenDest"/>
+   <addaction name="actionOpenLogFile"/>
+   <addaction name="actionOpenProcessedDB"/>
    <addaction name="separator"/>
-   <addaction name="actionTest"/>
+   <addaction name="actionHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionNewTask">
@@ -90,16 +121,19 @@
     <string>EditTask</string>
    </property>
    <property name="toolTip">
-    <string>Edit a task's property</string>
+    <string>Edit the selected task's property</string>
    </property>
   </action>
-  <action name="actionTest">
+  <action name="actionHelp">
    <property name="icon">
     <iconset>
      <normaloff>../transfer_dog/resource/img/question-line.png</normaloff>../transfer_dog/resource/img/question-line.png</iconset>
    </property>
    <property name="text">
-    <string>Test</string>
+    <string>Help</string>
+   </property>
+   <property name="toolTip">
+    <string>Help</string>
    </property>
   </action>
   <action name="actionDeleteTask">
@@ -111,7 +145,7 @@
     <string>DeleteTask</string>
    </property>
    <property name="toolTip">
-    <string>Delete selected task</string>
+    <string>Delete the selected task</string>
    </property>
   </action>
   <action name="actionOpenSource">
@@ -146,6 +180,9 @@
    <property name="text">
     <string>CopyTask</string>
    </property>
+   <property name="toolTip">
+    <string>Copy selected task</string>
+   </property>
   </action>
   <action name="actionStopTask">
    <property name="icon">
@@ -155,6 +192,9 @@
    <property name="text">
     <string>StopTask</string>
    </property>
+   <property name="toolTip">
+    <string>Stop the selected task</string>
+   </property>
   </action>
   <action name="actionStartTask">
    <property name="icon">
@@ -163,6 +203,33 @@
    </property>
    <property name="text">
     <string>StartTask</string>
+   </property>
+   <property name="toolTip">
+    <string>Start the selected task</string>
+   </property>
+  </action>
+  <action name="actionOpenLogFile">
+   <property name="icon">
+    <iconset>
+     <normaloff>../transfer_dog/resource/img/bug-2-line.png</normaloff>../transfer_dog/resource/img/bug-2-line.png</iconset>
+   </property>
+   <property name="text">
+    <string>LogFile</string>
+   </property>
+   <property name="toolTip">
+    <string>Open task's log file</string>
+   </property>
+  </action>
+  <action name="actionOpenProcessedDB">
+   <property name="icon">
+    <iconset>
+     <normaloff>../transfer_dog/resource/img/git-repository-commits-line.png</normaloff>../transfer_dog/resource/img/git-repository-commits-line.png</iconset>
+   </property>
+   <property name="text">
+    <string>ProcessedDB</string>
+   </property>
+   <property name="toolTip">
+    <string>Open task's processed db</string>
    </property>
   </action>
  </widget>

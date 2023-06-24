@@ -4,19 +4,24 @@
 # Author:  funway.wang
 # Created: 2022/11/03 20:23:34
 
-import os, sys, logging
+import os, sys, logging, configparser
 from datetime import datetime
+from ast import literal_eval
 
 import psutil
 from playhouse.shortcuts import model_to_dict
-from PySide6.QtWidgets import QMainWindow, QDialog, QAbstractItemView, QLineEdit, QMessageBox
-from PySide6.QtGui import QStandardItemModel, QStandardItem
+from PySide6.QtWidgets import QMainWindow, QDialog, QAbstractItemView, QLineEdit, QMessageBox, QTableWidgetItem, QHeaderView
+from PySide6.QtGui import QFontMetrics, QStandardItemModel, QStandardItem, QDesktopServices
+from PySide6.QtCore import Qt
+from peewee import SqliteDatabase
 
 from transfer_dog.transfer_dog import TransferDog
 from transfer_dog.ui.ui_main_window import Ui_MainWindow
 from transfer_dog.view.dialog_task_edit import DialogTaskEdit
 from transfer_dog.view.task_treeview import *
+from transfer_dog.utility import helper
 from transfer_worker.model import Task
+from transfer_worker.model import Processed
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -33,6 +38,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.doggy = TransferDog()
         self.source_model = TaskItemModel()
         self.proxy_model = TaskSearchProxyModel()
+        self.tb_processed_current_uuid = None
+
+        self.lab_uptime = QLabel(parent=self)
+        self.lab_uptime.setObjectName('lab_uptime')
         
         # 调用父类 Ui_MainWindow 的函数装载 UI
         self.setupUi(self)
@@ -44,16 +53,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionCopyTask.triggered.connect(self._action_copy_task)
         self.actionStartTask.triggered.connect(self._action_start_task)
         self.actionStopTask.triggered.connect(self._action_kill_task)
-        self.actionTest.triggered.connect(self.test_func)
+        self.actionOpenSource.triggered.connect(self._action_open_source)
+        self.actionOpenDest.triggered.connect(self._action_open_dest)
+        self.actionOpenLogFile.triggered.connect(self._action_open_log_file)
+        self.actionOpenProcessedDB.triggered.connect(self._action_open_processed_db)
+        self.actionHelp.triggered.connect(self._action_help)
 
         self.update_UI()
         
-        # 启动一个 10000 ms 的定时器，定时自动调用 self.timerEvent() 方法
-        # self.timer_id_update_taskinfo = self.startTimer(1000)
+        # 启动一个 1000 ms 的定时器，定时自动调用 self.timerEvent() 方法
+        self.timer_one_second = self.startTimer(1000)
         pass
 
     def timerEvent(self, event: QtCore.QTimerEvent):
         self.logger.debug('定时器事件 (timer id: %s)', event.timerId())
+
+        if event.timerId() == self.timer_one_second:
+            # 需要每秒钟触发的定时事件
+            # 1. 刷新状态栏显示的运行时间
+            self._update_uptime()
+            # 2. 刷新 table 中的 processed 记录
+            self._tb_process_load(self.tb_processed_current_uuid)
 
         super().timerEvent(event)
         pass
@@ -180,22 +200,53 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lineEdit.addAction(QIcon(str(RESOURCE_PATH / 'img/search-line.png')), QLineEdit.ActionPosition.LeadingPosition)
         self.lineEdit.textChanged.connect(self._search_text_changed)
 
-        self.statusBar.addWidget(QLabel('© %s funway' % datetime.now().strftime('%Y')), )
-        self.statusBar.addPermanentWidget(QLabel(text='Started at %s' % datetime.fromtimestamp(psutil.Process().create_time()).strftime(TIME_FORMAT)))
+        # 设置底部状态栏
+        self.statusBar.addWidget(self.lab_uptime)
+        self.statusBar.addPermanentWidget(QLabel('© %s funway' % datetime.now().strftime('%Y')))
+
+        # 设置 QSplitter 初始比例
+        self.splitter.setStretchFactor(0, 1)
+        self.splitter.setStretchFactor(1, 2)
+
+        # 设置 table 的基本属性
+        self.tb_processed.setColumnCount(3)
+        self.tb_processed.setHorizontalHeaderLabels(['id', 'file', 'processed_at'])
+        self.tb_processed.verticalHeader().setVisible(False)
+        self.tb_processed.setColumnWidth(0, 50)
+        self.tb_processed.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+        self.tb_processed.setColumnWidth(2, 150)
+
+        self._update_uptime()
+
         pass
 
-    def _action_delete_task(self):
+    def get_selected_task_item(self):
+        """获取用户当前选中的任务列表中的任务项, 如果无选中则返回 None 并在状态栏显示 message
+
+        Returns:
+            TaskItem / None: _description_
+        """
         ss = self.treeView.selectedIndexes()
         if len(ss) == 0:
             self.logger.debug('用户没有选中任何节点')
             self.statusBar.showMessage('未选中任务', timeout=3000)
-            return
+            return None
+        
         idx = ss[0]
         item = idx.model().itemFromIndex(idx)
-        
         if type(item) is TaskItem:
-            self.logger.debug('用户选中删除任务节点 [%s]', idx.data())
-            reply = QMessageBox.question(self, 'Delete Task', 'You sure to delete task [{0}]?'.format(idx.data()),
+            self.logger.debug('用户选中的是任务节点 [%s]', idx.data())
+            return item
+        else:
+            self.logger.debug('用户选中的不是任务节点')
+            self.statusBar.showMessage('未选中任务', timeout=3000)
+            return None
+
+    def _action_delete_task(self):
+        item = self.get_selected_task_item()
+        if item is not None:
+            self.logger.debug('用户选中删除任务节点 [%s]', item.data(role=QtCore.Qt.ItemDataRole.DisplayRole))
+            reply = QMessageBox.question(self, 'Delete Task', 'You sure to delete task [{0}]?'.format(item.data(role=QtCore.Qt.ItemDataRole.DisplayRole)),
                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
             if reply == QMessageBox.Yes:
                 self.logger.debug('用户选择了 Yes')
@@ -208,76 +259,96 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 task.delete_instance()
             else:
                 self.logger.debug('用户选择了 No')
-        else:
-            self.logger.debug('用户选中的不是任务节点')
-            self.statusBar.showMessage('未选中任务', timeout=3000)
         pass
 
     def _action_edit_task(self):
-        ss = self.treeView.selectedIndexes()
-        if len(ss) == 0:
-            self.logger.debug('用户没有选中任何节点')
-            self.statusBar.showMessage('未选中任务', timeout=3000)
-            return
-        
-        idx = ss[0]
-        item = idx.model().itemFromIndex(idx)
-        if type(item) is TaskItem:
-            self.logger.debug('用户选中编辑任务节点 [%s]', idx.data())
+        item = self.get_selected_task_item()
+        if item is not None:
+            self.logger.debug('用户选中编辑任务节点 [%s]', item.data(role=QtCore.Qt.ItemDataRole.DisplayRole))
             self.show_dialog_task_edit(task=self.doggy.dict_tasks[item.task_uuid], window_title='Edit Task')
-        else:
-            self.logger.debug('用户选中的不是任务节点')
-            self.statusBar.showMessage('未选中任务', timeout=3000)
         pass
     
     def _action_copy_task(self):
-        ss = self.treeView.selectedIndexes()
-        if len(ss) == 0:
-            self.logger.debug('用户没有选中任何节点')
-            self.statusBar.showMessage('未选中任务', timeout=3000)
-            return
-        idx = ss[0]
-        item = idx.model().itemFromIndex(idx)
-        if type(item) is TaskItem:
-            self.logger.debug('用户选中复制任务节点 [%s]', idx.data())
+        item = self.get_selected_task_item()
+        if item is not None:
+            self.logger.debug('用户选中复制任务节点 [%s]', item.data(role=QtCore.Qt.ItemDataRole.DisplayRole))
             src_task = self.doggy.dict_tasks[item.task_uuid]
             copy_task = src_task.copy()
             self.show_dialog_task_edit(task=copy_task, window_title='New Task (copy)')
-        else:
-            self.logger.debug('用户选中的不是任务节点')
-            self.statusBar.showMessage('未选中任务', timeout=3000)
         pass
 
     def _action_start_task(self):
-        ss = self.treeView.selectedIndexes()
-        if len(ss) == 0:
-            self.logger.debug('用户没有选中任何节点')
-            self.statusBar.showMessage('未选中任务', timeout=3000)
-            return
-        idx = ss[0]
-        item = idx.model().itemFromIndex(idx)
-        if type(item) is TaskItem:
-            self.logger.debug('用户选中启动任务 [%s]', idx.data())
+        item = self.get_selected_task_item()
+        if item is not None:
+            self.logger.debug('用户选中启动任务 [%s]', item.data(role=QtCore.Qt.ItemDataRole.DisplayRole))
             self.doggy.start_task(item.task_uuid)
-        else:
-            self.logger.debug('用户选中的不是任务节点')
-            self.statusBar.showMessage('未选中任务', timeout=3000)
         pass
 
     def _action_kill_task(self):
-        ss = self.treeView.selectedIndexes()
-        if len(ss) == 0:
-            self.logger.debug('用户没有选中任何节点')
-            self.statusBar.showMessage('未选中任务', timeout=3000)
-            return
-        idx = ss[0]
-        item = idx.model().itemFromIndex(idx)
-        if type(item) is TaskItem:
-            self.logger.debug('用户选中杀死任务 [%s]', idx.data())
+        item = self.get_selected_task_item()
+        if item is not None:
+            self.logger.debug('用户选中杀死任务 [%s]', item.data(role=QtCore.Qt.ItemDataRole.DisplayRole))
             self.doggy.kill_task(item.task_uuid)
-        else:
-            self.logger.debug('用户选中的不是任务节点')
-            self.statusBar.showMessage('未选中任务', timeout=3000)
+        pass
+
+    def _action_open_source(self):
+        item = self.get_selected_task_item()
+        if item is not None:
+            task = self.doggy.dict_tasks[item.task_uuid]
+            
+            url = helper.rebuild_standard_url(task.source_url, task.source_username, task.source_password)
+            
+            # QDesktopServices.openUrl('file:///Users/funway/project/')
+            if not QDesktopServices.openUrl(url):
+                self.statusBar.showMessage('无法打开源目录', timeout=3000)
+        pass
+    
+    def _action_open_dest(self):
+        item = self.get_selected_task_item()
+        if item is not None:
+            task = self.doggy.dict_tasks[item.task_uuid]
+            
+            url = helper.rebuild_standard_url(task.dest_url, task.dest_username, task.dest_password)
+            
+            if not QDesktopServices.openUrl(url):
+                self.statusBar.showMessage('无法打开目标目录', timeout=3000)
+        pass
+
+    def _action_open_log_file(self):
+        item = self.get_selected_task_item()
+        if item is not None:
+            self.logger.debug('用户选中查看任务日志 [%s]', item.data(role=QtCore.Qt.ItemDataRole.DisplayRole))
+            worker_log_file = None
+            worker_log_config = configparser.ConfigParser(defaults={'task_uuid': item.task_uuid})
+            worker_log_config.read(WORKER_LOGGIN_CONFIG)
+            worker_log_config_args = worker_log_config.get('handler_fileHandler', 'args', fallback=None)
+            if worker_log_config_args is not None:
+                worker_log_file_path = Path(literal_eval(worker_log_config_args)[0])
+                if not worker_log_file_path.is_absolute():
+                    worker_log_file_path = PROJECT_PATH.joinpath(worker_log_file_path)
+                if worker_log_file_path.exists():
+                    worker_log_file = str(worker_log_file_path)
+            
+            self.logger.debug('任务日志: %s', worker_log_file)
+            if worker_log_file is None:
+                self.statusBar.showMessage('未找到日志文件', timeout=3000)
+            else:
+                QDesktopServices.openUrl('file://%s' % worker_log_file)
+            
+        pass
+    
+    def _action_open_processed_db(self):
+        item = self.get_selected_task_item()
+        if item is not None:
+            processed_db = PROCESSED_PATH.joinpath(item.task_uuid + '.db')
+            if processed_db.exists():
+                QDesktopServices.openUrl('file://%s' % processed_db)
+            else:
+                self.statusBar.showMessage('未找到 processed db', timeout=3000)
+        pass
+
+    def _action_help(self):
+        QDesktopServices.openUrl('fiile://%s' % PROJECT_PATH.joinpath('README.md'))
         pass
 
     def show_dialog_task_edit(self, task:Task=None, window_title=None):
@@ -362,14 +433,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         # 获取当前被点击的 QStandardItem
         item = idx.model().itemFromIndex(idx)
-        # if type(item) is TaskItem:
-        #     self.logger.debug('用户单击任务节点 [%s]', idx.data())
-        #     for action in self.toolBar.actions():
-        #         action.setEnabled(True)
-        # else:
-        #     self.logger.debug('用户单击的不是任务节点')
-        #     for action in self.toolBar.actions():
-        #         action.setEnabled(False)
+        if type(item) is TaskItem:
+            self.logger.debug('用户单击任务节点 [%s]', idx.data())
+            
+            self._tb_process_load(uuid=item.task_uuid)
+        else:
+            self.logger.debug('用户单击的不是任务节点')
         pass
 
     def _treeview_double_clicked(self, idx):
@@ -393,6 +462,77 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._ensure_outrange_taskinfo_hidden()
         pass
 
+    def _tb_process_load(self, uuid):
+        """加载并显示指定任务的 processed 文件
+
+        Args:
+            uuid (_type_): 要显示的任务的 uuid
+        """
+
+        # 如果当前已显示的 uuid 与指定的 uuid 参数不一致，则清空 tableview
+        if self.tb_processed_current_uuid != uuid:
+            self.logger.debug('table_processed 切换要显示的任务')
+            # self.tb_processed.clear()
+            self.tb_processed.setRowCount(0)
+            self.tb_processed_current_uuid = uuid
+            pass
+        
+        if uuid is None:
+            return 
+        
+        self.logger.debug('加载任务[%s]的 processed 记录', uuid)
+
+        # 1 判断 processed.db 文件是否存在
+        processed_db_file = PROCESSED_PATH.joinpath(uuid + '.db')
+        if not processed_db_file.exists():
+            self.logger.debug('processed 文件不存在. 返回')
+            return 
+
+        # 2 获取当前已显示的最大 id
+        max_id = 0 if self.tb_processed.item(0, 0) is None else str(self.tb_processed.item(0, 0).text())
+        self.logger.debug('已加载的最大 id: %s', max_id)
+
+        processed_db = SqliteDatabase(str(processed_db_file))
+        processed_db.bind([Processed, ])
+        processed_db.create_tables([Processed], safe=True)
+        
+        # 3 查询更新的 processed 记录
+        if max_id == 0:
+            query = (Processed
+                     .select()
+                     .order_by(Processed.id.desc())
+                     .limit(TABLE_MAX_ROWS)
+                     )
+        else:
+            query = (Processed
+                    .select()
+                    .where(Processed.id > max_id)
+                    .order_by(Processed.id.asc())
+                    .limit(TABLE_MAX_ROWS)
+                    )
+        
+        for p in query:
+            self.logger.debug(p)
+            new_row = self.tb_processed.rowCount() if max_id == 0 else 0
+            self.tb_processed.insertRow(new_row)
+            self.tb_processed.setItem(new_row, 0, QTableWidgetItem(str(p.id)))
+            self.tb_processed.setItem(new_row, 1, QTableWidgetItem(p.source))
+            self.tb_processed.setItem(new_row, 2, QTableWidgetItem(p.processed_at.strftime(TIME_FORMAT)))
+
+        pass
+
+    def _update_uptime(self):
+        start_time = datetime.fromtimestamp(psutil.Process().create_time())
+        uptime = datetime.now() - start_time
+        self.logger.debug('uptime: %s', uptime)
+        
+        # use <pre> tag to keep space on (or else HTML will shrink extra spaces to one space)
+        # use <code> tag to make sure the widget show the string with monospace font in all platform
+        self.lab_uptime.setText('<pre><code>up time: {} days {:2} hours {:2} minutes {:2} seconds</code></pre>'.format(
+            uptime.days, uptime.seconds//3600, uptime.seconds%3600//60, uptime.seconds%60))
+        pass
+    
+    
     def __del__(self):
         self.logger.debug('Delete a %s instance', self.__class__.__name__)
         pass

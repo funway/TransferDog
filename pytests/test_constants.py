@@ -10,4 +10,4 @@ def test_logging_config():
     assert LOGGING_CONFIG.exists()
 
 def test_config_db():
-    assert CONFIG_DB.exists()
+    assert APP_CONFIG.exists()

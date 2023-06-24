@@ -74,15 +74,23 @@ class TransferWorker(object):
             getter 下载 mid_file 到系统 temp 目录下 > middleware > putter 上传文件 > 删除源文件 > 尝试删除 mid_file
 
         Returns:
-            int: 运行结果。0 表示正常结束，1 表示执行异常
+            int: 运行结果。0 表示正常结束, 非 0 表示执行异常
         """
         self.logger.info('开始作业 [%s]: %s', self.task.uuid, self.task.task_name)
 
         # 创建 Getter
-        g = GetterFactory.make_getter(self.task)
-
+        try:
+            g = GetterFactory.make_getter(self.task)
+        except Exception as e:
+            self.logger.exception('Failed to initialize a source Getter')
+            return 1
+        
         # 创建 Putter
-        p = PutterFactory.make_putter(self.task)
+        try:
+            p = PutterFactory.make_putter(self.task)
+        except Exception as e:
+            self.logger.exception('Failed to initialize a destination Putter')
+            return 1
 
         # 创建中间件
         middleware = self.load_middleware()
@@ -205,7 +213,7 @@ class TransferWorker(object):
     
     def save_processed(self, mid_file: MiddleFile):
         self.logger.debug('保存处理记录: (%s, %s)', mid_file.source, mid_file.source_mtime)
-        Processed.create(source=mid_file.source, mtime=mid_file.source_mtime, pid=os.getpid())
+        Processed.create(source=mid_file.source, mtime=mid_file.source_mtime, pid=os.getpid(), task_id=self.task.uuid)
         pass
     
     def delete_outdated_processed(self):

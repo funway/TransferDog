@@ -122,14 +122,14 @@ class TransferDog(object):
                 # 如果保存在 status 中的 schedule 与 task.schedule 不一致，说明用户修改了 task 的 schedule
                 # 重新计算任务的下次运行时间
                 if status.schedule != task.schedule:
-                    self.logger.info('[%s]任务计划变更', task.uuid)
+                    self.logger.debug('[%s]任务计划变更', task.uuid)
                     status.schedule = task.schedule
                     status.next_time = croniter(task.schedule, now).get_next(datetime)
                     status.need_update = True
                 
                 # 如果用户修改了 enabled 状态
                 if status.enabled != task.enabled:
-                    self.logger.info('[%s]enabled 状态变更', task.uuid)
+                    self.logger.debug('[%s]enabled 状态变更', task.uuid)
                     status.enabled = task.enabled
                     status.need_update= True
                     # 如果是重启了任务，需要重新计算下一次运行时间
@@ -158,7 +158,7 @@ class TransferDog(object):
                         continue
                     # 2.3 任务不在运行了，进入步骤3
                     else:
-                        self.logger.info('[%s] 任务进程 [p%s] 已结束运行', task.uuid, status.process.pid)
+                        self.logger.debug('[%s] 任务进程 [p%s] 已结束运行', task.uuid, status.process.pid)
                         status.process = None
                         status.need_update = True
                 
@@ -169,7 +169,7 @@ class TransferDog(object):
                         self.logger.debug('[%s] 任务未到计划运行时间: %s', task.uuid, status.next_time)
                     # 3.2 已到（或者已超过）计划时间，启动任务子进程，并计算下一次运行时间
                     else:
-                        self.logger.info('[%s] 任务 (%s) 已到运行时间，启动任务子进程', task.uuid, task.task_name)
+                        self.logger.debug('[%s] 任务 (%s) 已到运行时间，启动任务子进程', task.uuid, task.task_name)
                         # 启动任务子进程
                         self.start_task(task.uuid)
                 else:
@@ -208,11 +208,12 @@ class TransferDog(object):
         status = self.dict_task_statuses[uuid]
 
         # python3 worker.py --log_config conf/worker_logging.conf -d conf/task.db -i 71b63d312b0a4c7284843033ab7f6b92
-        cmd_line = 'python3 {py_file} --daemon --log_config {log_config} -d {db_file} -i {uuid}'.format(
+        cmd_line = 'python3 {py_file} --daemon --log_config {log_config} -d {db_file} -i {uuid} -p {processed_db}'.format(
             py_file = str(PROJECT_PATH / 'worker.py'),
-            log_config = str(LOGGING_CONFIG.parent / 'worker_logging.conf'),
+            log_config = str(WORKER_LOGGIN_CONFIG),
             db_file = str(TASK_DB),
-            uuid = task.uuid
+            uuid = task.uuid,
+            processed_db = str(PROCESSED_PATH.joinpath(uuid + '.db'))
             )
         self.logger.debug('子进程命令: %s', cmd_line)
         

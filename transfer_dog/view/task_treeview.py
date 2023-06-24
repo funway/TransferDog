@@ -135,14 +135,13 @@ class TaskWidget(QWidget):
 
     def task_disabled(self, task_status: TaskStatus):
         self.setEnabled(False)
-        self.label_description.setText('Next: {next_time}, Disabled'.format(
-                next_time = task_status.next_time))
+        self.label_description.setText('Next: Disabled')
         pass
 
     def task_enabled(self, task_status: TaskStatus):
         self.setEnabled(True)
         if task_status is not None:
-            self.label_description.setText('Next: {next_time}, Enabled'.format(
+            self.label_description.setText('Next: {next_time}'.format(
                 next_time = task_status.next_time))
         pass
 
@@ -158,7 +157,7 @@ class TaskWidget(QWidget):
         pass
 
     def __del__(self):
-        self.logger.info('Delete a %s instance. [%s]', self.__class__.__name__, self.label_title.text())
+        self.logger.debug('Delete a %s instance. [%s]', self.__class__.__name__, self.label_title.text())
         pass
 
 

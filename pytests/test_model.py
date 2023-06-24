@@ -6,8 +6,6 @@ from transfer_worker.model import Task
 def test_Task():
     t = Task()
     print(model_to_dict(t))
-    tt = t.replica()
-    print(model_to_dict(tt))
 
 def test_QRegularExpression():
     text = 'xeshi任务'

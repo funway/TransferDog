@@ -15,7 +15,8 @@ class Processed(Model):
     mtime = CharField(null=False)
     processed_at = DateTimeField(default=lambda: datetime.now())
     pid = IntegerField(null=False)
+    task_id = CharField(null=False)
 
     def __str__(self):
-        return '{{ id: {id}, source: "{source}", mtime: "{mtime}", processed_at: {processed_at}, pid: {pid} }}'.format(
-            id=self.id, source=self.source, mtime=self.mtime, processed_at=self.processed_at, pid=self.pid)
+        return '{{ id: {id}, source: "{source}", mtime: "{mtime}", processed_at: {processed_at}, pid: {pid}, task_id: {task_id} }}'.format(
+            id=self.id, source=self.source, mtime=self.mtime, processed_at=self.processed_at, pid=self.pid, task_id=self.task_id)

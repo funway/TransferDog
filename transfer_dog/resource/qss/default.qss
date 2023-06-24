@@ -66,3 +66,7 @@ QTreeView::item:selected:active {
 QTreeView::item:selected:!active {
 	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ced3db, stop: 1 #bbbdc1);
 }
+
+QStatusBar > QLabel#lab_uptime {
+	margin-left: 3px;
+}
