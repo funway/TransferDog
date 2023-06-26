@@ -8,7 +8,7 @@ from datetime import datetime
 from urllib import parse
 from pathlib import Path
 from io import BytesIO
-import logging, re, shutil
+import logging, re, shutil, os
 
 from transfer_worker.model.task import Task
 from transfer_worker.model.processed import Processed
@@ -26,7 +26,10 @@ class LocalGetter(Getter):
         self.task = task
         
         # 源目录
-        self.src_path = Path(parse.urlparse(task.source_url).path)
+        p = parse.urlparse(task.source_url).path
+        if os.name == 'nt':
+            p = p[1:]
+        self.src_path = Path(p)
         assert self.src_path.is_dir(), '[{path}] is not a valid directory'.format(path=self.src_path)
 
         # 正则表达式
@@ -152,7 +155,7 @@ class LocalPutter(Putter):
         querys = dict(parse.parse_qsl(self.dest.query))
 
         # 目标目录
-        self.dest_path = Path(self.dest.path)
+        self.dest_path = Path(self.dest.path[1:] if os.name=='nt' else self.dest.path)
         assert self.dest_path.is_dir(), '[{path}] is not a valid directory'.format(path=self.dest_path)
         
         pass
