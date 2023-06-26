@@ -115,7 +115,7 @@ def main():
             logging.config.fileConfig(args.log_config, encoding='UTF8', defaults={'task_uuid': args.task_uuid} )
         except Exception as e:
             logging.exception('Load logging config file failed! [%s]', args.log_config)
-            exit(-1)
+            exit(2)
     # This function does nothing if the root logger already has handlers configured.
     logging.basicConfig(filename=args.log_file, level=LOG_LEVEL[args.log_level], format=LOG_FORMAT[args.log_format])
 
@@ -129,11 +129,9 @@ def main():
         suicide_when_parent_exited()
         pass
     
-    # 创建并启动作业
-    worker = TransferWorker(task_uuid=args.task_uuid, task_db=args.db, processed_db=args.processed)
-    
-    # sys.exit(worker.run())
     try:
+        # 创建并启动作业
+        worker = TransferWorker(task_uuid=args.task_uuid, task_db=args.db, processed_db=args.processed)
         ret = worker.run()
     except Exception as e:
         logging.exception('Unexpected running error!')

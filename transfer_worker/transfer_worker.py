@@ -34,6 +34,9 @@ class TransferWorker(object):
         # 加载任务
         self.task = self.load_task(task_uuid)
 
+        # 确保 processed 文件的目录存在
+        Path(processed_db).parent.mkdir(parents=True, exist_ok=True)
+
         # 连接 processed 数据库
         self.processed_db = SqliteDatabase(processed_db)
         # 绑定模型与数据库

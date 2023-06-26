@@ -207,14 +207,23 @@ class TransferDog(object):
         task = self.dict_tasks[uuid]
         status = self.dict_task_statuses[uuid]
 
+        py_file = PROJECT_PATH.joinpath('worker.py')
+
+        if py_file.exists():
+            # 如果是开发版(判断根目录下是否存在 py 文件)
+            worker_cmd = 'python3 ' + str(py_file)
+        else:
+            worker_cmd = str(PROJECT_PATH.joinpath('worker.exe'))
+        
         # python3 worker.py --log_config conf/worker_logging.conf -d conf/task.db -i 71b63d312b0a4c7284843033ab7f6b92
-        cmd_line = 'python3 {py_file} --daemon --log_config {log_config} -d {db_file} -i {uuid} -p {processed_db}'.format(
-            py_file = str(PROJECT_PATH / 'worker.py'),
+        cmd_line = '{worker_cmd} --daemon --log_config {log_config} -d {db_file} -i {uuid} -p {processed_db}'.format(
+            worker_cmd = worker_cmd,
             log_config = str(WORKER_LOGGIN_CONFIG),
             db_file = str(TASK_DB),
             uuid = task.uuid,
             processed_db = str(PROCESSED_PATH.joinpath(uuid + '.db'))
             )
+        
         self.logger.debug('子进程命令: %s', cmd_line)
         
         args = shlex.split(cmd_line, posix=('win' not in sys.platform))
@@ -231,6 +240,7 @@ class TransferDog(object):
                 self.logger.exception('无法启动任务子进程: %s', args)
                 raise e
             else:
+                self.logger.debug('启动任务子进程: %s', status.process)
                 status.next_time = croniter(task.schedule, datetime.now()).get_next(datetime)
                 status.last_time = datetime.fromtimestamp(status.process.create_time())
                 status.need_update = True
