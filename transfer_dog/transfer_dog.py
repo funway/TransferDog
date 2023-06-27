@@ -4,7 +4,7 @@
 # Author:  funway.wang
 # Created: 2023/03/30 23:13:56
 
-import sys, logging, logging.config, threading, time, timeit, shlex
+import sys, logging, logging.config, threading, time, timeit, shlex, os
 from datetime import datetime
 
 import psutil
@@ -213,7 +213,10 @@ class TransferDog(object):
             # 如果是开发版(判断根目录下是否存在 py 文件)
             worker_cmd = 'python3 ' + str(py_file)
         else:
-            worker_cmd = str(PROJECT_PATH.joinpath('worker.exe'))
+            if os.name == 'nt':
+                worker_cmd = str(PROJECT_PATH.joinpath('worker.exe'))
+            else:
+                worker_cmd = str(PROJECT_PATH.joinpath('worker'))
         
         # python3 worker.py --log_config conf/worker_logging.conf -d conf/task.db -i 71b63d312b0a4c7284843033ab7f6b92
         cmd_line = '{worker_cmd} --daemon --log_config {log_config} -d {db_file} -i {uuid} -p {processed_db}'.format(
@@ -224,9 +227,9 @@ class TransferDog(object):
             processed_db = str(PROCESSED_PATH.joinpath(uuid + '.db'))
             )
         
-        self.logger.debug('子进程命令: %s', cmd_line)
+        self.logger.info('子进程命令: %s', cmd_line)
         
-        args = shlex.split(cmd_line, posix=('win' not in sys.platform))
+        args = shlex.split(cmd_line, posix=('posix'==os.name))
         self.logger.debug('拆解命令: %s', args)
         
         with __class__._lock:

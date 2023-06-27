@@ -8,7 +8,7 @@
 from pathlib import Path
 
 APP_NAME = 'TransferDog'
-APP_VERSION = '0.1.0'
+APP_VERSION = '0.1.2'
 
 # 包目录
 PACKAGE_PATH = Path(__file__).parent.parent

@@ -39,7 +39,7 @@ main_exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='dog.ico',
+    icon='transfer_dog/resource/app_icon/dog.ico',
 )
 
 worker_a = Analysis(

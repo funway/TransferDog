@@ -10,8 +10,8 @@ from ast import literal_eval
 
 import psutil
 from playhouse.shortcuts import model_to_dict
-from PySide6.QtWidgets import QMainWindow, QDialog, QAbstractItemView, QLineEdit, QMessageBox, QTableWidgetItem, QHeaderView
-from PySide6.QtGui import QFontMetrics, QStandardItemModel, QStandardItem, QDesktopServices
+from PySide6.QtWidgets import QMainWindow, QDialog, QAbstractItemView, QLineEdit, QMessageBox, QTableWidgetItem, QHeaderView, QMenu, QApplication, QSystemTrayIcon
+from PySide6.QtGui import QFontMetrics, QStandardItemModel, QStandardItem, QDesktopServices, QAction
 from PySide6.QtCore import Qt
 from peewee import SqliteDatabase
 
@@ -42,9 +42,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.lab_uptime = QLabel(parent=self)
         self.lab_uptime.setObjectName('lab_uptime')
+
+        self.tray_icon = None
+        self.tray_menu = None
         
-        # 调用父类 Ui_MainWindow 的函数装载 UI
-        self.setupUi(self)
+        self.setupUi()
         
         # 绑定信号-槽
         self.actionNewTask.triggered.connect(lambda: self.show_dialog_task_edit(None, 'New Task'))
@@ -59,10 +61,87 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionOpenProcessedDB.triggered.connect(self._action_open_processed_db)
         self.actionHelp.triggered.connect(self._action_help)
 
-        self.update_UI()
-        
         # 启动一个 1000 ms 的定时器，定时自动调用 self.timerEvent() 方法
         self.timer_one_second = self.startTimer(1000)
+
+        # 手动触发一次 更新状态栏的运行时间
+        self._update_uptime()
+        pass
+
+    def setupUi(self):
+        """装载 UI
+        """
+        
+        # 调用父类 Ui_MainWindow 的函数装载 UI
+        super().setupUi(self)
+
+        # 从数据库中读取所有 task
+        tasks = [task for task in Task.select()]
+        self.add_tasks(tasks)
+
+        # 设置 ProxyModel
+        self.proxy_model.setSourceModel(self.source_model)
+
+        # 给 QTreeView 设置数据
+        self.treeView.setModel(self.proxy_model)
+        self.treeView.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
+        
+        # 给 QTreeView 设置自定义的 ItemDelegate
+        delegate = TaskItemDelegate()
+        self.treeView.setItemDelegate(delegate)
+
+        # 关联 QTreeView 的 节点展开、收缩 事件
+        self.treeView.expanded.connect(self._treeview_item_expanded)
+        self.treeView.collapsed.connect(self._treeview_item_collapsed)
+        self.treeView.clicked.connect(self._treeview_clicked)
+        self.treeView.doubleClicked.connect(self._treeview_double_clicked)
+        self.treeView.verticalScrollBar().valueChanged.connect(self._on_v_scroll_changed)
+
+        # 给 QTreeView 设置其他参数
+        self.treeView.setHeaderHidden(True)
+        # self.treeView.setIndentation(0)
+        # self.treeView.setRootIsDecorated(False)
+        self.treeView.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.treeView.expandAll()
+
+        # 设置搜索栏
+        self.lineEdit.addAction(QIcon(str(RESOURCE_PATH / 'img/search-line.png')), QLineEdit.ActionPosition.LeadingPosition)
+        self.lineEdit.textChanged.connect(self._search_text_changed)
+
+        # 设置 QSplitter 初始比例
+        self.splitter.setStretchFactor(0, 1)
+        self.splitter.setStretchFactor(1, 2)
+
+        # 设置 table 的基本属性
+        self.tb_processed.setColumnCount(3)
+        self.tb_processed.setHorizontalHeaderLabels(['id', 'file', 'processed_at'])
+        self.tb_processed.verticalHeader().setVisible(False)
+        self.tb_processed.setColumnWidth(0, 50)
+        self.tb_processed.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+        self.tb_processed.setColumnWidth(2, 150)
+
+        # 设置主窗口标题
+        self.setWindowTitle('%s v%s' % (APP_NAME, APP_VERSION))
+
+        # 设置底部状态栏
+        self.statusBar.addWidget(self.lab_uptime)
+        self.statusBar.addPermanentWidget(QLabel('© %s funway' % datetime.now().strftime('%Y')))
+
+        # 设置系统托盘
+        self.tray_menu = QMenu(self)
+        action_quit = QAction('退出', self, triggered=self._action_quit)
+        action_show = QAction('显示', self, triggered=self._action_show)
+        self.tray_menu.addAction(action_show)
+        self.tray_menu.addAction(action_quit)
+        
+        self.tray_icon = QSystemTrayIcon(self)
+        self.tray_icon.setIcon(QIcon(str(RESOURCE_PATH / 'app_icon/dog.ico')))
+        self.tray_icon.setToolTip(APP_NAME)
+        self.tray_icon.setContextMenu(self.tray_menu)
+        self.tray_icon.activated.connect(self.tray_icon_event)
+        # 如果不主动show，系统托盘只会显示图标但不响应事件
+        self.tray_icon.show()
+
         pass
 
     def timerEvent(self, event: QtCore.QTimerEvent):
@@ -76,6 +155,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self._tb_process_load(self.tb_processed_current_uuid)
 
         super().timerEvent(event)
+        pass
+
+    def closeEvent(self, event):
+        """重载closeEvent函数, 关闭窗口后程序最小化到系统托盘而不是退出"""
+        self.logger.debug('close main window? no, just hide it')
+        self.hide()
+        event.ignore()
         pass
 
     def test_func(self):
@@ -162,62 +248,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # 5 从 doggy 的 set_visible_task 集合中删除
         self.doggy.set_visible_tasks.discard(task.uuid)
-        pass
-
-    def update_UI(self):
-        """执行一些无法在 setupUi() 中完成的界面更新
-        """
-        # 从数据库中读取所有 task
-        tasks = [task for task in Task.select()]
-        self.add_tasks(tasks)
-
-        # 设置 ProxyModel
-        self.proxy_model.setSourceModel(self.source_model)
-
-        # 给 QTreeView 设置数据
-        self.treeView.setModel(self.proxy_model)
-        self.treeView.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
-        
-        # 给 QTreeView 设置自定义的 ItemDelegate
-        delegate = TaskItemDelegate()
-        self.treeView.setItemDelegate(delegate)
-
-        # 关联 QTreeView 的 节点展开、收缩 事件
-        self.treeView.expanded.connect(self._treeview_item_expanded)
-        self.treeView.collapsed.connect(self._treeview_item_collapsed)
-        self.treeView.clicked.connect(self._treeview_clicked)
-        self.treeView.doubleClicked.connect(self._treeview_double_clicked)
-        self.treeView.verticalScrollBar().valueChanged.connect(self._on_v_scroll_changed)
-
-        # 给 QTreeView 设置其他参数
-        self.treeView.setHeaderHidden(True)
-        # self.treeView.setIndentation(0)
-        # self.treeView.setRootIsDecorated(False)
-        self.treeView.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.treeView.expandAll()
-
-        # 设置搜索栏
-        self.lineEdit.addAction(QIcon(str(RESOURCE_PATH / 'img/search-line.png')), QLineEdit.ActionPosition.LeadingPosition)
-        self.lineEdit.textChanged.connect(self._search_text_changed)
-
-        # 设置底部状态栏
-        self.statusBar.addWidget(self.lab_uptime)
-        self.statusBar.addPermanentWidget(QLabel('© %s funway' % datetime.now().strftime('%Y')))
-
-        # 设置 QSplitter 初始比例
-        self.splitter.setStretchFactor(0, 1)
-        self.splitter.setStretchFactor(1, 2)
-
-        # 设置 table 的基本属性
-        self.tb_processed.setColumnCount(3)
-        self.tb_processed.setHorizontalHeaderLabels(['id', 'file', 'processed_at'])
-        self.tb_processed.verticalHeader().setVisible(False)
-        self.tb_processed.setColumnWidth(0, 50)
-        self.tb_processed.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
-        self.tb_processed.setColumnWidth(2, 150)
-
-        self._update_uptime()
-
         pass
 
     def get_selected_task_item(self):
@@ -349,6 +379,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def _action_help(self):
         QDesktopServices.openUrl('fiile://%s' % PROJECT_PATH.joinpath('README.md'))
+        pass
+
+    def _action_show(self):
+        self.show()
+        # macOS: 如果 QApplication 是 inactive 的，需要通过将程序窗口 raise 到桌面最前台来 active 程序
+        self.raise_()
+        pass
+
+    def _action_quit(self):
+        dlg = QMessageBox(QMessageBox.Icon.Question, 'Confirm', 'Quit the app?',
+                          QMessageBox.Yes | QMessageBox.Cancel, self, 
+                          Qt.WindowStaysOnTopHint|Qt.X11BypassWindowManagerHint)
+        reply = dlg.exec()
+        # reply = QMessageBox.question(self, 'Confirm', 'Quit the app?', QMessageBox.Yes | QMessageBox.Cancel)
+        
+        if reply == QMessageBox.Yes:
+            self.logger.info('User confirm to quit app')
+            # self.tray_icon.hide()
+            QApplication.quit()
+        else:
+            self.logger.debug('Cancel quit')
         pass
 
     def show_dialog_task_edit(self, task:Task=None, window_title=None):
@@ -532,7 +583,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             uptime.days, uptime.seconds//3600, uptime.seconds%3600//60, uptime.seconds%60))
         pass
     
-    
+    def tray_icon_event(self, event):
+        """
+        响应系统托盘的点击事件
+
+        Args:
+            event ( QSystemTrayIcon::ActivationReason ): _description_
+        """
+        if event == QSystemTrayIcon.ActivationReason.Context:
+            self.logger.debug('右键点击系统托盘图标')
+        elif event == QSystemTrayIcon.ActivationReason.DoubleClick:
+            self.logger.debug('双击系统托盘图标')
+        elif event == QSystemTrayIcon.ActivationReason.Trigger:
+            self.logger.debug('单机系统托盘图标')
+            if os.name == 'nt':
+                self.show()
+        pass
+
     def __del__(self):
         self.logger.debug('Delete a %s instance', self.__class__.__name__)
         pass

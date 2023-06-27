@@ -4,9 +4,10 @@
 # Author:  funway.wang
 # Created: 2023/04/13 20:41:06
 
-import sys, logging, logging.config, random
+import sys, logging, logging.config, random, os
 
 from PySide6.QtWidgets import QApplication, QMessageBox, QStyleFactory
+from PySide6.QtGui import QIcon, Qt
 
 from transfer_dog.transfer_dog import TransferDog
 from transfer_dog.utility.constants import *
@@ -14,11 +15,14 @@ from transfer_dog.view.main_window import MainWindow
 
 
 def run():
+    # 设置当前工作目录
+    os.chdir(PROJECT_PATH)
+
     # 生成QApplication主程序
     q_app = QApplication(sys.argv)
 
     # 设置即使所有窗口都关闭也不退出程序
-    # app.setQuitOnLastWindowClosed(False)
+    # q_app.setQuitOnLastWindowClosed(False)
 
     # 设置日志 logging
     try:
@@ -26,12 +30,16 @@ def run():
     except Exception as e:
         logging.exception('Load logging config file failed! [%s]', LOGGING_CONFIG)
         QMessageBox.critical(None, '配置文件错误', '<b>Failed to load [ %s ]</b><br><br>%s' % (LOGGING_CONFIG, e))
-        return -1
+        return 2
     
     # 设置 QApplication 的程序名与版本号
     q_app.setApplicationName(APP_NAME)
     q_app.setApplicationVersion(APP_VERSION)
-    
+
+    # 设置程序运行时窗口图标(使用 python 命令运行的才需要)
+    app_icon = QIcon(str(RESOURCE_PATH / 'app_icon/dog.ico'))
+    q_app.setWindowIcon(app_icon)
+
     # 创建 TransferDog 单例并加载配置
     doggy = TransferDog()
 
@@ -51,6 +59,8 @@ def run():
     main_window = MainWindow()
     main_window.show()
 
+    q_app.applicationStateChanged.connect(lambda state: on_app_state_changed(state, main_window))
+
     # 启动 TransferDog 运行子线程，进行任务调度
     doggy.run()
     
@@ -58,3 +68,12 @@ def run():
     result = q_app.exec()
     
     return result
+
+def on_app_state_changed(state, main_window):
+    logging.info('app state changed: %s', state)
+    
+    if state == Qt.ApplicationState.ApplicationActive:
+        # 针对 macOS 平台，点击 dock 栏程序图标，就会触发 ApplicationState 变成 ApplicationActive
+        if QApplication.instance().activeWindow() is None:
+            main_window.show()
+    pass
