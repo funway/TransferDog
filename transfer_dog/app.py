@@ -70,9 +70,21 @@ def run():
     return result
 
 def on_app_state_changed(state, main_window):
+    """QApplication.ApplicationState 状态变化时的响应函数
+
+    不同系统，会有不同的情况触发 QApplication 的状态变化
+    
+    Windows: 鼠标不论左右键点击系统托盘图标，都会触发 ApplicationActive
+    macOS: 鼠标点击 dock 栏图标，会触发 ApplicationActive
+
+    Args:
+        state (_type_): _description_
+        main_window (_type_): _description_
+    """
+
     logging.info('app state changed: %s', state)
     
-    if state == Qt.ApplicationState.ApplicationActive:
+    if state == Qt.ApplicationState.ApplicationActive and os.name != 'nt':
         # 针对 macOS 平台，点击 dock 栏程序图标，就会触发 ApplicationState 变成 ApplicationActive
         if QApplication.instance().activeWindow() is None:
             main_window.show()

@@ -76,6 +76,8 @@ worker_exe = EXE(
     entitlements_file=None,
 )
 
+from transfer_dog.utility.constants import APP_NAME, APP_VERSION, APP_BUNDLE_ID
+
 coll = COLLECT(
     main_exe,
     main_a.binaries,
@@ -90,15 +92,13 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='TransferDog',
+    name=APP_NAME,
 )
-
-from transfer_dog.utility.constants import APP_VERSION
 
 app = BUNDLE(
     coll,
-    name='TransferDog.app',
+    name=APP_NAME+'.app',
     icon='transfer_dog/resource/app_icon/dog.icns',
     version=APP_VERSION,
-    bundle_identifier='me.hawu.TransferDog',
+    bundle_identifier=APP_BUNDLE_ID,
 )

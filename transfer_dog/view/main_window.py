@@ -388,11 +388,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         pass
 
     def _action_quit(self):
-        dlg = QMessageBox(QMessageBox.Icon.Question, 'Confirm', 'Quit the app?',
+        dlg = QMessageBox(QMessageBox.Icon.Question, APP_NAME, 'Quit the app?',
                           QMessageBox.Yes | QMessageBox.Cancel, self, 
                           Qt.WindowStaysOnTopHint|Qt.X11BypassWindowManagerHint)
         reply = dlg.exec()
-        # reply = QMessageBox.question(self, 'Confirm', 'Quit the app?', QMessageBox.Yes | QMessageBox.Cancel)
+        # reply = QMessageBox.question(self, APP_NAME, 'Quit the app?', QMessageBox.Yes | QMessageBox.Cancel)
         
         if reply == QMessageBox.Yes:
             self.logger.info('User confirm to quit app')
