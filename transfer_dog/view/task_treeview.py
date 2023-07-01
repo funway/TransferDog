@@ -9,6 +9,7 @@ import logging, random
 from PySide6 import QtCore
 from PySide6.QtGui import QIcon, QFont, QStandardItem, QStandardItemModel, QPainter, QMovie
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QStyledItemDelegate, QStyle, QStyleOption
+from PySide6.QtCore import QSize
 
 from transfer_dog.utility.constants import *
 from transfer_dog.transfer_dog import TransferDog
@@ -43,6 +44,8 @@ class TaskItem(QStandardItem):
 
 
 class TaskWidget(QWidget):
+    _running_gif = None
+    _waiting_icon = None
 
     def __init__(self, title: str = 'Title', description: str = 'Description...', parent: QWidget = None):
         """Init a TaskWidget instance.
@@ -55,6 +58,16 @@ class TaskWidget(QWidget):
         super().__init__(parent)
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.debug('Init a %s instance. title[%s]', self.__class__.__name__, title)
+
+        # 0. 初始化类变量
+        if __class__._running_gif is None:
+            __class__._running_gif = QMovie(str( RESOURCE_PATH / 'img/running2.gif' ))
+            __class__._running_gif.setScaledSize(QSize(32, 32))
+            __class__._running_gif.setCacheMode(QMovie.CacheMode.CacheAll)
+            __class__._running_gif.start()
+        if __class__._waiting_icon is None:
+            __class__._waiting_icon = QIcon( str(RESOURCE_PATH / "img/dog_enabled.png") )
+
         
         # 1. 图标
         self.label_icon = QLabel(self)
@@ -63,7 +76,7 @@ class TaskWidget(QWidget):
 
         # 1.1 QLabel 加载图片
         ## 使用 QIcon 来获得缩放后的 QPixmap
-        self.label_icon.setPixmap(QIcon( str(RESOURCE_PATH / "img/dog_enabled.png") ).pixmap(32, 32))
+        self.label_icon.setPixmap(__class__._waiting_icon.pixmap(32, 32))
 
         # 1.2 QLabel 加载 gif
         # self.movie = QMovie(str( RESOURCE_PATH / 'img/running.gif' ))
@@ -145,15 +158,12 @@ class TaskWidget(QWidget):
                 next_time = task_status.next_time))
         pass
 
-    def task_running(self, movie:QMovie = None):
-        if movie is not None:
-            self.label_icon.setMovie(movie)
-        else:
-            self.label_icon.setPixmap(QIcon( str(RESOURCE_PATH / "img/dog_enabled.png") ).pixmap(32, 32))
+    def task_running(self):
+        self.label_icon.setMovie(__class__._running_gif)
         pass
 
     def task_stopped(self):
-        self.label_icon.setPixmap(QIcon( str(RESOURCE_PATH / "img/dog_enabled.png") ).pixmap(32, 32))
+        self.label_icon.setPixmap(__class__._waiting_icon.pixmap(32, 32))
         pass
 
     def __del__(self):

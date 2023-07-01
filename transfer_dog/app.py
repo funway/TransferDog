@@ -4,9 +4,9 @@
 # Author:  funway.wang
 # Created: 2023/04/13 20:41:06
 
-import sys, logging, logging.config, random, os
+import sys, logging, logging.config, os
 
-from PySide6.QtWidgets import QApplication, QMessageBox, QStyleFactory
+from PySide6.QtWidgets import QApplication, QMessageBox
 from PySide6.QtGui import QIcon, Qt
 
 from transfer_dog.transfer_dog import TransferDog
@@ -40,9 +40,6 @@ def run():
     app_icon = QIcon(str(RESOURCE_PATH / 'app_icon/dog.ico'))
     q_app.setWindowIcon(app_icon)
 
-    # 创建 TransferDog 单例并加载配置
-    doggy = TransferDog()
-
     # 加载 stylesheet
     #   由于 QtDesigner 工具不支持加载外部 qss 文件，所以如果想要在 QtDesigner 中预览样式，
     #   就需要在根节点（比如 QMainWindow）上右键选择 "Change styleSheet"，然后将 qss 文件内容拷贝进去
@@ -54,7 +51,10 @@ def run():
     except Exception as e:
         logging.exception('Load qss file failed! [%s]', qss_file)
         QMessageBox.warning(None, '配置文件错误', '<b>Failed to load [ %s ]</b><br><br>%s' % (qss_file, e))
-    
+
+    # 创建 TransferDog 单例并加载任务配置
+    doggy = TransferDog()
+        
     # 生成并显示主窗口
     main_window = MainWindow()
     main_window.show()
@@ -66,6 +66,9 @@ def run():
     
     # 进入 QApplication 事件循环线程（主线程）
     result = q_app.exec()
+
+    doggy.stop(True)
+    TransferDog._instance = None
     
     return result
 
@@ -82,7 +85,7 @@ def on_app_state_changed(state, main_window):
         main_window (_type_): _description_
     """
 
-    logging.info('app state changed: %s', state)
+    logging.debug('app state changed: %s', state)
     
     if state == Qt.ApplicationState.ApplicationActive and os.name != 'nt':
         # 针对 macOS 平台，点击 dock 栏程序图标，就会触发 ApplicationState 变成 ApplicationActive

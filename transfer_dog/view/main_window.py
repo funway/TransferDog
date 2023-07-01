@@ -32,7 +32,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # 设置 logger
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.logger.debug('Init a %s instance', self.__class__.__name__)
+        self.logger.info('Init a %s instance', self.__class__.__name__)
         
         # 定义成员变量
         self.doggy = TransferDog()
@@ -601,5 +601,5 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         pass
 
     def __del__(self):
-        self.logger.debug('Delete a %s instance', self.__class__.__name__)
+        self.logger.info('Delete a %s instance', self.__class__.__name__)
         pass

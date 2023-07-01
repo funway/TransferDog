@@ -4,14 +4,12 @@
 # Author:  funway.wang
 # Created: 2023/03/30 23:13:56
 
-import sys, logging, logging.config, threading, time, timeit, shlex, os
+import logging, logging.config, threading, time, timeit, shlex, os
 from datetime import datetime
 
 import psutil
 from croniter import croniter
 from peewee import SqliteDatabase
-from PySide6 import QtCore
-from PySide6.QtGui import QMovie
 
 from transfer_dog.utility.constants import *
 from transfer_worker.model import Task
@@ -48,9 +46,10 @@ class TransferDog(object):
                 if not cls._initialized:
                     # 在此处进行成员变量的声明与初始化
                     self.logger = logging.getLogger(cls.__name__)
-                    self.logger.debug('Init %s singleton', cls.__name__)
+                    self.logger.info('Init %s singleton', cls.__name__)
                     self.logger.setLevel(logging.INFO)
 
+                    self._running_thread = None
                     self._stop = False
 
                     self.db = None
@@ -68,12 +67,6 @@ class TransferDog(object):
                     # 处于 treeview 可视区域的任务集合 {uuid}
                     self.set_visible_tasks = set()
 
-                    # 所有 taskwidget 共享这个 QMovie 对象，减少内存与 CPU 开销
-                    self.running_gif = QMovie(str( RESOURCE_PATH / 'img/running2.gif' ))
-                    self.running_gif.setScaledSize(QtCore.QSize(32, 32))
-                    self.running_gif.setCacheMode(QMovie.CacheMode.CacheAll)
-                    self.running_gif.start()
-
                     cls._initialized = True
                     pass
                 pass
@@ -81,7 +74,11 @@ class TransferDog(object):
         pass
     
     def __del__(self):
-        self.logger.debug('Delete %s singleton', self.__class__.__name__)
+        """注意: Python 并不保证在解释器退出时，会对所有还存活的对象调用 __del__() 方法。
+        然后由于该类是一个单例模式，而且还可能运行子线程。
+        所以很它的 __del__() 很难在程序退出时被调用到。
+        """
+        self.logger.info('Delete %s singleton', self.__class__.__name__)
         pass
 
     def load_config(self, db_file=TASK_DB):
@@ -189,18 +186,29 @@ class TransferDog(object):
         """启动任务调度子线程。对到点运行的任务，启动一个 subprocess 进行处理
 
         Args:
-            daemon (bool, optional): 子线程是否运行在 daemon 模式。Defaults to True.
-                如果是，则程序主线程退出后，子线程自动退出；
-                如果不是，需要手工调用 stop() 停止子线程，否则子线程、主线程均不会退出。
+            daemon (bool, optional): 子线程是否运行在 daemon 模式。Defaults to False.
+                如果是 daemon, 则程序主线程退出后，子线程自动退出；
+                如果不是 daemon, 需要手工调用 stop() 停止子线程，否则子线程、主线程均不会退出。
         """
-        running_thread = threading.Thread(target=self._run, daemon=daemon)
-        running_thread.start()
+        if self._running_thread is not None and self._running_thread.is_alive():
+            self.logger.warning('Scheduling sub-thread is still alive. %s', self._running_thread)
+        else:
+            # 每个 Thread 对象只能 start 一次！所以如果要想重用 run() 方法，就得每次新建一个 Thread 对象
+            self._running_thread = threading.Thread(target=self._run, daemon=daemon)
+            self.logger.info('Start scheduling sub-thread')
+            self._running_thread.start()
         pass
 
-    def stop(self):
+    def stop(self, wait=False):
         """手动停止任务调度子线程（通过 self._stop 标记位）
+
+        Args:
+            wait (bool, optional): 是否阻塞等待子线程退出. Defaults to False.
         """
         self._stop = True
+        if wait and self._running_thread is not None and self._running_thread.is_alive():
+            self.logger.debug('Wait for scheduling sub-thread stop')
+            self._running_thread.join()
         pass
 
     def start_task(self, uuid):
@@ -234,7 +242,7 @@ class TransferDog(object):
         
         with __class__._lock:
             if status.process is not None and status.process.is_running():
-                self.logger.warning('[%s] 任务进程正在运行', task.task_name)
+                self.logger.warning('[%s] 任务进程正在运行. %s', task.task_name, status.process)
                 return
             
             try:
@@ -299,7 +307,7 @@ class TransferDog(object):
         # 如果任务在运行
         if status is not None and status.process is not None and status.process.is_running():
             self.logger.debug('[%s] 任务正在运行', task_uuid)
-            widget.task_running(movie=self.running_gif)
+            widget.task_running()
         else:
             self.logger.debug('[%s] 任务未运行', task_uuid)
             widget.task_stopped()
