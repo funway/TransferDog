@@ -4,13 +4,14 @@
 # Author:  funway.wang
 # Created: 2023/04/13 20:41:06
 
-import sys, logging, logging.config, os
+import sys, logging, logging.config, os, time
 
 from PySide6.QtWidgets import QApplication, QMessageBox
 from PySide6.QtGui import QIcon, Qt
 
 from transfer_dog.transfer_dog import TransferDog
 from transfer_dog.utility.constants import *
+from transfer_dog.utility.single_app_guard import SingleAppGuard, raise_window
 from transfer_dog.view.main_window import MainWindow
 
 
@@ -31,6 +32,9 @@ def run():
         logging.exception('Load logging config file failed! [%s]', LOGGING_CONFIG)
         QMessageBox.critical(None, '配置文件错误', '<b>Failed to load [ %s ]</b><br><br>%s' % (LOGGING_CONFIG, e))
         return 2
+    
+    # 确保程序单实例运行
+    guard = SingleAppGuard(APP_BUNDLE_ID)
     
     # 设置 QApplication 的程序名与版本号
     q_app.setApplicationName(APP_NAME)
@@ -61,12 +65,17 @@ def run():
 
     q_app.applicationStateChanged.connect(lambda state: on_app_state_changed(state, main_window))
 
+    if guard.is_listening():
+        # 当程序有新实例“企图”运行时，唤醒当前的唯一实例
+        guard.server.newConnection.connect(lambda: raise_window(main_window))
+
     # 启动 TransferDog 运行子线程，进行任务调度
     doggy.run()
     
     # 进入 QApplication 事件循环线程（主线程）
     result = q_app.exec()
 
+    # 进程程序退出前的资源释放操作
     doggy.stop(True)
     TransferDog._instance = None
     

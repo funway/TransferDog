@@ -22,7 +22,7 @@ class GetterFactory(object):
         logger.debug('src url: %s', task.source_url)
         logger.debug('src url parse result: %s', o)
 
-        if o.scheme == 'local':
+        if o.scheme == 'file':
             return LocalGetter(task)
         elif o.scheme == 'ftp' or o.scheme == 'ftps':
             return FtpGetter(task)
@@ -42,7 +42,7 @@ class PutterFactory(object):
         logger.debug('dest url: %s', task.dest_url)
         logger.debug('dest url parse result: %s', o)
 
-        if o.scheme == 'local':
+        if o.scheme == 'file':
             return LocalPutter(task)
         elif o.scheme == 'ftp' or o.scheme == 'ftps':
             return FtpPutter(task)

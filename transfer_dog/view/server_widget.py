@@ -45,7 +45,7 @@ class ServerWidget(QWidget, Ui_Form):
         querys = dict(parse.parse_qsl(o.query))
 
         # protocol
-        if o.scheme == 'local':
+        if o.scheme == 'file':
             self.rb_local.setChecked(True)
         elif o.scheme == 'ftp' or o.scheme == 'ftps':
             self.rb_ftp.setChecked(True)
@@ -154,15 +154,19 @@ class ServerWidget(QWidget, Ui_Form):
         """返回当前选中的服务器协议
 
         Returns:
-            str: local/ftp/ftps/sftp
+            str: file/ftp/ftps/sftp
         """
-        scheme = self.btn_group_protocol.checkedButton().text().lower()
+        checked_btn = self.btn_group_protocol.checkedButton()
         
-        if self.btn_group_protocol.checkedButton() is self.rb_ftp:
+        if checked_btn is self.rb_local:
+            scheme = 'file'
+        elif checked_btn is self.rb_ftp:
             if self.chkb_ftps.isChecked():
                 scheme = 'ftps'
             else:
                 scheme = 'ftp'
+        else:
+            scheme = checked_btn.text().lower()
 
         self.logger.debug('scheme: (%s)', scheme)
         return scheme

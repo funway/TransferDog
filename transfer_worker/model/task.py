@@ -31,7 +31,7 @@ class Task(Model):
     # 采用 URL 的格式
     #   协议支持：local, http, ftp, ftps, sftp
     #   将 encoding, passive, keyfile 这些跟服务器相关的参数放在 URL 查询子串中
-    source_url = CharField(default='local://127.0.0.1/Users/funway/Downloads/src/?encoding=UTF8')
+    source_url = CharField(default='file://127.0.0.1/Users/funway/Downloads/src/?encoding=UTF8')
     source_username = CharField(null=True)
     source_password = CharField(null=True)
     

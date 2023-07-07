@@ -37,7 +37,7 @@ def suicide_when_parent_exited():
         self_proc.kill()
     
     if parent_proc.pid == 1:
-        logging.warning('Parent process dead (ppid=1). Commit suicide.')
+        logging.warning('Parent process dead (now ppid=1). Commit suicide.')
         self_proc.kill()
 
     t = threading.Thread(target=_polling_in_sub_thread, kwargs={'parent_proc': parent_proc}, daemon=True)
@@ -118,6 +118,8 @@ def main():
             exit(2)
     # This function does nothing if the root logger already has handlers configured.
     logging.basicConfig(filename=args.log_file, level=LOG_LEVEL[args.log_level], format=LOG_FORMAT[args.log_format])
+
+    logging.info('Start process: %s', ' '.join(sys.argv))
 
     if args.processed is None:
         processed = Path(__file__).parent.joinpath('processed', args.task_uuid + '.db')

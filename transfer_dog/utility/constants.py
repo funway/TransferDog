@@ -8,7 +8,7 @@
 from pathlib import Path
 
 APP_NAME = 'TransferDog'
-APP_VERSION = '0.1.2'
+APP_VERSION = '0.2.0'
 APP_BUNDLE_ID = 'me.hawu.' + APP_NAME
 
 # 包目录
@@ -43,4 +43,5 @@ TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 _IP_FIELD = '(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])'
 REGEX_IP_ADDRESS = '^' + _IP_FIELD + '\.' + _IP_FIELD + '\.' + _IP_FIELD + '\.' + _IP_FIELD + '$'
 
+# 主窗口显示处理记录的 table 的最大行数
 TABLE_MAX_ROWS = 1000

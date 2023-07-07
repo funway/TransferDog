@@ -102,8 +102,8 @@ class TransferDog(object):
             for task in self.dict_tasks.values():
                 """
                 1. 判断上次 task 是否还在运行
-                    1.1 如果还在运行且未超时，continue 下一个任务
-                    1.2 如果还在运行且已超时，kill it，下一步
+                    1.1 如果还在运行且未超时, continue 下一个任务
+                    1.2 如果还在运行且已超时, kill it, 下一步
                     1.3 如果不在运行，下一步
                 2. 判断 task 是否启用
                     2.1 如果启用且到点运行了，启动作业子进程，下一步
@@ -178,7 +178,7 @@ class TransferDog(object):
             time.sleep(0.2)
 
             t2 = timeit.default_timer()
-            self.logger.debug(t2 - t1)
+            self.logger.debug('任务列表遍历一次耗时: %s', t2 - t1)
             pass
         pass
 
@@ -235,7 +235,7 @@ class TransferDog(object):
             processed_db = str(PROCESSED_PATH.joinpath(uuid + '.db'))
             )
         
-        self.logger.info('子进程命令: %s', cmd_line)
+        self.logger.info('启动作业子进程: %s', cmd_line)
         
         args = shlex.split(cmd_line, posix=('posix'==os.name))
         self.logger.debug('拆解命令: %s', args)

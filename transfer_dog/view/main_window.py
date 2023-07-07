@@ -6,6 +6,7 @@
 
 import os, sys, logging, configparser
 from datetime import datetime
+from urllib import parse
 from ast import literal_eval
 
 import psutil
@@ -259,7 +260,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ss = self.treeView.selectedIndexes()
         if len(ss) == 0:
             self.logger.debug('用户没有选中任何节点')
-            self.statusBar.showMessage('未选中任务', timeout=3000)
+            self.show_message('未选中任务', level='warning')
             return None
         
         idx = ss[0]
@@ -269,7 +270,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return item
         else:
             self.logger.debug('用户选中的不是任务节点')
-            self.statusBar.showMessage('未选中任务', timeout=3000)
+            self.show_message('未选中任务', level='warning')
             return None
 
     def _action_delete_task(self):
@@ -329,8 +330,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             url = helper.rebuild_standard_url(task.source_url, task.source_username, task.source_password)
             
             # QDesktopServices.openUrl('file:///Users/funway/project/')
-            if not QDesktopServices.openUrl(url):
-                self.statusBar.showMessage('无法打开源目录', timeout=3000)
+            # if not QDesktopServices.openUrl(url):
+            #     self.show_message('无法打开源目录')
+            try:
+                helper.show_in_file_manager(url)
+            except Exception as e:
+                self.show_message(str(e))
         pass
     
     def _action_open_dest(self):
@@ -340,8 +345,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
             url = helper.rebuild_standard_url(task.dest_url, task.dest_username, task.dest_password)
             
-            if not QDesktopServices.openUrl(url):
-                self.statusBar.showMessage('无法打开目标目录', timeout=3000)
+            try:
+                helper.show_in_file_manager(url)
+            except Exception as e:
+                self.show_message(str(e))
         pass
 
     def _action_open_log_file(self):
@@ -361,10 +368,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
             self.logger.debug('任务日志: %s', worker_log_file)
             if worker_log_file is None:
-                self.statusBar.showMessage('未找到日志文件', timeout=3000)
+                self.show_message('未找到日志文件')
             else:
-                QDesktopServices.openUrl('file://%s' % worker_log_file)
-            
+                url = parse.urlunparse(parse.ParseResult('file', '', worker_log_file, '', '', ''))
+                try:
+                    helper.show_in_file_manager(url, is_file=True)
+                except Exception as e:
+                    self.show_message(str(e))
         pass
     
     def _action_open_processed_db(self):
@@ -372,9 +382,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if item is not None:
             processed_db = PROCESSED_PATH.joinpath(item.task_uuid + '.db')
             if processed_db.exists():
-                QDesktopServices.openUrl('file://%s' % processed_db)
+                url = parse.urlunparse(parse.ParseResult('file', '', str(processed_db), '', '', ''))
+                try:
+                    helper.show_in_file_manager(url, is_file=True)
+                except Exception as e:
+                    self.show_message(str(e))
             else:
-                self.statusBar.showMessage('未找到 processed db', timeout=3000)
+                self.show_message('未找到 processed db 文件')
         pass
 
     def _action_help(self):
@@ -598,6 +612,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.logger.debug('单机系统托盘图标')
             if os.name == 'nt':
                 self.show()
+        pass
+
+    def show_message(self, msg: str, level='error', timeout=3000):
+        """在状态栏显示临时信息
+
+        Args:
+            msg (str): _description_
+            level (str, optional): error / warning / info. Defaults to 'error'.
+            timeout (int, optional): Defaults to 3000ms.
+        """
+        level = level.lower()
+        
+        if level == 'error':
+            msg = '🔴' + msg
+        elif level == 'warning':
+            msg = '🟠' + msg
+        else:
+            msg = '🟢' + msg
+        self.statusBar.showMessage(msg, timeout=timeout)
         pass
 
     def __del__(self):
