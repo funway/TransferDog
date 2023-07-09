@@ -172,12 +172,12 @@ class ServerWidget(QWidget, Ui_Form):
         return scheme
     
     def get_netloc(self):
-        netloc = self.le_host.text() 
-        netloc += '' if self.le_port.text() == '' else ':%s'%self.le_port.text()
+        netloc = self.le_host.text().strip()
+        netloc += '' if self.le_port.text().strip() == '' else ':%s'%self.le_port.text().strip()
         
         if self.rb_local.isChecked():
             # netloc = ''
-            netloc = '127.0.0.1'
+            netloc = 'localhost'
 
         self.logger.debug('netloc: (%s)', netloc)
         return netloc
@@ -217,7 +217,7 @@ class ServerWidget(QWidget, Ui_Form):
             o = parse.ParseResult(
                     scheme = self.get_scheme(),
                     netloc = self.get_netloc(),
-                    path = self.le_dir.text(),
+                    path = self.le_dir.text().strip(),
                     params = '',
                     query = self.get_query(),
                     fragment = ''

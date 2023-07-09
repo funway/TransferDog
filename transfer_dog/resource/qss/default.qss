@@ -39,6 +39,7 @@ QPushButton:hover { color: white }
 qss 语法参考：
 	https://doc.qt.io/qt-6/stylesheet-syntax.html
 	https://doc.qt.io/qt-6/stylesheet-reference.html
+	https://doc.qt.io/qt-6/stylesheet-examples.html
 
 */
 

@@ -282,7 +282,9 @@ class TaskItemDelegate(QStyledItemDelegate):
         item = index.model().itemFromIndex(index)
         assert type(item) is TaskItem
         task_widget = TransferDog().dict_task_widgets[item.task_uuid]
-        task_widget.setGeometry(option.rect)
+        # task_widget.setGeometry(option.rect)
+        # 手工让二级节点的位置往左偏移一个 indentation，与一级节点在同一个垂直位置
+        task_widget.setGeometry(option.rect.adjusted(-1*option.widget.indentation(), 0, 0, 0))
         task_widget.show()
         TransferDog().set_visible_tasks.add(item.task_uuid)
         

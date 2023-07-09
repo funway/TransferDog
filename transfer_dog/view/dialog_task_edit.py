@@ -78,6 +78,7 @@ class DialogTaskEdit(QDialog, Ui_Dialog):
         self.comb_task_group.addItems(groups)
 
         # update general group
+        self.label_id.setText(task.uuid)
         self.le_task_name.setText(task.task_name)
         self.comb_task_group.setCurrentText(task.group_name)
         self.le_task_schedule.setText(task.schedule)

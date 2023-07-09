@@ -69,49 +69,61 @@ class Ui_Dialog(object):
         self.label_2 = QLabel(self.gbox_general)
         self.label_2.setObjectName(u"label_2")
 
-        self.gridLayout.addWidget(self.label_2, 0, 2, 1, 1)
+        self.gridLayout.addWidget(self.label_2, 1, 2, 1, 1)
 
         self.le_task_name = QLineEdit(self.gbox_general)
         self.le_task_name.setObjectName(u"le_task_name")
 
-        self.gridLayout.addWidget(self.le_task_name, 0, 1, 1, 1)
+        self.gridLayout.addWidget(self.le_task_name, 1, 1, 1, 1)
 
         self.le_task_schedule = QLineEdit(self.gbox_general)
         self.le_task_schedule.setObjectName(u"le_task_schedule")
 
-        self.gridLayout.addWidget(self.le_task_schedule, 1, 1, 1, 1)
+        self.gridLayout.addWidget(self.le_task_schedule, 2, 1, 1, 1)
 
         self.comb_task_group = QComboBox(self.gbox_general)
         self.comb_task_group.setObjectName(u"comb_task_group")
         self.comb_task_group.setEditable(True)
 
-        self.gridLayout.addWidget(self.comb_task_group, 0, 3, 1, 1)
+        self.gridLayout.addWidget(self.comb_task_group, 1, 3, 1, 1)
 
         self.label_6 = QLabel(self.gbox_general)
         self.label_6.setObjectName(u"label_6")
         self.label_6.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
-        self.gridLayout.addWidget(self.label_6, 1, 2, 1, 1)
-
-        self.chkb_task_enabled = QCheckBox(self.gbox_general)
-        self.chkb_task_enabled.setObjectName(u"chkb_task_enabled")
-
-        self.gridLayout.addWidget(self.chkb_task_enabled, 1, 4, 1, 1)
+        self.gridLayout.addWidget(self.label_6, 2, 2, 1, 1)
 
         self.le_timeout = QLineEdit(self.gbox_general)
         self.le_timeout.setObjectName(u"le_timeout")
 
-        self.gridLayout.addWidget(self.le_timeout, 1, 3, 1, 1)
+        self.gridLayout.addWidget(self.le_timeout, 2, 3, 1, 1)
 
         self.label_3 = QLabel(self.gbox_general)
         self.label_3.setObjectName(u"label_3")
 
-        self.gridLayout.addWidget(self.label_3, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.label_3, 2, 0, 1, 1)
 
         self.label = QLabel(self.gbox_general)
         self.label.setObjectName(u"label")
 
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.label, 1, 0, 1, 1)
+
+        self.chkb_task_enabled = QCheckBox(self.gbox_general)
+        self.chkb_task_enabled.setObjectName(u"chkb_task_enabled")
+
+        self.gridLayout.addWidget(self.chkb_task_enabled, 2, 5, 1, 1)
+
+        self.label_13 = QLabel(self.gbox_general)
+        self.label_13.setObjectName(u"label_13")
+
+        self.gridLayout.addWidget(self.label_13, 0, 0, 1, 1)
+
+        self.label_id = QLabel(self.gbox_general)
+        self.label_id.setObjectName(u"label_id")
+        self.label_id.setCursor(QCursor(Qt.IBeamCursor))
+        self.label_id.setTextInteractionFlags(Qt.LinksAccessibleByMouse|Qt.TextSelectableByMouse)
+
+        self.gridLayout.addWidget(self.label_id, 0, 1, 1, 3)
 
 
         self.verticalLayout_3.addWidget(self.gbox_general)
@@ -304,12 +316,14 @@ class Ui_Dialog(object):
         self.label_2.setText(QCoreApplication.translate("Dialog", u"Task Group", None))
         self.le_task_schedule.setPlaceholderText(QCoreApplication.translate("Dialog", u"* * * * *", None))
         self.label_6.setText(QCoreApplication.translate("Dialog", u"Timeout", None))
-        self.chkb_task_enabled.setText(QCoreApplication.translate("Dialog", u"Enable", None))
 #if QT_CONFIG(tooltip)
         self.le_timeout.setToolTip(QCoreApplication.translate("Dialog", u"process timeout in seconds", None))
 #endif // QT_CONFIG(tooltip)
         self.label_3.setText(QCoreApplication.translate("Dialog", u"Schedule", None))
         self.label.setText(QCoreApplication.translate("Dialog", u"Task Name", None))
+        self.chkb_task_enabled.setText(QCoreApplication.translate("Dialog", u"Enable", None))
+        self.label_13.setText(QCoreApplication.translate("Dialog", u"Task ID", None))
+        self.label_id.setText(QCoreApplication.translate("Dialog", u"uuid", None))
         self.gbox_source.setTitle(QCoreApplication.translate("Dialog", u"Source", None))
         self.gbox_filter.setTitle(QCoreApplication.translate("Dialog", u"Filter / Middleware", None))
         self.label_8.setText(QCoreApplication.translate("Dialog", u"Filename RegEx", None))

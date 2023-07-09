@@ -8,7 +8,7 @@
 from pathlib import Path
 
 APP_NAME = 'TransferDog'
-APP_VERSION = '0.2.0'
+APP_VERSION = '0.2.1'
 APP_BUNDLE_ID = 'me.hawu.' + APP_NAME
 
 # 包目录
