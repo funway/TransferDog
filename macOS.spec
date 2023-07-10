@@ -10,6 +10,7 @@ main_a = Analysis(
     binaries=[],
     datas=[ ('./conf/', './conf/'),
             ('./plugin/', './plugin/'),
+            ('./manual/', './manual/'),
             ('./transfer_dog/resource/', './transfer_dog/resource/')],
     hiddenimports=['transfer_worker.utility.logging'],
     hookspath=[],

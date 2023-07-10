@@ -28,7 +28,7 @@
 
 ### 主窗口
 
-![SCR-20230709-mjbl.png](Manual/SCR-20230709-mjbl.png)
+![SCR-20230709-mjbl.png](manual/img/SCR-20230709-mjbl.png)
 
 主窗口包括：
 
@@ -39,7 +39,7 @@
 
 ### 任务编辑窗口
 
-![SCR-20230709-mmme.png](Manual/SCR-20230709-mmme.png)
+![SCR-20230709-mmme.png](manual/img/SCR-20230709-mmme.png)
 
 当新建、编辑、复制任务时候，都会弹出任务编辑窗口。任务编辑窗口包括:
 
@@ -62,7 +62,7 @@
 
 ### 正则测试窗口
 
-![SCR-20230709-mpsd.png](Manual/SCR-20230709-mpsd.png)
+![SCR-20230709-mpsd.png](manual/img/SCR-20230709-mpsd.png)
 
 在任务编辑窗口的源文件名正则表达式后面， 有一个测试按钮，可以打开正则测试窗口。你可以使用该窗口进行正则表达式的测试。
 
@@ -122,7 +122,7 @@
 
 ## 概述
 
-![项目目录结构](Manual/SCR-20230709-odoz.png)
+![项目目录结构](manual/img/SCR-20230709-odoz.png)
 
 项目目录结构
 
