@@ -26,6 +26,7 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(800, 600)
+        MainWindow.setContextMenuPolicy(Qt.NoContextMenu)
         MainWindow.setStyleSheet(u"")
         self.actionNewTask = QAction(MainWindow)
         self.actionNewTask.setObjectName(u"actionNewTask")
