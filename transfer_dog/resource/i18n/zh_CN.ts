@@ -395,15 +395,17 @@
     </message>
     <message>
         <location filename="../../view/main_window.py" line="120"/>
+        <location filename="../../view/main_window.py" line="175"/>
         <source>file</source>
         <comment>tb_processed</comment>
         <translation>源文件</translation>
     </message>
     <message>
         <location filename="../../view/main_window.py" line="120"/>
+        <location filename="../../view/main_window.py" line="175"/>
         <source>processed_at</source>
         <comment>tb_processed</comment>
-        <translation>处理记录</translation>
+        <translation>处理时间</translation>
     </message>
     <message>
         <location filename="../../view/main_window.py" line="135"/>
@@ -418,33 +420,38 @@
         <translation>显示</translation>
     </message>
     <message>
-        <location filename="../../view/main_window.py" line="274"/>
-        <location filename="../../view/main_window.py" line="284"/>
+        <location filename="../../view/main_window.py" line="275"/>
+        <location filename="../../view/main_window.py" line="285"/>
         <source>No task selected</source>
         <translation>未选中任务</translation>
     </message>
     <message>
-        <location filename="../../view/main_window.py" line="291"/>
+        <location filename="../../view/main_window.py" line="292"/>
         <source>Delete Task</source>
         <translation>删除任务</translation>
     </message>
     <message>
-        <location filename="../../view/main_window.py" line="291"/>
+        <location filename="../../view/main_window.py" line="292"/>
         <source>You sure to delete task [{}]?</source>
         <translation>确认删除任务[{}]?</translation>
     </message>
     <message>
-        <location filename="../../view/main_window.py" line="382"/>
+        <location filename="../../view/main_window.py" line="383"/>
         <source>Log file not found</source>
         <translation>未找到日志文件</translation>
     </message>
     <message>
-        <location filename="../../view/main_window.py" line="402"/>
+        <location filename="../../view/main_window.py" line="403"/>
         <source>ProcessedDB file not found</source>
         <translation>未找到 ProcessedDB 文件</translation>
     </message>
     <message>
-        <location filename="../../view/main_window.py" line="612"/>
+        <location filename="../../view/main_window.py" line="422"/>
+        <source>Quit the app?</source>
+        <translation>退出程序?</translation>
+    </message>
+    <message>
+        <location filename="../../view/main_window.py" line="613"/>
         <source>up time: {} days {:2} hours {:2} minutes {:2} seconds</source>
         <translation>运行时间: {}天{:2}小时{:2}分{:2}秒</translation>
     </message>

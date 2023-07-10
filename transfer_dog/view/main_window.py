@@ -172,6 +172,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.logger.debug('修改语言设置')
             self.retranslateUi(self)
             self.setWindowTitle('%s v%s' % (APP_NAME, APP_VERSION))
+            self.tb_processed.setHorizontalHeaderLabels(['id', self.tr('file', 'tb_processed'), self.tr('processed_at', 'tb_processed')])
         
         super().changeEvent(event)
         pass
@@ -418,7 +419,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         pass
 
     def _action_quit(self):
-        dlg = QMessageBox(QMessageBox.Icon.Question, APP_NAME, 'Quit the app?',
+        dlg = QMessageBox(QMessageBox.Icon.Question, APP_NAME, self.tr('Quit the app?'),
                           QMessageBox.Yes | QMessageBox.Cancel, self, 
                           Qt.WindowStaysOnTopHint|Qt.X11BypassWindowManagerHint)
         reply = dlg.exec()
