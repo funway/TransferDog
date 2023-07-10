@@ -49,7 +49,7 @@ class Task(Model):
     subdir_recursion = IntegerField(default=0)
 
     # 中间件
-    middleware = CharField(default=None)
+    middleware = CharField(null=True, default=None)
     middleware_arg = CharField(default='')
 
     # 临时文件后缀

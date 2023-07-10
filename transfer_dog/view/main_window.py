@@ -409,7 +409,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         pass
 
     def _action_help(self):
-        QDesktopServices.openUrl('file://%s' % PROJECT_PATH.joinpath('manual/manual.html'))
+        url = parse.urlunparse(parse.ParseResult('file', '', str(PROJECT_PATH.joinpath('manual/manual.html')), '', '', ''))
+        self.logger.debug('manual url: %s', url)
+        QDesktopServices.openUrl(url)
         pass
 
     def _action_show(self):
