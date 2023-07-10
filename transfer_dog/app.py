@@ -75,9 +75,9 @@ def run():
     # 进入 QApplication 事件循环线程（主线程）
     result = q_app.exec()
 
-    # 进程程序退出前的资源释放操作
-    doggy.stop(True)
-    TransferDog._instance = None
+    # 程序退出前的资源释放操作（Python 的垃圾回收机制会自行释放，没必要手工执行）
+    # doggy.stop(True)
+    # TransferDog._instance = None
     
     return result
 

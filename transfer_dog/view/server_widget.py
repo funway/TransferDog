@@ -4,7 +4,7 @@
 # Author:  funway.wang
 # Created: 2023/05/08 20:08:18
 
-import logging
+import logging, os
 from urllib import parse
 
 from PySide6.QtWidgets import QWidget, QLineEdit, QFileDialog
@@ -75,7 +75,7 @@ class ServerWidget(QWidget, Ui_Form):
         self.comb_encoding.setCurrentText(encoding)
 
         # directory
-        dir = o.path
+        dir = o.path if os.name != 'nt' else o.path[1:]
         self.le_dir.setText(dir)
         
         pass

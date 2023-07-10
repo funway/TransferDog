@@ -175,10 +175,14 @@ class TransferDog(object):
                 if status.need_update:
                     self._update_task_widget(task.uuid)
 
-            time.sleep(0.2)
-
             t2 = timeit.default_timer()
-            self.logger.debug('任务列表遍历一次耗时: %s', t2 - t1)
+            delta = t2 - t1
+            self.logger.debug('任务列表遍历一次耗时: %s', delta)
+            
+            if delta > 0.5:
+                self.logger.warning('任务列表遍历一次耗时长达: %s秒, 有点久了!', delta)
+            else:
+                time.sleep(0.2)
             pass
         pass
 

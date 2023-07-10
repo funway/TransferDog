@@ -1,0 +1,737 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>TransferDog Manual</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+    margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-interactiveBlue { background-color: rgba(35, 131, 226, .07); }
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-translucentGray { background-color: rgba(255, 255, 255, 0.0375); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="ed65f828-353e-489a-8a4f-73189b26f4bd" class="page sans"><header><img class="page-cover-image" src="https://images.unsplash.com/photo-1608496601160-f86d19a44f9f?ixlib=rb-4.0.3&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb" style="object-position:center 50%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon">🐶</span></div><h1 class="page-title">TransferDog Manual</h1><p class="page-description"></p></header><div class="page-body"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="f60208b3-1171-4e2a-b5e3-197e606f373a"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%"><strong>TransferDog</strong> 是一个用 Python 语言编写的文件传输程序。它可以帮你定时地从源地址收集文件，并发送到目标地址。源与目标地址可以是本地目录，也可以是 FTP, FTPS, SFTP 服务器。</div></figure><nav id="541525d6-d41d-48cd-9e3d-657fb9a32416" class="block-color-gray table_of_contents"><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#3893360e-a77a-4af9-96ac-11daa8785591">⭐ <strong><strong>Getting Started</strong></strong></a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#48e1b4f4-007c-43a0-a269-2d1f77280d79">运行程序</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#0f186f09-9d56-45d7-b8ee-e8cc354f3ab3">从源码运行</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#45549087-5a72-49b2-9dd1-099668cd767b">从打包版本运行</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#4bea54ed-f700-42f2-b0a7-d69ebdf8e808">程序界面</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#c6ac2cc4-fd8d-4362-a63e-25e2d2da9658">主窗口</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#7282a9e8-4a58-466e-940f-9a2cba76189f">任务编辑窗口</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#d3084f47-14cd-4d65-8c8c-3e5b9b6a5028">正则测试窗口</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#279a743d-49dd-4362-a32f-e7c5dc0ea019">任务调度</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#82c4a43d-8a14-43e0-9621-546956530a47">主程序的调度逻辑</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#145e9642-03c6-4086-a982-e315e96078f3">任务计划</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#1d9a96a3-ffe4-41f9-b2e8-fdbe80a10320">过滤与中间件</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#a4c9bab8-6775-4718-a5c7-ed45a9924569">正则匹配</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#49c267e4-a79a-4b48-9bfd-306aa16850f0">中间件</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#401749b6-67f8-4427-b494-ce4bf9658397">💻 代码框架</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#73d77fb6-b1bf-42ea-a072-616b853fcb39">概述</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#cd97536d-abc8-4b74-abed-d9b53bddda8f">transfer_dog 模块</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#aba52324-5f3d-4f7a-8bdb-e079b0b6bd12">transfer_worker 模块</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#8a908a39-deda-49c7-8b1d-9d56f4f33f43">执行逻辑</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#ad9ccf91-387f-4bfb-921e-1dce6ede9c66">middleware 开发</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#cc1ef452-1651-47da-afb8-350df663780d">🎁 Thanks to</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#d252dc28-2259-43e8-94f7-b79da96c3285">Python 第三方库</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#7f1611fb-c100-43a2-83e6-607fa7741481">资源文件</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#4676a60b-0f64-404f-9cb4-48c0af146332">📝 Todo list</a></div></nav><h1 id="3893360e-a77a-4af9-96ac-11daa8785591" class="">⭐ <strong><strong>Getting Started</strong></strong></h1><h2 id="48e1b4f4-007c-43a0-a269-2d1f77280d79" class="">运行程序</h2><h3 id="0f186f09-9d56-45d7-b8ee-e8cc354f3ab3" class="">从源码运行</h3><p id="e3282728-b6f5-4b23-bfe7-0df06fd2590a" class="">如果你下载的 TransferDog 的源码，你可以使用命令行 <code>python main.py</code> 来运行本程序。</p><p id="d5dd17f6-7c23-441d-922f-a9b27b11b50b" class="">在运行程序之前，你需要确保：</p><ol type="1" id="a8b54c4e-02cb-4427-99e2-932fb32cf9ab" class="numbered-list" start="1"><li>Python 版本 ≥ 3.10</li></ol><ol type="1" id="511f6843-207b-4f88-9e83-baf77a8d46f1" class="numbered-list" start="2"><li>安装 requirements.txt 文件里要求的依赖库。可以使用命令 <code>pip install -r requirements.txt</code> 进行安装。</li></ol><h3 id="45549087-5a72-49b2-9dd1-099668cd767b" class="">从打包版本运行</h3><p id="c8522687-2ed9-4817-98a2-79ce045b31a7" class="">如果你下载的是 TransferDog 已经打包好的版本，我们已经将 Python 运行环境以及依赖库都打包进项目目录中了。</p><p id="49d48dcb-3a59-4f84-96e2-4b104d58b45c" class="">你可以直接双击目录下的 main 文件 (Windows 平台是 main.exe 文件) 运行 TransferDog 程序。</p><h2 id="4bea54ed-f700-42f2-b0a7-d69ebdf8e808" class="">程序界面</h2><h3 id="c6ac2cc4-fd8d-4362-a63e-25e2d2da9658" class="">主窗口</h3><figure id="1e9417a6-b3c3-473b-bc61-36c8f5e2dca7" class="image"><a href="Manual/SCR-20230709-mjbl.png"><img style="width:720px" src="Manual/SCR-20230709-mjbl.png"/></a></figure><p id="9afdf08c-992c-45d5-b48d-3e9760b6efb8" class="">
+</p><p id="a9a10af2-96c7-48f0-a566-b931730eb374" class="">主窗口包括：</p><ol type="1" id="fa1da937-1eed-4bde-a242-374d95d8a967" class="numbered-list" start="1"><li>菜单栏，显示菜单。包括 新建任务，编辑任务，复制任务，删除任务，启动任务，停止任务，打开源目录，打开目标目录，打开任务日志，打开任务处理记录，打开帮助文件。</li></ol><ol type="1" id="90ad317e-c2ac-4a45-8b29-4ff96fc40a10" class="numbered-list" start="2"><li>任务列表，显示所有传输任务，可以通过任务列表顶部的搜索条来筛选任务。</li></ol><ol type="1" id="7607ba52-9a94-4c9e-99dc-2bb92d5d77ae" class="numbered-list" start="3"><li>处理记录，显示当前在任务列表中选中任务的处理记录。</li></ol><ol type="1" id="3cb8d793-eca0-4fac-92e4-2a5c683c756a" class="numbered-list" start="4"><li>状态栏，显示程序运行状态与错误信息。</li></ol><h3 id="7282a9e8-4a58-466e-940f-9a2cba76189f" class="">任务编辑窗口</h3><figure id="369c1da1-d55e-424b-b1f4-18184705c718" class="image"><a href="Manual/SCR-20230709-mmme.png"><img style="width:720px" src="Manual/SCR-20230709-mmme.png"/></a></figure><p id="8012323d-dc1f-471a-a330-5cd7c24ee6df" class="">
+</p><p id="146834fc-6b73-40c4-af1d-22ca2db5697c" class="">当新建、编辑、复制任务时候，都会弹出任务编辑窗口。任务编辑窗口包括:</p><ul id="c12cb164-6ea2-44a5-a2d4-9ddd5e25d5cc" class="bulleted-list"><li style="list-style-type:disc">General 组<p id="99478adb-9312-456e-9558-6b5a6b012b56" class="">设置任务名字，任务组，任务调度规则（使用 Crontab 表达式），任务超时时间，以及是否启用任务。</p></li></ul><ul id="2bd5fdd0-1ecb-4c9d-97e6-248529a8332b" class="bulleted-list"><li style="list-style-type:disc">Source 组<p id="91a0b563-19ca-42ad-a4ee-cacac134ae4d" class="">设置任务的源地址。</p></li></ul><ul id="bcfc9dca-8269-43a7-ae5c-c3f431285da7" class="bulleted-list"><li style="list-style-type:disc">Filter / Middleware 组<p id="de952d5d-c57a-4d3b-926e-79012ad94d58" class="">设置任务的源文件名匹配规则，源文件有效时间，子目录递归，中间件，文件传输的临时后缀，处理记录的保留时长。</p></li></ul><ul id="a9213c37-2ee7-4bbe-96e4-2ac3e4d232e5" class="bulleted-list"><li style="list-style-type:disc">Destination 组<p id="7e23b69f-effc-47b8-8de9-fc5bec6c6fa9" class="">设置任务的目标地址。</p></li></ul><h3 id="d3084f47-14cd-4d65-8c8c-3e5b9b6a5028" class="">正则测试窗口</h3><figure id="389de018-401b-4759-b805-ecae5af9279f" class="image"><a href="Manual/SCR-20230709-mpsd.png"><img style="width:720px" src="Manual/SCR-20230709-mpsd.png"/></a></figure><p id="aa1e1a50-0781-4752-a96f-8e56a5299788" class="">
+</p><p id="9be1959c-8c91-4db5-a00a-d6513dd0b8a3" class="">在任务编辑窗口的源文件名正则表达式后面， 有一个测试按钮，可以打开正则测试窗口。你可以使用该窗口进行正则表达式的测试。</p><p id="7202d31d-b75a-44ec-bc9f-7b9401d01eb1" class="">在 Input 栏输入待匹配的文件名，每行一个。在 RegEx 栏输入你的正则表达式。点击 start 按钮，即可在 Output 栏输出该正则表达式匹配到的文件名。</p><h2 id="279a743d-49dd-4362-a32f-e7c5dc0ea019" class="">任务调度</h2><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="aea189e5-3a40-4ae3-bae0-0b4c522ec3cc"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%">TransferDog 主程序会一直轮询任务列表，并根据每个任务自身配置的任务计划与超时时间来启动、中止任务。TransferDog 采用子进程的方式来运行任务，而不是线程方式。</div></figure><h3 id="82c4a43d-8a14-43e0-9621-546956530a47" class="">主程序的调度逻辑</h3><ol type="1" id="787bc35d-3a69-4882-b45c-fef943e1bd63" class="numbered-list" start="1"><li>轮询任务列表。</li></ol><ol type="1" id="fa42f22c-db60-4960-aa4f-f28c012443d7" class="numbered-list" start="2"><li>如果一个任务到了执行时间点，则启动任务<strong><mark class="highlight-red">子进程</mark></strong>(即 worker 进程)。</li></ol><ol type="1" id="07b09595-b7ef-4234-bd5d-bb08e8247fd6" class="numbered-list" start="3"><li>如果检测到任务超时，则主动 kill 任务子进程。</li></ol><ol type="1" id="34f3cec1-3526-4ae8-83ca-2fedd37e01dc" class="numbered-list" start="4"><li>如果主程序退出，任务子进程会自动检测到父进程已死并中止自身运行。</li></ol><h3 id="145e9642-03c6-4086-a982-e315e96078f3" class="">任务计划</h3><ol type="1" id="33bbde36-8fc0-4ab6-a61c-ff1fe61dbb43" class="numbered-list" start="1"><li>TransferDog 对于每个任务的运行计划，采用的是 Linux 平台通用的 crontab 表达式。即用 <code>* * * * *</code> 表达 <code>分 时 日 月 周几</code>。</li></ol><ol type="1" id="276418a1-fce2-4514-95d6-973a65b69d67" class="numbered-list" start="2"><li>crontab 示例：<ol type="a" id="65d79900-f513-4511-a38e-8980512f8fe7" class="numbered-list" start="1"><li><code>*/5 * * * *</code> 表示每5分钟运行</li></ol><ol type="a" id="63e6e986-9a40-426d-843d-797c73941d6b" class="numbered-list" start="2"><li><code>2 4 * * mon,fri</code> 表示每周一、周五的04:02运行</li></ol></li></ol><ol type="1" id="7f644e5a-619c-4c3f-ac20-c06a32e9c4d4" class="numbered-list" start="3"><li>由于采用了 <a href="https://github.com/kiorky/croniter">croniter</a> 库，TransferDog 的 crontab 表达式也支持在第六位设置秒。比如 <code>* * * * */5</code> 表示每5秒钟运行一次。</li></ol><ol type="1" id="1499dc2d-f561-4ce9-9688-558abf9fd0ca" class="numbered-list" start="4"><li>推荐一个在线测试 crontab 表达式的网站：<a href="https://crontab.guru/">https://crontab.guru/</a></li></ol><h2 id="1d9a96a3-ffe4-41f9-b2e8-fdbe80a10320" class="">过滤与中间件</h2><h3 id="a4c9bab8-6775-4718-a5c7-ed45a9924569" class="">正则匹配</h3><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="46cad5d0-7162-48f5-be7a-a2e79cb1fabe"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%">对源文件的正则匹配，默认是匹配源文件全路径名的。即 <code>/path_to_file/filename.txt</code> 这一整个路径。所以建议使用 <code>$</code> 号来匹配结尾。</div></figure><h3 id="49c267e4-a79a-4b48-9bfd-306aa16850f0" class="">中间件</h3><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="65f607eb-6bf0-4024-96bd-b87a0f945a62"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%">TransferDog 引入了中间件的概念，用来修改文件的收集（下载）与发送（上传）逻辑。</div></figure><ol type="1" id="107287be-6964-43d4-888c-5bc8d91891b1" class="numbered-list" start="1"><li>程序默认只提供了 example.py 与 init_processed.py 两个中间件模块。</li></ol><ol type="1" id="79c68107-ff8a-4075-b65f-6a430ce477c8" class="numbered-list" start="2"><li>你可以在项目的 <code>plugin/middleware/</code> 目录下找到这两个模块文件。</li></ol><ol type="1" id="16442303-ea34-409b-944f-3d4082d9a532" class="numbered-list" start="3"><li>example.py 中间件什么都不做，就是给你看源码用的。</li></ol><ol type="1" id="9f9642d3-a781-4f91-aa60-c96fc15ea4b6" class="numbered-list" start="4"><li>init_processed.py 中间件在源文件被过滤之后、下载之前接管执行逻辑。放弃下载与上传文件，但将该文件写入处理记录。你可以用它来初始化一个任务，如果它的源目录下有太多文件，而你又不想下载这些过期文件。</li></ol><ol type="1" id="4f3e459c-051a-4f3e-aede-1796e42a8d38" class="numbered-list" start="5"><li>你可以编写自己的中间件模块，放在 <code>plugin/middleware/</code> 目录下。只要它符合我们对中间件的格式要求（请参考 example.py 中间件）。</li></ol><h1 id="401749b6-67f8-4427-b494-ce4bf9658397" class="">💻 代码框架</h1><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="f1213ccd-5645-431a-ac5e-8407bd524ce7"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%">TransferDog 代码主要由两个模块组成: transfer_dog 与 transfer_worker。</div></figure><h2 id="73d77fb6-b1bf-42ea-a072-616b853fcb39" class="">概述</h2><figure id="753ea96c-7434-417f-aecf-a627b82cb019" class="image"><a href="Manual/SCR-20230709-odoz.png"><img style="width:192px" src="Manual/SCR-20230709-odoz.png"/></a><figcaption>项目目录结构</figcaption></figure><ul id="2e87b34d-4660-4439-ba8b-d4bd24088db6" class="bulleted-list"><li style="list-style-type:disc">main.py<p id="06a34ea0-48bd-4240-9e92-1f9cbaaf8da1" class="">程序 GUI 的入口文件，调用 transfer_dog 模块。</p></li></ul><ul id="f678f622-2297-4163-919d-6239ec656a8e" class="bulleted-list"><li style="list-style-type:disc">worker.py<p id="3eec3407-c8b0-4460-a593-8f99fe5bb824" class="">传输程序（任务子进程）的入口文件，调用 transfer_worker 模块。</p><p id="8c3017ad-febb-495a-8740-142a86ad338d" class="">worker 可以独立于 GUI 运行。你可以执行 <code>python worker.py -h</code> 查看它的命令行参数。</p></li></ul><ul id="0ee4d8fe-b0f9-481e-bd99-981d0993f947" class="bulleted-list"><li style="list-style-type:disc">transfer_dog/<p id="9fdad587-b2ee-4073-ae76-a492027e027e" class="">该模块负责应用程序的 GUI，以及任务调度。</p></li></ul><ul id="74118d5e-8fc4-4035-bb3e-51bb1601b30e" class="bulleted-list"><li style="list-style-type:disc">transfer_worker/<p id="17323ffa-ffd1-41dd-9844-dcabf5bae3c9" class="">该模块负责实际执行传输任务。</p></li></ul><ul id="498023ba-6669-4629-a0bf-a021ba8d0151" class="bulleted-list"><li style="list-style-type:disc">conf/<p id="fd833463-efc5-44f4-bd7a-85ffaa9b1c20" class="">配置文件所在的目录。包括日志配置与任务配置。</p><p id="aa13ce89-d654-44a7-b61d-cd945b9d3d1c" class="">配置文件均采用 UTF8 编码，在 Windows 环境下编辑修改配置文件时需要留意这点。</p></li></ul><ul id="62cdced1-382c-4d2e-8af4-9237156cf2b8" class="bulleted-list"><li style="list-style-type:disc">designer/<p id="368c06ce-512c-4021-9437-1d8f92c4e0ac" class="">保存 Qt Designer 生成的 UI 设计文件。</p></li></ul><ul id="7ee8da1a-2201-4c28-bd72-80c3cb039351" class="bulleted-list"><li style="list-style-type:disc">log/<p id="5a187973-c153-4e0b-9ded-6876df7d2c48" class="">日志目录。</p></li></ul><ul id="d2bfb0fb-a778-4aee-9388-f03fa4976a10" class="bulleted-list"><li style="list-style-type:disc">plugin/<p id="4bee33f9-7fa4-4fe7-95ea-b98f05c9fee7" class="">插件目录。用来扩展传输程序的中间件模块。</p></li></ul><ul id="ce0ecc81-57ef-43c0-8ae0-9a6662be2bb9" class="bulleted-list"><li style="list-style-type:disc">processed/<p id="58c99bab-4670-4c02-9825-ebafe9b43377" class="">保存任务处理记录的目录。每个任务处理记录文件(我们叫它 processed_db)，都对应着一个传输任务，并以相应任务的 uuid 命名。</p><p id="0d8ed56a-79de-4238-b80d-6600160b2a24" class="">每个 processed_db 文件都是一个 SQLite 数据库，保存着对应传输任务已经处理过的源文件信息。</p></li></ul><ul id="cd343480-e0f5-4a65-957b-42921ca87dc8" class="bulleted-list"><li style="list-style-type:disc">test.py, pytest.ini, pytests/<p id="446efae4-b55f-4e5a-a7ee-e6a233b758c8" class="">单元测试文件。</p></li></ul><ul id="a57c729f-7ba4-4202-8723-859ad4679610" class="bulleted-list"><li style="list-style-type:disc">requirements.txt<p id="daf2d1a2-de83-4f3e-8175-968d80efb938" class="">依赖库要求。</p></li></ul><ul id="433a6bcc-4a2d-4dba-80ec-a6dda774a1e3" class="bulleted-list"><li style="list-style-type:disc">linux.spec, macOS.spec, win64.spec<p id="b4e29a51-5d38-481a-a663-1f4aa50c7285" class="">不同操作系统的 pyinstaller 打包配置文件。</p></li></ul><h2 id="cd97536d-abc8-4b74-abed-d9b53bddda8f" class="">transfer_dog 模块</h2><p id="c5d4d821-dd32-4607-b585-d453e6b18497" class="">transfer_dog 模块是程序的 GUI 框架，主要负责：</p><ol type="1" id="d2f56507-6bb4-4116-b7e6-d887d514230c" class="numbered-list" start="1"><li>增删查改传输任务。</li></ol><ol type="1" id="d8952fd6-08cc-452f-9c9d-716eb4bb4315" class="numbered-list" start="2"><li>启动、停止任务。</li></ol><ol type="1" id="a184057c-4e3d-46e5-ba72-22da12b48e8a" class="numbered-list" start="3"><li>显示任务运行状态，处理记录。</li></ol><ol type="1" id="f8432784-c60d-459f-bc7f-5153372849a3" class="numbered-list" start="4"><li>根据任务的 schedule 定时调度任务，启动任务子进程。</li></ol><h2 id="aba52324-5f3d-4f7a-8bdb-e079b0b6bd12" class="">transfer_worker 模块</h2><p id="f34a5c82-e144-4e8f-8cf2-eba1bb14a0d9" class="">transfer_worker 模块负责传输任务的实际执行，它可以独立于 transfer_dog 模块单独运行。</p><h3 id="8a908a39-deda-49c7-8b1d-9d56f4f33f43" class="">执行逻辑</h3><ul id="4eab3f04-b62d-4a2d-9d9b-e6cbd1a115e5" class="bulleted-list"><li style="list-style-type:disc">Getter 对象负责过滤与下载源文件，生成 MiddleFile 对象。</li></ul><ul id="b599a6e6-9709-4837-ad53-53ec63c5685b" class="bulleted-list"><li style="list-style-type:disc">MiddleFile 对象负责保存临时文件的状态。包括临时文件本身，以及对应的源文件路径、目标文件路径。</li></ul><ul id="536f4cf0-4ec0-446a-880e-5d8849a3d841" class="bulleted-list"><li style="list-style-type:disc">Putter 对象负责上传 MiddleFile 临时文件，生成目标文件。</li></ul><ul id="a8906292-2758-49b2-829b-a7c0daa18827" class="bulleted-list"><li style="list-style-type:disc">middleware 中间件负责对 MiddleFile 进行中间过程的处理。可以通过 middleware 改变文件下载/上传的逻辑。</li></ul><p id="f34d15b6-d783-48df-9dd3-dc6dcc5c9688" class="">
+</p><p id="4cb5c718-c322-4da8-b9a9-a2539fd37432" class="">worker 的整个执行过程可以简化为：</p><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="672c523c-6540-43a5-a5d9-9e02dea810cc"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%"><mark class="highlight-red">Getter 过滤 &gt; middleware.pre_process 预处理 &gt; Getter 下载 &gt; middleware.process 后处理 &gt; Putter 上传</mark></div></figure><p id="fd846e46-cee1-410c-9447-0cfa66640486" class="">详细过程：</p><ol type="1" id="2217f03b-d9f4-469f-9260-4a8b17acf931" class="numbered-list" start="1"><li>任务启动时，先根据源与目标创建对应的 getter 与 putter。并进行有效性检查，异常的直接报错退出。</li></ol><ol type="1" id="ade227bb-15a8-4a39-9ab9-18a5245254be" class="numbered-list" start="2"><li>getter.next() 获取下一个待传输文件：<ol type="a" id="815c6172-0c7b-4648-a096-42f845a9786f" class="numbered-list" start="1"><li>遍历源目录。</li></ol><ol type="a" id="93d0b1bc-9b47-4e0f-8b81-f38b1cb5d036" class="numbered-list" start="2"><li>判断文件更新时间是否小于 interval (constants.IGNORE_MTIME_IN_SECONDS)。</li></ol><ol type="a" id="0ce04ef4-6abe-42cb-8aa8-7ea696ee508f" class="numbered-list" start="3"><li>判断文件名是否匹配正则表达式。</li></ol><ol type="a" id="e6fe217f-d029-46e8-b7e7-bbf6680506e4" class="numbered-list" start="4"><li>判断 <mark class="highlight-red">(源文件, mtime)</mark> 是否已存在于 processed_db 数据库中。</li></ol><ol type="a" id="ff9477f7-e790-4885-988d-c4e089f83583" class="numbered-list" start="5"><li>返回一个 mid_file = MiddleFile(源文件路径, 源文件修改时间)，其中源文件路径是相对于任务配置中源地址(task.source.path)的相对路径。</li></ol></li></ol><ol type="1" id="ec0b1c69-46d2-4d8c-84cf-1819d9493419" class="numbered-list" start="3"><li>middleware.pre_process() 进行预处理。<p id="faf34762-cd01-4908-bfff-a8bd8cf1046d" class="">可以添加无法只使用正则匹配实现的过滤规则，可以用来修改目标文件路径，可以修改 mid_file.abort 属性来指定对源文件是否执行后续处理。</p></li></ol><ol type="1" id="96b65dcd-fe72-4f93-8258-94b214f6dd8f" class="numbered-list" start="4"><li>getter.get() 下载该文件，生成 mid_file.middle 中间临时文件。<p id="c456d2cb-c1e3-48ec-8f52-eab67c360133" class="">如果源文件 size 很小，并不落地生成中间文件，mid_file.middle 指向一个 BytesIO 对象。</p><p id="b36a7f18-bf9e-4b02-a95f-02331265749b" class="">如果源文件 size 较大，才落地生成中间文件，mid_file.middle 指向该中间文件的全路径（Path 对象）。</p><p id="b09da836-ef52-48a6-92ab-7ad0734abfce" class="">这个标准 size 的值由 constants.MIDDLE_FILE_THRESHOLD 指定。</p></li></ol><ol type="1" id="0da5548b-fccf-493f-9453-5a99e39c2814" class="numbered-list" start="5"><li>middleware.process() 进行后处理。</li></ol><ol type="1" id="b74777c1-9a0d-4e35-8c6c-6604557d7e99" class="numbered-list" start="6"><li>putter.put(mid_file) 将临时文件上传到目标路径。</li></ol><ol type="1" id="331e914e-4cda-4dc0-9bed-6e60458b6b93" class="numbered-list" start="7"><li>删除源文件以及清理临时文件。</li></ol><h2 id="ad9ccf91-387f-4bfb-921e-1dce6ede9c66" class="">middleware 开发</h2><pre id="f2fa15a5-13e5-49a7-9dff-5ce60f33b3b6" class="code"><code>import logging
+
+from transfer_worker.worker.middle_file import Abort, MiddleFile
+
+DESCRIPTION = &quot;&quot;&quot;中间件示例
+你可以通过自己编写的中间件脚本来修改 TransferWorker 的传输逻辑。
+
+有效的中间件应该可选地包含两个函数: pre_process(mid_file, arg) 与 process(mid_file, arg).
+
+你可以在中间件函数中决定目标文件的文件路径，决定是否中止传输，甚至通过 mid_file.middle 修改上传的文件内容。
+
+参数 mid_file 代表处于 下载 &gt;&gt; 上传 中间状态的临时文件。TransferWorker 从源地址下载源文件，形成 mid_file, 然后将 mid_file 上传到目标地址。
+    MiddleFile {
+        source:         源文件的相对路径, Path 类型
+        source_mtime:   源文件的文件修改时间, str 类型
+        middle:         临时文件, Path 类型或者字节流类型
+        dest:           目标文件的相对路径, Path 类型
+        abort:          是否中止后续操作, middle_file.Abort 枚举。包括 Abort.ABORT, Abort.NO_ABORT, Abort.ABORT_AND_RECORD。
+                        三个枚举值分别表示 中止、不中止、中止并记录为已处理。默认为 NO_ABORT。
+    }
+
+参数 arg 是由任务配置中的 task.middleware_arg 字段传递的。两个函数共享该字段，由你自己决定如何划分该参数。
+    比如你可以决定 arg.split(&#x27;,&#x27;)[0] 给 pre_process 用， arg.split(&#x27;,&#x27;)[1] 给 process() 用。
+
+&quot;&quot;&quot;
+
+def pre_process(mid_file: MiddleFile, arg: str) -&gt; None:
+    &quot;&quot;&quot;TransferWorker 在过滤出待处理的源文件之后，准备下载该源文件之前，会尝试调用中间件的 pre_process() 函数。
+
+    此时的 mid_file 只有 {source, source_mtime, abort} 属性
+    
+    你可以在 pre_process() 中设置 mid_file 的 dest 与 abort 属性
+
+    Args:
+        mid_file (MiddleFile): _description_
+        arg (str): _description_
+    &quot;&quot;&quot;
+    logger = logging.getLogger(__name__)
+    logger.debug(&#x27;Just do nothing.&#x27;)
+    pass
+
+def process(mid_file: MiddleFile, arg: str) -&gt; None:
+    &quot;&quot;&quot;TransferWorker 在下载完源文件，生成 mid_file.middle 之后，准备上传该 mid_file 之前，会尝试调用中间件的 process() 函数。
+    
+    此时的 mid_file 只有 {source, source_mtime, middle, abort 属性}
+
+    你可以在 process() 中设置 mid_file 的 dest 与 abort 属性。甚至修改 mid_file.middle 临时文件的内容。
+
+    Args:
+        mid_file (MiddleFile): _description_
+        arg (str): _description_
+    &quot;&quot;&quot;
+    logger = logging.getLogger(__name__)
+    logger.debug(&#x27;Just do nothing.&#x27;)
+    pass</code></pre><p id="b3056f3f-133d-4a16-8be9-b5d973efded4" class="">
+</p><h1 id="cc1ef452-1651-47da-afb8-350df663780d" class="">🎁 Thanks to</h1><h2 id="d252dc28-2259-43e8-94f7-b79da96c3285" class="">Python 第三方库</h2><ul id="d57ec7a2-b104-4e33-ab13-20c67eb74c23" class="bulleted-list"><li style="list-style-type:disc"><a href="https://pypi.org/project/PySide6/">PySide6</a> for GUI</li></ul><ul id="58e21e0f-4c9a-4ceb-8dc3-7ea24e4cb96c" class="bulleted-list"><li style="list-style-type:disc"><a href="https://www.sqlite.org/index.html">SQLite</a> for Database</li></ul><ul id="81191e2e-8f6a-42af-a4c8-c4d3f327633d" class="bulleted-list"><li style="list-style-type:disc"><a href="https://github.com/coleifer/peewee">peewee</a> for ORM</li></ul><ul id="7b4684b5-9c00-4748-a629-d3c5ca1f252e" class="bulleted-list"><li style="list-style-type:disc"><a href="https://github.com/paramiko/paramiko">Paramiko</a> for SFTP</li></ul><ul id="1583ec35-e5da-48b5-bd7b-02daf2ee19a5" class="bulleted-list"><li style="list-style-type:disc"><a href="https://github.com/kiorky/croniter">croniter</a> for scheduling task</li></ul><h2 id="7f1611fb-c100-43a2-83e6-607fa7741481" class="">资源文件</h2><ul id="d0020cd9-e1e7-484e-848f-98ca2fc4a738" class="bulleted-list"><li style="list-style-type:disc"><a href="https://remixicon.com/">remixicon</a> for Icon</li></ul><ul id="9b51cac5-ef47-433e-a644-994437c23e5a" class="bulleted-list"><li style="list-style-type:disc"><a href="https://www.flaticon.com/icon-fonts-most-downloaded/2?weight=bold&amp;corner=rounded&amp;type=uicon">flaticon</a> for Icon</li></ul><ul id="aa19e06a-cfe8-452c-8b59-8d1b0f38be01" class="bulleted-list"><li style="list-style-type:disc"><a href="https://loading.io/">loading.io</a> for GIF</li></ul><p id="4f3490de-926b-4f05-848e-1051cd143ae8" class="">
+</p><h1 id="4676a60b-0f64-404f-9cb4-48c0af146332" class="">📝 Todo list</h1><ul id="66876f5c-c73e-47df-a13d-630937bd7152" class="to-do-list"><li><div class="checkbox checkbox-off"></div> <span class="to-do-children-unchecked">SFTP 使用的是 Paramiko 库，但是该库目前不支持非 UTF8 编码的服务器</span><div class="indented"></div></li></ul><ul id="f35beb6c-cfa1-4da1-baff-7bbecfc62f1c" class="to-do-list"><li><div class="checkbox checkbox-off"></div> <span class="to-do-children-unchecked">HTTP 下载(上传就不做了，因为 HTTP 上传跟服务器太相关了)</span><div class="indented"></div></li></ul><ul id="3cea5f1d-af35-4de0-aac7-c4be46f7c129" class="to-do-list"><li><div class="checkbox checkbox-off"></div> <span class="to-do-children-unchecked">源文件正则匹配，可选匹配全路径还是单单匹配文件名。（现在默认是匹配全路径的）</span><div class="indented"></div></li></ul><p id="bde93b85-853a-49a1-8a58-d3ffb79b6cb0" class="">
+</p></div></article></body></html>

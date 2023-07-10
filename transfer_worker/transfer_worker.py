@@ -218,7 +218,7 @@ class TransferWorker(object):
     
     def save_processed(self, mid_file: MiddleFile):
         self.logger.debug('保存处理记录: (%s, %s)', mid_file.source, mid_file.source_mtime)
-        Processed.create(source=mid_file.source, mtime=mid_file.source_mtime, pid=os.getpid(), task_id=self.task.uuid)
+        Processed.create(source=mid_file.source, mtime=mid_file.source_mtime, pid=os.getpid())
         pass
     
     def delete_outdated_processed(self):
