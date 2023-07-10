@@ -13,12 +13,13 @@ import psutil
 from playhouse.shortcuts import model_to_dict
 from PySide6.QtWidgets import QMainWindow, QDialog, QAbstractItemView, QLineEdit, QMessageBox, QTableWidgetItem, QHeaderView, QMenu, QApplication, QSystemTrayIcon
 from PySide6.QtGui import QFontMetrics, QStandardItemModel, QStandardItem, QDesktopServices, QAction
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QEvent
 from peewee import SqliteDatabase
 
 from transfer_dog.transfer_dog import TransferDog
 from transfer_dog.ui.ui_main_window import Ui_MainWindow
 from transfer_dog.view.dialog_task_edit import DialogTaskEdit
+from transfer_dog.view.dialog_settings import DialogSettings
 from transfer_dog.view.task_treeview import *
 from transfer_dog.utility import helper
 from transfer_worker.model import Task
@@ -60,6 +61,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionOpenDest.triggered.connect(self._action_open_dest)
         self.actionOpenLogFile.triggered.connect(self._action_open_log_file)
         self.actionOpenProcessedDB.triggered.connect(self._action_open_processed_db)
+        self.actionSettings.triggered.connect(self._action_open_settings)
         self.actionHelp.triggered.connect(self._action_help)
 
         # 启动一个 1000 ms 的定时器，定时自动调用 self.timerEvent() 方法
@@ -115,7 +117,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # 设置 table 的基本属性
         self.tb_processed.setColumnCount(3)
-        self.tb_processed.setHorizontalHeaderLabels(['id', 'file', 'processed_at'])
+        self.tb_processed.setHorizontalHeaderLabels(['id', self.tr('file', 'tb_processed'), self.tr('processed_at', 'tb_processed')])
         self.tb_processed.verticalHeader().setVisible(False)
         self.tb_processed.setColumnWidth(0, 50)
         self.tb_processed.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
@@ -130,8 +132,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # 设置系统托盘
         self.tray_menu = QMenu(self)
-        action_quit = QAction('退出', self, triggered=self._action_quit)
-        action_show = QAction('显示', self, triggered=self._action_show)
+        action_quit = QAction(self.tr('Quit', 'action'), self, triggered=self._action_quit)
+        action_show = QAction(self.tr('Show', 'action'), self, triggered=self._action_show)
         self.tray_menu.addAction(action_show)
         self.tray_menu.addAction(action_quit)
         
@@ -163,6 +165,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.logger.debug('close main window? no, just hide it')
         self.hide()
         event.ignore()
+        pass
+
+    def changeEvent(self, event):
+        if event.type() == QEvent.Type.LanguageChange:
+            self.logger.debug('修改语言设置')
+            self.retranslateUi(self)
+            self.setWindowTitle('%s v%s' % (APP_NAME, APP_VERSION))
+        
+        super().changeEvent(event)
         pass
 
     def test_func(self):
@@ -260,7 +271,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ss = self.treeView.selectedIndexes()
         if len(ss) == 0:
             self.logger.debug('用户没有选中任何节点')
-            self.show_message('未选中任务', level='warning')
+            self.show_message(self.tr('No task selected'), level='warning')
             return None
         
         idx = ss[0]
@@ -270,14 +281,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return item
         else:
             self.logger.debug('用户选中的不是任务节点')
-            self.show_message('未选中任务', level='warning')
+            self.show_message(self.tr('No task selected'), level='warning')
             return None
 
     def _action_delete_task(self):
         item = self.get_selected_task_item()
         if item is not None:
             self.logger.debug('用户选中删除任务节点 [%s]', item.data(role=QtCore.Qt.ItemDataRole.DisplayRole))
-            reply = QMessageBox.question(self, 'Delete Task', 'You sure to delete task [{0}]?'.format(item.data(role=QtCore.Qt.ItemDataRole.DisplayRole)),
+            reply = QMessageBox.question(self, self.tr('Delete Task'), self.tr('You sure to delete task [{}]?').format(item.data(role=QtCore.Qt.ItemDataRole.DisplayRole)),
                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
             if reply == QMessageBox.Yes:
                 self.logger.debug('用户选择了 Yes')
@@ -368,7 +379,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
             self.logger.debug('任务日志: %s', worker_log_file)
             if worker_log_file is None:
-                self.show_message('未找到日志文件')
+                self.show_message(self.tr('Log file not found'))
             else:
                 url = parse.urlunparse(parse.ParseResult('file', '', worker_log_file, '', '', ''))
                 try:
@@ -388,11 +399,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 except Exception as e:
                     self.show_message(str(e))
             else:
-                self.show_message('未找到 processed db 文件')
+                self.show_message(self.tr('ProcessedDB file not found'))
+        pass
+
+    def _action_open_settings(self):
+        dialog = DialogSettings()
+        dialog.exec()
         pass
 
     def _action_help(self):
-        QDesktopServices.openUrl('fiile://%s' % PROJECT_PATH.joinpath('README.md'))
+        QDesktopServices.openUrl('file://%s' % PROJECT_PATH.joinpath('Manual.html'))
         pass
 
     def _action_show(self):
@@ -593,8 +609,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         # use <pre> tag to keep space on (or else HTML will shrink extra spaces to one space)
         # use <code> tag to make sure the widget show the string with monospace font in all platform
-        self.lab_uptime.setText('<pre><code>up time: {} days {:2} hours {:2} minutes {:2} seconds</code></pre>'.format(
-            uptime.days, uptime.seconds//3600, uptime.seconds%3600//60, uptime.seconds%60))
+        text_uptime = '<pre><code>' + self.tr('up time: {} days {:2} hours {:2} minutes {:2} seconds') + '</code></pre>'
+        self.lab_uptime.setText(text_uptime.format(uptime.days, uptime.seconds//3600, uptime.seconds%3600//60, uptime.seconds%60))
         pass
     
     def tray_icon_event(self, event):

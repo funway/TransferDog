@@ -49,6 +49,7 @@ QToolBar {
 }
 QToolBar QToolButton {
 	/* set style for QToolButtons in QToolBar */
+	min-width: 40px;
 }
 QToolBar QToolButton:hover {
 	border-radius: 3px;

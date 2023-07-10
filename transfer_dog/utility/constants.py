@@ -8,7 +8,7 @@
 from pathlib import Path
 
 APP_NAME = 'TransferDog'
-APP_VERSION = '0.2.2'
+APP_VERSION = '0.3.1'
 APP_BUNDLE_ID = 'me.hawu.' + APP_NAME
 
 # 包目录
@@ -23,6 +23,12 @@ MIDDLEWARE_PATH = PROJECT_PATH / 'plugin/middleware/'
 # 任务 processed 文件的保存目录
 PROCESSED_PATH = PROJECT_PATH / 'processed/'
 
+# 静态资源目录
+RESOURCE_PATH = PACKAGE_PATH / 'resource'
+
+# 语言文件目录
+LANGS_PATH = RESOURCE_PATH / 'i18n'
+
 # 项目配置文件
 APP_CONFIG = PROJECT_PATH / 'conf/app.conf'
 
@@ -34,9 +40,6 @@ WORKER_LOGGIN_CONFIG = PROJECT_PATH / 'conf/worker_logging.conf'
 
 # 任务数据库
 TASK_DB = PROJECT_PATH / 'conf/task.db'
-
-# 静态资源目录
-RESOURCE_PATH = PACKAGE_PATH / 'resource'
 
 TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 

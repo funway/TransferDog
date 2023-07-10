@@ -5,14 +5,17 @@
 # Created: 2023/04/13 20:41:06
 
 import sys, logging, logging.config, os, time
+from configparser import ConfigParser
 
 from PySide6.QtWidgets import QApplication, QMessageBox
 from PySide6.QtGui import QIcon, Qt
+from PySide6.QtCore import QTranslator, QLocale
 
 from transfer_dog.transfer_dog import TransferDog
 from transfer_dog.utility.constants import *
 from transfer_dog.utility.single_app_guard import SingleAppGuard, raise_window
 from transfer_dog.view.main_window import MainWindow
+import transfer_dog.utility.global_variables as gv
 
 
 def run():
@@ -25,16 +28,18 @@ def run():
     # 设置即使所有窗口都关闭也不退出程序
     # q_app.setQuitOnLastWindowClosed(False)
 
-    # 设置日志 logging
-    try:
-        logging.config.fileConfig(LOGGING_CONFIG, encoding='UTF8')
-    except Exception as e:
-        logging.exception('Load logging config file failed! [%s]', LOGGING_CONFIG)
-        QMessageBox.critical(None, '配置文件错误', '<b>Failed to load [ %s ]</b><br><br>%s' % (LOGGING_CONFIG, e))
-        return 2
+    # 加载配置文件
+    load_logging_config()
+    load_app_config()
     
     # 确保程序单实例运行
     guard = SingleAppGuard(APP_BUNDLE_ID)
+
+    # 加载翻译器
+    gv.translator = QTranslator()
+    if gv.translator.load(gv.cfg['DEFAULT']['lang'], directory=str(LANGS_PATH)) is False:
+        logging.warning('加载语言文件失败! [%s]', gv.cfg['DEFAULT']['lang'])
+    q_app.installTranslator(gv.translator)
     
     # 设置 QApplication 的程序名与版本号
     q_app.setApplicationName(APP_NAME)
@@ -100,4 +105,28 @@ def on_app_state_changed(state, main_window):
         # 针对 macOS 平台，点击 dock 栏程序图标，就会触发 ApplicationState 变成 ApplicationActive
         if QApplication.instance().activeWindow() is None:
             main_window.show()
+    pass
+
+def load_logging_config():
+    try:
+        logging.config.fileConfig(LOGGING_CONFIG, encoding='UTF8')
+    except Exception as e:
+        logging.exception('Load logging config file failed! [%s]', LOGGING_CONFIG)
+        QMessageBox.critical(None, '配置文件错误', '<b>Failed to load [ %s ]</b><br><br>%s' % (LOGGING_CONFIG, e))
+        sys.exit(2)
+    pass
+
+def load_app_config():
+    cfg = ConfigParser(defaults={'lang':'en_US', 
+                                 'theme':'default.qss'})
+    try:
+        logging.info('Load app config from: %s', APP_CONFIG)
+        assert APP_CONFIG.exists(), '%s not exists!' % APP_CONFIG
+        cfg.read(APP_CONFIG)
+    except Exception as e:
+        logging.exception('Load app config file failed! [%s]', APP_CONFIG)
+        QMessageBox.critical(None, '配置文件错误', '<b>Failed to load [ %s ]</b><br><br>%s' % (APP_CONFIG, e))
+        sys.exit(3)
+    
+    gv.cfg = cfg
     pass
