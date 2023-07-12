@@ -88,7 +88,7 @@
 2. crontab 示例：
     1. `*/5 * * * *` 表示每5分钟运行
     2. `2 4 * * mon,fri` 表示每周一、周五的04:02运行
-3. 由于采用了 [croniter](https://github.com/kiorky/croniter) 库，TransferDog 的 crontab 表达式也支持在第六位设置秒。比如 `* * * * */5` 表示每5秒钟运行一次。
+3. 由于采用了 [croniter](https://github.com/kiorky/croniter) 库，TransferDog 的 crontab 表达式也支持在第六位设置秒。比如 `* * * * * */5` 表示每5秒钟运行一次。
 4. 推荐一个在线测试 crontab 表达式的网站：[https://crontab.guru/](https://crontab.guru/)
 
 ## 过滤与中间件
@@ -314,3 +314,4 @@ def process(mid_file: MiddleFile, arg: str) -> None:
 - [ ]  SFTP 使用的是 Paramiko 库，但是该库目前不支持非 UTF8 编码的服务器
 - [ ]  HTTP 下载(上传就不做了，因为 HTTP 上传跟服务器太相关了)
 - [ ]  源文件正则匹配，可选匹配全路径还是单单匹配文件名。（现在默认是匹配全路径的）
+- [ ]  可选主题
