@@ -52,14 +52,14 @@ def run():
     # 加载 stylesheet
     #   由于 QtDesigner 工具不支持加载外部 qss 文件，所以如果想要在 QtDesigner 中预览样式，
     #   就需要在根节点（比如 QMainWindow）上右键选择 "Change styleSheet"，然后将 qss 文件内容拷贝进去
-    qss_file = str(RESOURCE_PATH / 'qss/default.qss')
+    qss_file = str(RESOURCE_PATH.joinpath('qss', gv.cfg['DEFAULT']['theme']+'.qss'))
     try:
         with open(qss_file, 'r', encoding='UTF8') as qf:
             qss = qf.read()
             q_app.setStyleSheet(qss)
     except Exception as e:
         logging.exception('Load qss file failed! [%s]', qss_file)
-        QMessageBox.warning(None, '配置文件错误', '<b>Failed to load [ %s ]</b><br><br>%s' % (qss_file, e))
+        QMessageBox.warning(None, '无法加载主题文件', '<b>Failed to load [ %s ]</b><br><br>%s' % (qss_file, e))
 
     # 创建 TransferDog 单例并加载任务配置
     doggy = TransferDog()
@@ -112,20 +112,22 @@ def load_logging_config():
         logging.config.fileConfig(LOGGING_CONFIG, encoding='UTF8')
     except Exception as e:
         logging.exception('Load logging config file failed! [%s]', LOGGING_CONFIG)
-        QMessageBox.critical(None, '配置文件错误', '<b>Failed to load [ %s ]</b><br><br>%s' % (LOGGING_CONFIG, e))
+        QMessageBox.critical(None, '无法加载日志配置', '<b>Failed to load [ %s ]</b><br><br>%s' % (LOGGING_CONFIG, e))
         sys.exit(2)
     pass
 
 def load_app_config():
+    """读取 app.conf 配置文件，并保存在 global_variables.py 模块的 cfg 变量中
+    """
     cfg = ConfigParser(defaults={'lang':'en_US', 
-                                 'theme':'default.qss'})
+                                 'theme':'default'})
     try:
         logging.info('Load app config from: %s', APP_CONFIG)
         assert APP_CONFIG.exists(), '%s not exists!' % APP_CONFIG
         cfg.read(APP_CONFIG)
     except Exception as e:
         logging.exception('Load app config file failed! [%s]', APP_CONFIG)
-        QMessageBox.critical(None, '配置文件错误', '<b>Failed to load [ %s ]</b><br><br>%s' % (APP_CONFIG, e))
+        QMessageBox.critical(None, '无法加载程序配置', '<b>Failed to load [ %s ]</b><br><br>%s' % (APP_CONFIG, e))
         sys.exit(3)
     
     gv.cfg = cfg

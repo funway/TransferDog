@@ -33,6 +33,7 @@ class DialogSettings(QDialog, Ui_Dialog):
         self.setupUi()
 
         self.comb_language.currentIndexChanged.connect(self._on_change_language)
+        self.comb_theme.currentIndexChanged.connect(self._on_change_theme)
         pass
 
     def setupUi(self):
@@ -45,6 +46,12 @@ class DialogSettings(QDialog, Ui_Dialog):
             self.comb_language.addItem(lang.stem, str(lang))
         self.comb_language.setCurrentIndex(self.comb_language.findText(gv.cfg['DEFAULT']['lang']))
 
+        # 主题
+        themes = [f for f in RESOURCE_PATH.joinpath('qss').glob('*.qss')]
+        themes.sort()
+        for theme in themes:
+            self.comb_theme.addItem(theme.stem, str(theme))
+        self.comb_theme.setCurrentIndex(self.comb_theme.findText(gv.cfg['DEFAULT']['theme']))
         pass
 
     def closeEvent(self, event):
@@ -67,6 +74,19 @@ class DialogSettings(QDialog, Ui_Dialog):
 
         gv.translator.load(self.comb_language.currentData())
         gv.cfg['DEFAULT']['lang'] = self.comb_language.currentText()
+        pass
+
+    def _on_change_theme(self):
+        self.logger.debug('变更主题:  %s, %s.', self.comb_theme.currentText(), self.comb_theme.currentData())
+        
+        qss_file = self.comb_theme.currentData()
+        try:
+            with open(qss_file, 'r', encoding='UTF8') as qf:
+                qss = qf.read()
+                QApplication.instance().setStyleSheet(qss)
+            gv.cfg['DEFAULT']['theme'] = self.comb_theme.currentText()
+        except Exception as e:
+            logging.exception('Load qss file failed! [%s]', qss_file)
         pass
 
     def changeEvent(self, event):

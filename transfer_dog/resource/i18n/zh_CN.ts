@@ -41,6 +41,11 @@
         <translation>语言</translation>
     </message>
     <message>
+        <location filename="../../../designer/dialog_settings.ui" line="32"/>
+        <source>Theme</source>
+        <translation>主题</translation>
+    </message>
+    <message>
         <location filename="../../../designer/dialog_task_edit.ui" line="75"/>
         <source>General</source>
         <translation>通用</translation>
@@ -263,133 +268,133 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../../../designer/main_window.ui" line="14"/>
+        <location filename="../../../designer/main_window.ui" line="17"/>
         <source>MainWindow</source>
         <translation>主窗口</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="31"/>
+        <location filename="../../../designer/main_window.ui" line="34"/>
         <source>Search Task</source>
         <translation>搜索任务</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="78"/>
+        <location filename="../../../designer/main_window.ui" line="81"/>
         <source>toolBar</source>
         <translation>工具栏</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="114"/>
+        <location filename="../../../designer/main_window.ui" line="117"/>
         <source>NewTask</source>
         <translation>新建</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="117"/>
+        <location filename="../../../designer/main_window.ui" line="120"/>
         <source>Add new transfer task</source>
         <translation>新建传输任务</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="126"/>
+        <location filename="../../../designer/main_window.ui" line="129"/>
         <source>EditTask</source>
         <translation>编辑</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="129"/>
+        <location filename="../../../designer/main_window.ui" line="132"/>
         <source>Edit the selected task&apos;s property</source>
         <translation>编辑选中任务</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="138"/>
         <location filename="../../../designer/main_window.ui" line="141"/>
+        <location filename="../../../designer/main_window.ui" line="144"/>
         <source>Help</source>
         <translation>帮助</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="150"/>
+        <location filename="../../../designer/main_window.ui" line="153"/>
         <source>DeleteTask</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="153"/>
+        <location filename="../../../designer/main_window.ui" line="156"/>
         <source>Delete the selected task</source>
         <translation>删除选中任务</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="162"/>
+        <location filename="../../../designer/main_window.ui" line="165"/>
         <source>OpenSource</source>
         <translation>源地址</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="165"/>
+        <location filename="../../../designer/main_window.ui" line="168"/>
         <source>Open source path</source>
         <translation>打开源地址</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="174"/>
+        <location filename="../../../designer/main_window.ui" line="177"/>
         <source>OpenDest</source>
         <translation>目标地址</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="177"/>
+        <location filename="../../../designer/main_window.ui" line="180"/>
         <source>Open destination path</source>
         <translation>打开目标地址</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="186"/>
+        <location filename="../../../designer/main_window.ui" line="189"/>
         <source>CopyTask</source>
         <translation>复制</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="189"/>
+        <location filename="../../../designer/main_window.ui" line="192"/>
         <source>Copy selected task</source>
         <translation>复制选中任务</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="198"/>
+        <location filename="../../../designer/main_window.ui" line="201"/>
         <source>StopTask</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="201"/>
+        <location filename="../../../designer/main_window.ui" line="204"/>
         <source>Stop the selected task</source>
         <translation>停止选中任务</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="210"/>
+        <location filename="../../../designer/main_window.ui" line="213"/>
         <source>StartTask</source>
         <translation>启动</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="213"/>
+        <location filename="../../../designer/main_window.ui" line="216"/>
         <source>Start the selected task</source>
         <translation>启动选中任务</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="222"/>
+        <location filename="../../../designer/main_window.ui" line="225"/>
         <source>LogFile</source>
         <translation>日志</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="225"/>
+        <location filename="../../../designer/main_window.ui" line="228"/>
         <source>Open task&apos;s log file</source>
         <translation>打开任务日志</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="234"/>
+        <location filename="../../../designer/main_window.ui" line="237"/>
         <source>ProcessedDB</source>
         <translation>处理记录</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="237"/>
+        <location filename="../../../designer/main_window.ui" line="240"/>
         <source>Open task&apos;s processed db</source>
         <translation>打开处理记录</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="246"/>
+        <location filename="../../../designer/main_window.ui" line="249"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="249"/>
+        <location filename="../../../designer/main_window.ui" line="252"/>
         <source>Open application settings dialog</source>
         <translation>打开程序设置</translation>
     </message>
@@ -446,12 +451,12 @@
         <translation>未找到 ProcessedDB 文件</translation>
     </message>
     <message>
-        <location filename="../../view/main_window.py" line="422"/>
+        <location filename="../../view/main_window.py" line="424"/>
         <source>Quit the app?</source>
         <translation>退出程序?</translation>
     </message>
     <message>
-        <location filename="../../view/main_window.py" line="613"/>
+        <location filename="../../view/main_window.py" line="615"/>
         <source>up time: {} days {:2} hours {:2} minutes {:2} seconds</source>
         <translation>运行时间: {}天{:2}小时{:2}分{:2}秒</translation>
     </message>

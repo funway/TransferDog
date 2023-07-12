@@ -37,6 +37,16 @@ class Ui_Dialog(object):
 
         self.formLayout.setWidget(0, QFormLayout.FieldRole, self.comb_language)
 
+        self.label_2 = QLabel(Dialog)
+        self.label_2.setObjectName(u"label_2")
+
+        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.label_2)
+
+        self.comb_theme = QComboBox(Dialog)
+        self.comb_theme.setObjectName(u"comb_theme")
+
+        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.comb_theme)
+
 
         self.verticalLayout.addLayout(self.formLayout)
 
@@ -49,5 +59,6 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Dialog", None))
         self.label.setText(QCoreApplication.translate("Dialog", u"Language", None))
+        self.label_2.setText(QCoreApplication.translate("Dialog", u"Theme", None))
     # retranslateUi
 

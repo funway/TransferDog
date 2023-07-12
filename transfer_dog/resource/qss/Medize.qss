@@ -260,7 +260,7 @@ QComboBox::drop-down
 
 QComboBox::down-arrow
 {
-	image: url("./ressources/down_arrow.png");
+	image: url('transfer_dog/resource/img/arrow-down.png');
 	width:8px;
 	height:8px;
 
@@ -308,7 +308,7 @@ QSpinBox::down-button:pressed
 
 QSpinBox::down-arrow
 {
-    image: url("./ressources/down_arrow.png");
+    image: url('transfer_dog/resource/img/arrow-down.png');
     width: 7px;
 
 }
@@ -316,7 +316,7 @@ QSpinBox::down-arrow
 
 QSpinBox::up-arrow
 {
-    image: url("./ressources/up_arrow.png");
+    image: url('transfer_dog/resource/img/arrow-up.png');
     width: 7px;
 
 }

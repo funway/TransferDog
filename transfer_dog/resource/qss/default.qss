@@ -43,7 +43,6 @@ qss 语法参考：
 
 */
 
-
 QToolBar {
 	/* set style for QToolBar */
 }
