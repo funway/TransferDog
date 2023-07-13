@@ -36,7 +36,7 @@ class DialogRegularExpress(QDialog, Ui_Dialog):
         ]
         self.text_input.setPlainText('\n'.join(default_inputs))
         self.le_regex.setText(regex)
-        self.setWindowTitle('RegularExpression Test')
+        self.setWindowTitle(self.tr('RegularExpression Test'))
 
         self.pushButton.clicked.connect(self._start_match)
 

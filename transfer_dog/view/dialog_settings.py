@@ -96,6 +96,12 @@ class DialogSettings(QDialog, Ui_Dialog):
         super().changeEvent(event)
         pass
 
+    def retranslateUi(self, Dialog):
+        super().retranslateUi(Dialog)
+        
+        self.setWindowTitle(self.tr('Settings'))
+        pass
+
 
 def test(arg=None):
     import sys

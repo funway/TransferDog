@@ -172,6 +172,22 @@
     </message>
 </context>
 <context>
+    <name>DialogRegularExpress</name>
+    <message>
+        <location filename="../../view/dialog_regular_express.py" line="39"/>
+        <source>RegularExpression Test</source>
+        <translation>正则表达式测试</translation>
+    </message>
+</context>
+<context>
+    <name>DialogSettings</name>
+    <message>
+        <location filename="../../view/dialog_settings.py" line="102"/>
+        <source>Settings</source>
+        <translation>设置</translation>
+    </message>
+</context>
+<context>
     <name>Form</name>
     <message>
         <location filename="../../../designer/server_widget.ui" line="14"/>
