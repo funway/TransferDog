@@ -142,7 +142,7 @@ QToolBar
 QToolButton
 {
 	background-color: #d6e1f0;
-	color: #ffffff;
+	color: #217346;
 	border-color: #000000;
 
 }
