@@ -1,239 +1,275 @@
-# TransferDog Manual
+# TransferDog Manual (English)
+
+English / [中文](README_zh.md)
 
 <aside>
-💡 **TransferDog** 是一个用 Python 语言编写的文件传输程序。它可以帮你定时地从源地址收集文件，并发送到目标地址。源与目标地址可以是本地目录，也可以是 FTP, FTPS, SFTP 服务器。
+💡 **TransferDog** is a file transfer program written in Python. It helps you collect files from a source address and send them to a destination address at regular intervals. The source and destination addresses can be local directories or FTP, FTPS, SFTP servers.
 
 </aside>
 
 # ⭐ ****Getting Started****
 
-## 运行程序
+## Running Program
 
-### 从源码运行
+### From source code
 
-如果你下载的 TransferDog 的源码，你可以使用命令行 `python main.py` 来运行本程序。
+If you downloaded the source code of TransferDog, you can use the command line `python main.py` to run the program.
 
-在运行程序之前，你需要确保：
+Before running the program, you need to make sure:
 
-1. Python 版本 ≥ 3.10
-2. 安装 requirements.txt 文件里要求的依赖库。可以使用命令 `pip install -r requirements.txt` 进行安装。
+1. Python version ≥ 3.10
+2. You have installed the required dependencies in the `requirements.txt` file. This can be done with the command `pip install -r requirements.txt`.
 
-### 从打包版本运行
+### From packaged version
 
-如果你下载的是 TransferDog 已经打包好的版本，我们已经将 Python 运行环境以及依赖库都打包进项目目录中了。
+If you have downloaded a packaged version of TransferDog, we've packaged the Python runtime environment and dependencies in the project directory.
 
-你可以直接双击目录下的 main 文件 (Windows 平台是 main.exe 文件) 运行 TransferDog 程序。
+You can run the TransferDog program by double-clicking on the main file (main.exe on Windows platforms) in the directory.
 
-## 程序界面
+## Program user interface
 
-### 主窗口
+### Main window
 
-![SCR-20230709-mjbl.png](manual/img/SCR-20230709-mjbl.png)
+![SCR-20230715-lqul.png](manual/img/SCR-20230715-lqul.png)
 
-主窗口包括：
+The main window includes：
 
-1. 菜单栏，显示菜单。包括 新建任务，编辑任务，复制任务，删除任务，启动任务，停止任务，打开源目录，打开目标目录，打开任务日志，打开任务处理记录，打开帮助文件。
-2. 任务列表，显示所有传输任务，可以通过任务列表顶部的搜索条来筛选任务。
-3. 处理记录，显示当前在任务列表中选中任务的处理记录。
-4. 状态栏，显示程序运行状态与错误信息。
+1. Tool Bar, which displays the menus. Includes New Task, Edit Task, Copy Task, Delete Task, Start Task, Stop Task, Open Source Directory, Open Destination Directory, Open Task Log, Open Task Processing Record, Setting, Open Help File.
+2. Task List, which displays all transfer tasks, and you can filter tasks by the search bar at the top of the task list.
+3. Processed Log, displays the processed records of the currently selected task in the task list.
+4. Status Bar, displays the running status or error message of the program.
 
-### 任务编辑窗口
+### Task Edit Dialog
 
 ![SCR-20230709-mmme.png](manual/img/SCR-20230709-mmme.png)
 
-当新建、编辑、复制任务时候，都会弹出任务编辑窗口。任务编辑窗口包括:
+The Task Edit Dialog pops up when you click the NewTask, EditTask, or CopyTask button in the Tool Bar, or when you double-click a task in the Task List.
 
-- General 组
+- General Group
     
-    设置任务名字，任务组，任务调度规则（使用 Crontab 表达式），任务超时时间，以及是否启用任务。
+    Set the task name, task group, task scheduling rules (using Crontab expressions), task timeout, and whether to enable the task.
     
-- Source 组
+- Source Group
     
-    设置任务的源地址。
+    Set the source address of the transfer.
     
-- Filter / Middleware 组
+- Filter / Middleware Group
     
-    设置任务的源文件名匹配规则，源文件有效时间，子目录递归，中间件，文件传输的临时后缀，处理记录的保留时长。
+    Set the task's source file name matching rules, source file expiration time, subdirectory recursion, middleware, temporary suffix for file transfer, and retention time for processed records.
     
-- Destination 组
+- Destination Group
     
-    设置任务的目标地址。
+    Set the destination address of the transfer.
     
 
-### 正则测试窗口
+### Regular Expression Testing Dialog
 
 ![SCR-20230709-mpsd.png](manual/img/SCR-20230709-mpsd.png)
 
-在任务编辑窗口的源文件名正则表达式后面， 有一个测试按钮，可以打开正则测试窗口。你可以使用该窗口进行正则表达式的测试。
+After the source filename regular expression in the Task Edit Dialog, there is a Test button that opens the Regular Expression Testing Dialog. You can use this dialog to test the regular expression.
 
-在 Input 栏输入待匹配的文件名，每行一个。在 RegEx 栏输入你的正则表达式。点击 start 按钮，即可在 Output 栏输出该正则表达式匹配到的文件名。
+In the Input field, enter the names of the files to be matched, one filename per line. Enter your regular expression in the RegEx field. Click the start button to output the file names matched by the regular expression in the Output field.
 
-## 任务调度
+### Settings Dialog
+
+![SCR-20230713-oszk.png](manual/img/SCR-20230713-oszk.png)
+
+In the Settings Dialog, you could choose the language and theme for the program.
+
+## Task Scheduling
 
 <aside>
-💡 TransferDog 主程序会一直轮询任务列表，并根据每个任务自身配置的任务计划与超时时间来启动、中止任务。TransferDog 采用子进程的方式来运行任务，而不是线程方式。
+💡 The TransferDog’s main process polls the list of tasks all the time and starts or stops them according to each task's own configured task schedule and timeout. TransferDog runs tasks as subprocesses, not as threads.
 
 </aside>
 
-### 主程序的调度逻辑
+### Scheduling Logic in Main Process
 
-1. 轮询任务列表。
-2. 如果一个任务到了执行时间点，则启动任务**子进程**(即 worker 进程)。
-3. 如果检测到任务超时，则主动 kill 任务子进程。
-4. 如果主程序退出，任务子进程会自动检测到父进程已死并中止自身运行。
+1. Poll the list of tasks.
+2. If a task reaches its execution time, start the task **subprocess** (the worker process).
+3. if a task timeout is detected, kill the subprocess of this task.
+4. If the main process exits, the subprocess automatically detects that the parent process is dead and aborts itself.
 
-### 任务计划
+### Task Scheduling
 
-1. TransferDog 对于每个任务的运行计划，采用的是 Linux 平台通用的 crontab 表达式。即用 `* * * * *` 表达 `分 时 日 月 周几`。
-2. crontab 示例：
-    1. `*/5 * * * *` 表示每5分钟运行
-    2. `2 4 * * mon,fri` 表示每周一、周五的04:02运行
-3. 由于采用了 [croniter](https://github.com/kiorky/croniter) 库，TransferDog 的 crontab 表达式也支持在第六位设置秒。比如 `* * * * * */5` 表示每5秒钟运行一次。
-4. 推荐一个在线测试 crontab 表达式的网站：[https://crontab.guru/](https://crontab.guru/)
+1. TransferDog uses the crontab expression common to the Linux platform to schedule each task. That is, `* * * * *` for `minutes, hours, days, months, and days of the week`.
+2. crontab example：
+    1. `*/5 * * * *` means run every 5 minutes.
+    2. `2 4 * * mon,fri` means it runs every Monday and Friday at 04:02.
+3. Thanks to the [croniter](https://github.com/kiorky/croniter) library, TransferDog's crontab expression also supports setting seconds in the sixth position. For example, `* * * * * */5` means run every 5 seconds.
+4. We recommend a website to test your crontab expressions online：[https://crontab.guru/](https://crontab.guru/)
 
-## 过滤与中间件
+## Filter and Middleware
 
-### 正则匹配
+### Regular Expression
 
 <aside>
-💡 对源文件的正则匹配，默认是匹配源文件全路径名的。即 `/path_to_file/filename.txt` 这一整个路径。所以建议使用 `$` 号来匹配结尾。
+💡 Regular Expression matches a source file, which by default matches the full pathname of the source file. That is, `/path_to_file/filename.txt` is the whole path. So it is recommended to use the `$` sign to match the end.
 
 </aside>
 
-### 中间件
+### Middleware
 
 <aside>
-💡 TransferDog 引入了中间件的概念，用来修改文件的收集（下载）与发送（上传）逻辑。
+💡 TransferDog introduces the concept of middleware to modify the logic of collecting (downloading) and sending (uploading) files.
 
 </aside>
 
-1. 程序默认只提供了 example.py 与 init_processed.py 两个中间件模块。
-2. 你可以在项目的 `plugin/middleware/` 目录下找到这两个模块文件。
-3. example.py 中间件什么都不做，就是给你看源码用的。
-4. init_processed.py 中间件在源文件被过滤之后、下载之前接管执行逻辑。放弃下载与上传文件，但将该文件写入处理记录。你可以用它来初始化一个任务，如果它的源目录下有太多文件，而你又不想下载这些过期文件。
-5. 你可以编写自己的中间件模块，放在 `plugin/middleware/` 目录下。只要它符合我们对中间件的格式要求（请参考 example.py 中间件）。
+1. By default, the program only provides two middleware modules, `example.py` and `init_processed.py`.
+2. You can find the middleware module files in the `plugin/middleware/` directory.
+3. `example.py` does nothing but show you the structure of a middleware module.
+4. `init_processed.py` middleware takes over the execution logic after the source files have been filtered and before they are downloaded. It gives up on downloading and uploading the file but writes the file to the processed log. You can use it to initialize a task if it has too many files in the source directory and you don't want to download those outdated files.
+5. you can write your own middleware module and put it in the `plugin/middleware/` directory. As long as it meets our coding requirements for middleware (see example.py middleware).
 
-# 💻 代码框架
+# 💻 Code Structure
 
 <aside>
-💡 TransferDog 代码主要由两个模块组成: transfer_dog 与 transfer_worker。
+💡 The TransferDog code consists of two main packages: **transfer_dog** and **transfer_worker**.
 
 </aside>
 
-## 概述
+## Overview
 
-![项目目录结构](manual/img/SCR-20230709-odoz.png)
+![Project Structure](manual/img/SCR-20230709-odoz.png)
 
-项目目录结构
+Project Structure
 
 - main.py
     
-    程序 GUI 的入口文件，调用 transfer_dog 模块。
+    Entry file for the program GUI, calling the transfer_dog package.
     
 - worker.py
     
-    传输程序（任务子进程）的入口文件，调用 transfer_worker 模块。
+    Entry file for the worker process (task subprocess), calling the transfer_worker package.
     
-    worker 可以独立于 GUI 运行。你可以执行 `python worker.py -h` 查看它的命令行参数。
+    The worker process can run independently of the GUI. You can run `python worker.py -h` to see its command line arguments. 
     
 - transfer_dog/
     
-    该模块负责应用程序的 GUI，以及任务调度。
+    This package is responsible for the application's GUI and for scheduling tasks.
     
 - transfer_worker/
     
-    该模块负责实际执行传输任务。
+    This package is responsible for the actual execution of transfer tasks.
     
 - conf/
     
-    配置文件所在的目录。包括日志配置与任务配置。
+    The directory where the configuration files are located. Includes log configuration and task configuration.
     
-    配置文件均采用 UTF8 编码，在 Windows 环境下编辑修改配置文件时需要留意这点。
+    Configuration files are UTF8 encoded, so be aware of this when editing or modifying configuration files in Windows platform.
     
 - designer/
     
-    保存 Qt Designer 生成的 UI 设计文件。
+    Holds the UI design files generated by Qt Designer.
     
 - log/
     
-    日志目录。
+    Logs directory.
     
 - plugin/
     
-    插件目录。用来扩展传输程序的中间件模块。
+    Plugins directory. Include the middleware modules.
     
 - processed/
     
-    保存任务处理记录的目录。每个任务处理记录文件(我们叫它 processed_db)，都对应着一个传输任务，并以相应任务的 uuid 命名。
+    The directory holds the tasks’ processed records. Each task processed record file (we call it processed_db) corresponds to a transfer task and is named after the uuid of the corresponding task.
     
-    每个 processed_db 文件都是一个 SQLite 数据库，保存着对应传输任务已经处理过的源文件信息。
+    Each processed_db file is an SQLite database that holds information about the source files that have been processed.
     
 - test.py, pytest.ini, pytests/
     
-    单元测试文件。
+    Directory and files for unit test.
     
 - requirements.txt
     
-    依赖库要求。
+    Dependency libraries.
     
 - linux.spec, macOS.spec, win64.spec
     
-    不同操作系统的 pyinstaller 打包配置文件。
+    Pyinstaller’s specification files for packaging the program in different operating systems.
     
 
-## transfer_dog 模块
+## transfer_dog Package
 
-transfer_dog 模块是程序的 GUI 框架，主要负责：
+transfer_dog is the GUI framework of the program, mainly responsible for:
 
-1. 增删查改传输任务。
-2. 启动、停止任务。
-3. 显示任务运行状态，处理记录。
-4. 根据任务的 schedule 定时调度任务，启动任务子进程。
+1. adding, deleting, checking, and changing transfer tasks. 
+2. start and stop task subprocess manually.
+3. displaying the running status of the task and processed records.
+4. scheduling the tasks according to their schedules and starting worker subprocesses.
 
-## transfer_worker 模块
+### Multi-Language
 
-transfer_worker 模块负责传输任务的实际执行，它可以独立于 transfer_dog 模块单独运行。
+The source file .ts and the binary file .qm for multilingual translation are placed in the `transfer_dog/resource/i18n/` directory. the TransferDog program will automatically scan the .qm files in this directory and then you can choose which language you want to use in the settings dialog.
 
-### 执行逻辑
+If you want to add your own language file, you can follow the steps below:
 
-- Getter 对象负责过滤与下载源文件，生成 MiddleFile 对象。
-- MiddleFile 对象负责保存临时文件的状态。包括临时文件本身，以及对应的源文件路径、目标文件路径。
-- Putter 对象负责上传 MiddleFile 临时文件，生成目标文件。
-- middleware 中间件负责对 MiddleFile 进行中间过程的处理。可以通过 middleware 改变文件下载/上传的逻辑。
+1. Use the `pyside6-lupdate` command to generate the .ts file.
+    
+    `pyside6-lupdate -no-obsolete designer/* transfer_dog/view/* -ts transfer_dog/resource/i18n/lang.ts`
+    
+2. Use the Qt Linguist tool to edit the strings to be translated in the .ts file.
+    
+    (Of course, you can also use any text editor tool to edit it directly, since a .ts file is essentially an XML file.)
+    
+3. Use the `pyside6-lrelease` command to compile the .ts file into the binary file .qm.
+    
+    `pyside6-lrelease transfer_dog/resource/i18n/lang.ts -qm transfer_dog/resource/i18n/lang.qm`
+    
+    (You can also compile the .ts file into a .qm file directly using the “File - Release” menu of the Qt Linguist tool.)
+    
+4. Make sure that the generated .qm file is saved in the `transfer_dog/resource/i18n/` directory.
 
-worker 的整个执行过程可以简化为：
+### Themes
+
+We save the program's theme file in the `transfer_dog/resource/qss/` directory. transferDog automatically scans this directory for .qss files, and then you can select the theme you want to use in the settings dialog. You can also write your own theme file and save it in this directory.
+
+For more information about writing a QSS file, please refer to [https://doc.qt.io/qt-6/stylesheet.html](https://doc.qt.io/qt-6/stylesheet.html).
+
+## transfer_worker Pacakge
+
+transfer_worker package is responsible for the actual execution of the transfer task. It can run independently of the transfer_dog package (GUI), just run in the command line.
+
+### Execution Logic
+
+- The **Getter** object is responsible for filtering and downloading the source file and generating the MiddleFile object.
+- The **MiddleFile** object is responsible for saving the state of the temporary file. It includes the temporary file itself, and the corresponding paths of source file and destination file.
+- The **Putter** object is responsible for uploading the temporary file in the MiddleFile object and generating the target file in the destination address.
+- The **middleware** is responsible for the middle process of MiddleFile. The logic of file download/upload can be changed by middleware.
+
+The whole execution process of a transfer worker can be simplified as follows:
 
 <aside>
-💡 Getter 过滤 > middleware.pre_process 预处理 > Getter 下载 > middleware.process 后处理 > Putter 上传
+💡 Getter filtering > middleware.pre_process for pre-processing > Getter downloading > middleware.process for post-processing > Putter uploading
 
 </aside>
 
-详细过程：
+Details：
 
-1. 任务启动时，先根据源与目标创建对应的 getter 与 putter。并进行有效性检查，异常的直接报错退出。
-2. getter.next() 获取下一个待传输文件：
-    1. 遍历源目录。
-    2. 判断文件更新时间是否小于 interval (constants.IGNORE_MTIME_IN_SECONDS)。
-    3. 判断文件名是否匹配正则表达式。
-    4. 判断 (源文件, mtime) 是否已存在于 processed_db 数据库中。
-    5. 返回一个 mid_file = MiddleFile(源文件路径, 源文件修改时间)，其中源文件路径是相对于任务配置中源地址(task.source.path)的相对路径。
-3. middleware.pre_process() 进行预处理。
+1. When the task starts, TransferDog creates the corresponding getter and putter objects according to the source and target, and check the validity.
+2. getter.next() gets the next file that need to be transferred:
+    1. Traverse the source directory.
+    2. Check the source file’s update time is not in the interval (constants.IGNORE_MTIME_IN_SECONDS).
+    3. Check the source file name matches the regular expression.
+    4. Check the (source_file, mtime) already exists in the processed_db file.
+    5. return a mid_file = MiddleFile(source_file path, source_file_modification_time), where the source_file path is a relative path to the source address (task.source.path) in the task configuration.
+3. middleware.pre_process() performs pre-processing.
     
-    可以添加无法只使用正则匹配实现的过滤规则，可以用来修改目标文件路径，可以修改 mid_file.abort 属性来指定对源文件是否执行后续处理。
+    You can add filtering rules that can't be implemented using only regular matching, you can use it to modify the target file path, and you can modify the mid_file.abort property to specify whether to perform subsequent processing or not on the source file.
     
-4. getter.get() 下载该文件，生成 mid_file.middle 中间临时文件。
+4. getter.get() downloads the file and generates the mid_file.middle temporary file.
     
-    如果源文件 size 很小，并不落地生成中间文件，mid_file.middle 指向一个 BytesIO 对象。
+    If the source file size is very small, it will not generate a middle file, mid_file.middle refers to a BytesIO object in memory.
     
-    如果源文件 size 较大，才落地生成中间文件，mid_file.middle 指向该中间文件的全路径（Path 对象）。
+    If the source file size is large, the intermediate file is generated, and mid_file.middle points to the full path (a pathlib.Path object) of the intermediate file.
     
-    这个标准 size 的值由 constants.MIDDLE_FILE_THRESHOLD 指定。
+    The value of this standard size is specified by constants.MIDDLE_FILE_THRESHOLD.
     
-5. middleware.process() 进行后处理。
-6. putter.put(mid_file) 将临时文件上传到目标路径。
-7. 删除源文件以及清理临时文件。
+5. middleware.process() performs post-processing.
+6. putter.put(mid_file) uploads the temporary file to the destination path.
+7. Delete the source file and clean up the temporary files.
 
-## middleware 开发
+## Middleware Developing
 
 ```python
 import logging
@@ -295,7 +331,7 @@ def process(mid_file: MiddleFile, arg: str) -> None:
 
 # 🎁 Thanks to
 
-## Python 第三方库
+## Third-party Libraries
 
 - [PySide6](https://pypi.org/project/PySide6/) for GUI
 - [SQLite](https://www.sqlite.org/index.html) for Database
@@ -303,7 +339,7 @@ def process(mid_file: MiddleFile, arg: str) -> None:
 - [Paramiko](https://github.com/paramiko/paramiko) for SFTP
 - [croniter](https://github.com/kiorky/croniter) for scheduling task
 
-## 资源文件
+## Resource files
 
 - [remixicon](https://remixicon.com/) for Icon
 - [flaticon](https://www.flaticon.com/icon-fonts-most-downloaded/2?weight=bold&corner=rounded&type=uicon) for Icon
@@ -311,7 +347,6 @@ def process(mid_file: MiddleFile, arg: str) -> None:
 
 # 📝 Todo list
 
-- [ ]  SFTP 使用的是 Paramiko 库，但是该库目前不支持非 UTF8 编码的服务器
-- [ ]  HTTP 下载(上传就不做了，因为 HTTP 上传跟服务器太相关了)
-- [ ]  源文件正则匹配，可选匹配全路径还是单单匹配文件名。（现在默认是匹配全路径的）
-- [ ]  可选主题
+- [ ]  We use the Paramiko library for SFTP, but it does not currently support non-UTF8 encoded servers.
+- [ ]  HTTP downloading (uploading is not in the plan, because HTTP uploads are too server related)
+- [ ]  Can choose to match the full path or just the file name when filtering the source file. (Now the default is to match the full path)

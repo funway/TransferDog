@@ -41,6 +41,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../../../designer/dialog_settings.ui" line="32"/>
+        <source>Theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../../designer/dialog_task_edit.ui" line="75"/>
         <source>General</source>
         <translation type="unfinished"></translation>
@@ -167,6 +172,22 @@
     </message>
 </context>
 <context>
+    <name>DialogRegularExpress</name>
+    <message>
+        <location filename="../../view/dialog_regular_express.py" line="39"/>
+        <source>RegularExpression Test</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DialogSettings</name>
+    <message>
+        <location filename="../../view/dialog_settings.py" line="102"/>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Form</name>
     <message>
         <location filename="../../../designer/server_widget.ui" line="14"/>
@@ -263,144 +284,146 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../../../designer/main_window.ui" line="14"/>
+        <location filename="../../../designer/main_window.ui" line="17"/>
         <source>MainWindow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="31"/>
+        <location filename="../../../designer/main_window.ui" line="34"/>
         <source>Search Task</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="78"/>
+        <location filename="../../../designer/main_window.ui" line="81"/>
         <source>toolBar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="114"/>
+        <location filename="../../../designer/main_window.ui" line="117"/>
         <source>NewTask</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="117"/>
+        <location filename="../../../designer/main_window.ui" line="120"/>
         <source>Add new transfer task</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="126"/>
+        <location filename="../../../designer/main_window.ui" line="129"/>
         <source>EditTask</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="129"/>
+        <location filename="../../../designer/main_window.ui" line="132"/>
         <source>Edit the selected task&apos;s property</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="138"/>
         <location filename="../../../designer/main_window.ui" line="141"/>
+        <location filename="../../../designer/main_window.ui" line="144"/>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="150"/>
+        <location filename="../../../designer/main_window.ui" line="153"/>
         <source>DeleteTask</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="153"/>
+        <location filename="../../../designer/main_window.ui" line="156"/>
         <source>Delete the selected task</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="162"/>
+        <location filename="../../../designer/main_window.ui" line="165"/>
         <source>OpenSource</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="165"/>
+        <location filename="../../../designer/main_window.ui" line="168"/>
         <source>Open source path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="174"/>
+        <location filename="../../../designer/main_window.ui" line="177"/>
         <source>OpenDest</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="177"/>
+        <location filename="../../../designer/main_window.ui" line="180"/>
         <source>Open destination path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="186"/>
+        <location filename="../../../designer/main_window.ui" line="189"/>
         <source>CopyTask</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="189"/>
+        <location filename="../../../designer/main_window.ui" line="192"/>
         <source>Copy selected task</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="198"/>
+        <location filename="../../../designer/main_window.ui" line="201"/>
         <source>StopTask</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="201"/>
+        <location filename="../../../designer/main_window.ui" line="204"/>
         <source>Stop the selected task</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="210"/>
+        <location filename="../../../designer/main_window.ui" line="213"/>
         <source>StartTask</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="213"/>
+        <location filename="../../../designer/main_window.ui" line="216"/>
         <source>Start the selected task</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="222"/>
+        <location filename="../../../designer/main_window.ui" line="225"/>
         <source>LogFile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="225"/>
+        <location filename="../../../designer/main_window.ui" line="228"/>
         <source>Open task&apos;s log file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="234"/>
+        <location filename="../../../designer/main_window.ui" line="237"/>
         <source>ProcessedDB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="237"/>
+        <location filename="../../../designer/main_window.ui" line="240"/>
         <source>Open task&apos;s processed db</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="246"/>
+        <location filename="../../../designer/main_window.ui" line="249"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../designer/main_window.ui" line="249"/>
+        <location filename="../../../designer/main_window.ui" line="252"/>
         <source>Open application settings dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../view/main_window.py" line="120"/>
+        <location filename="../../view/main_window.py" line="175"/>
         <source>file</source>
         <comment>tb_processed</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../view/main_window.py" line="120"/>
+        <location filename="../../view/main_window.py" line="175"/>
         <source>processed_at</source>
         <comment>tb_processed</comment>
         <translation type="unfinished"></translation>
@@ -418,23 +441,38 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/main_window.py" line="274"/>
-        <location filename="../../view/main_window.py" line="284"/>
+        <location filename="../../view/main_window.py" line="275"/>
+        <location filename="../../view/main_window.py" line="285"/>
         <source>No task selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/main_window.py" line="382"/>
+        <location filename="../../view/main_window.py" line="292"/>
+        <source>Delete Task</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../view/main_window.py" line="292"/>
+        <source>You sure to delete task [{}]?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../view/main_window.py" line="383"/>
         <source>Log file not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/main_window.py" line="402"/>
+        <location filename="../../view/main_window.py" line="403"/>
         <source>ProcessedDB file not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../view/main_window.py" line="612"/>
+        <location filename="../../view/main_window.py" line="424"/>
+        <source>Quit the app?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../view/main_window.py" line="615"/>
         <source>up time: {} days {:2} hours {:2} minutes {:2} seconds</source>
         <translation type="unfinished"></translation>
     </message>
